@@ -1,0 +1,713 @@
+/* Register.css - Para o componente Register.jsx */
+/* Estilo alinhado com Home.css, Intro.css e Login.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --primary: #13ec80;
+  --primary-dark: #0fb86b;
+  --primary-glow: rgba(19, 236, 128, 0.3);
+  --background-dark: #0a0f0d;
+  --background-light: #13291e;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-bg: rgba(255, 255, 255, 0.03);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  color: var(--text-primary);
+  background: var(--background-light);
+  overflow-x: hidden;
+}
+
+/* Glass Effect - igual da Home */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+}
+
+/* CONTAINER PRINCIPAL */
+.register-container {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  background: #13291e;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 16px 16px 40px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* BACKGROUND LAYERS (mesmo padrão da Intro/Login) */
+.register-background-layer {
+  position: fixed;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.register-background-layer-1 {
+  background-image: url("/public/assets/image/Fundo_intro.png");
+  opacity: 0.25;
+  transform: scale(1.1);
+}
+
+.register-background-layer-2 {
+  background: linear-gradient(0deg, var(--background-light) 0%, transparent 100%);
+  opacity: 0.8;
+}
+
+.register-background-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 30% 50%, rgba(19, 236, 128, 0.1) 0%, var(--background-light) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* GRADIENT SPHERES */
+.register-gradient-sphere {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(100px);
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.4;
+  animation: floatSphere 20s infinite alternate ease-in-out;
+}
+
+.register-gradient-sphere-1 {
+  width: 500px;
+  height: 500px;
+  top: -200px;
+  right: -200px;
+  background: radial-gradient(circle, rgba(19, 236, 128, 0.2) 0%, transparent 70%);
+}
+
+.register-gradient-sphere-2 {
+  width: 400px;
+  height: 400px;
+  bottom: -150px;
+  left: -150px;
+  background: radial-gradient(circle, rgba(19, 236, 128, 0.15) 0%, transparent 70%);
+  animation: floatSphere 18s infinite alternate-reverse ease-in-out;
+}
+
+/* GRID PATTERN */
+.register-grid-pattern {
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(19, 236, 128, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(19, 236, 128, 0.02) 1px, transparent 1px);
+  background-size: 50px 50px;
+  z-index: 2;
+  pointer-events: none;
+  animation: gridMove 30s linear infinite;
+}
+
+/* CARD PRINCIPAL */
+.register-card {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 500px;
+   background: rgba(10, 20, 10, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 40px;
+  padding: 32px 24px;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+  animation: cardAppear 0.8s ease-out;
+  margin: 20px auto;
+}
+
+.register-card-glow {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(19, 236, 128, 0.1), transparent);
+  animation: cardShine 8s infinite;
+  pointer-events: none;
+  border-radius: 40px;
+}
+
+.register-card-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 30% 50%, rgba(19, 236, 128, 0.05) 1px, transparent 1px);
+  background-size: 30px 30px;
+  pointer-events: none;
+  border-radius: 40px;
+}
+
+/* HEADER */
+.register-header {
+  text-align: center;
+  margin-bottom: 28px;
+  position: relative;
+}
+
+.register-header h2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.register-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.register-subtitle span {
+  animation: float 3s ease-in-out infinite;
+  display: inline-block;
+}
+
+/* FORMULÁRIO */
+.register-form {
+  margin-bottom: 16px;
+}
+
+.input-group-register {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.input-group-register label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-size: 0.85rem;
+  letter-spacing: 0.3px;
+  padding-left: 5px;
+  transition: color 0.2s ease;
+}
+
+.input-group-register:focus-within label {
+  color: var(--primary);
+}
+
+.input-group-register input,
+.input-group-register select {
+  width: 100%;
+  padding: 14px 20px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 30px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  color: var(--text-primary);
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.input-group-register input:focus,
+.input-group-register select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.input-group-register input::placeholder,
+.input-group-register select::placeholder {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.input-group-register input:hover,
+.input-group-register select:hover {
+  border-color: rgba(19, 236, 128, 0.3);
+}
+
+.input-group-register select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 20px center;
+  background-size: 1.2em;
+  cursor: pointer;
+}
+
+.input-group-register select option {
+  background: var(--background-dark);
+  color: var(--text-primary);
+}
+
+/* TOOLTIP/ÍCONE DE AJUDA */
+.tooltip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+  font-size: 0.7rem;
+  cursor: help;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+}
+
+.tooltip-icon:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.tooltip-icon:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--background-dark);
+  color: var(--text-primary);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  z-index: 30;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+/* CAMPO VÁLIDO (opcional) */
+.input-group-register.valid input {
+  border-color: var(--primary);
+  padding-right: 45px;
+}
+
+.input-group-register.valid::after {
+  content: '✓';
+  position: absolute;
+  right: 20px;
+  bottom: 14px;
+  color: var(--primary);
+  font-size: 1.2rem;
+  font-weight: bold;
+  animation: popIn 0.3s ease-out;
+}
+
+/* FORÇA DA SENHA (opcional) */
+.password-strength {
+  margin-top: 8px;
+  height: 4px;
+  background: var(--glass-border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.strength-bar {
+  height: 100%;
+  width: 0;
+  transition: width 0.3s, background-color 0.3s;
+}
+
+.strength-bar.weak {
+  background: #ff5757;
+  width: 33.33%;
+}
+
+.strength-bar.medium {
+  background: var(--primary);
+  width: 66.66%;
+}
+
+.strength-bar.strong {
+  background: var(--primary);
+  width: 100%;
+}
+
+.password-hint {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* BOTÃO PRINCIPAL */
+.register-button {
+  width: 100%;
+  padding: 16px 24px;
+  background: var(--primary);
+  color: var(--background-dark);
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Space Grotesk', sans-serif;
+  box-shadow: 0 4px 15px var(--primary-glow);
+  margin-top: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.register-button:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px var(--primary-glow);
+}
+
+.register-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.register-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ALERTAS */
+.alert-message-register {
+  padding: 14px 20px;
+  border-radius: 30px;
+  margin: 20px 0 10px;
+  font-weight: 500;
+  text-align: center;
+  animation: shake 0.3s ease-out;
+  background: var(--glass-bg);
+  border: 1px solid;
+  font-size: 0.9rem;
+  backdrop-filter: blur(10px);
+}
+
+.alert-message-register.success {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.alert-message-register.error {
+  border-color: #ff5757;
+  color: #ff5757;
+}
+
+/* LOADING SPINNER */
+.loading-spinner-register {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--background-dark);
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 0.8s linear infinite;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* LINK PARA LOGIN */
+.login-link {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--glass-border);
+}
+
+.login-link span {
+  display: inline-block;
+  margin-right: 5px;
+}
+
+.login-link a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border-bottom: 1px dashed var(--primary);
+  padding-bottom: 2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.login-link a:hover {
+  color: var(--primary-dark);
+  gap: 8px;
+}
+
+/* DECORAÇÕES (opcionais) */
+.register-decoration {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 24px;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  opacity: 0.3;
+}
+
+.register-decoration span {
+  animation: float 3s ease-in-out infinite;
+  display: inline-block;
+  cursor: default;
+}
+
+.register-decoration span:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.register-decoration span:nth-child(3) {
+  animation-delay: 1s;
+}
+
+/* PROPERTY PREVIEW (opcional) */
+.property-preview {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 16px;
+  margin: 20px 0;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.property-preview p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.property-preview span {
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+/* ANIMAÇÕES */
+@keyframes floatSphere {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    transform: translate(30px, 20px) scale(1.1);
+  }
+}
+
+@keyframes gridMove {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  100% {
+    transform: translateY(30px) translateX(30px);
+  }
+}
+
+@keyframes cardAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes cardShine {
+  0% {
+    left: -100%;
+  }
+  20%, 100% {
+    left: 100%;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(5px);
+  }
+  75% {
+    transform: translateX(-5px);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* RESPONSIVIDADE - MOBILE FIRST */
+
+/* Tablets (768px+) */
+@media (min-width: 768px) {
+  .register-card {
+    max-width: 550px;
+    padding: 40px 32px;
+  }
+  
+  .register-header h2 {
+    font-size: 2.5rem;
+  }
+  
+  .register-subtitle {
+    font-size: 1rem;
+  }
+  
+  .input-group-register input,
+  .input-group-register select {
+    padding: 16px 24px;
+    font-size: 1rem;
+  }
+  
+  .register-button {
+    padding: 16px 28px;
+    font-size: 1.1rem;
+  }
+  
+  .tooltip-icon:hover::after {
+    font-size: 0.8rem;
+  }
+}
+
+/* Telas muito pequenas (até 360px) */
+@media (max-width: 360px) {
+  .register-card {
+    padding: 24px 16px;
+  }
+  
+  .register-header h2 {
+    font-size: 1.8rem;
+  }
+  
+  .register-subtitle {
+    font-size: 0.8rem;
+  }
+  
+  .input-group-register input,
+  .input-group-register select {
+    padding: 12px 16px;
+    font-size: 0.85rem;
+  }
+  
+  .input-group-register label {
+    font-size: 0.75rem;
+  }
+  
+  .tooltip-icon:hover::after {
+    white-space: normal;
+    width: 150px;
+    text-align: center;
+  }
+  
+  .register-decoration {
+    font-size: 1.2rem;
+    gap: 12px;
+  }
+}
+
+/* Telas muito altas (altura < 700px) */
+@media (max-height: 700px) {
+  .register-container {
+    align-items: flex-start;
+    padding: 20px 16px;
+  }
+  
+  .register-card {
+    margin: 10px auto;
+  }
+  
+  .input-group-register {
+    margin-bottom: 12px;
+  }
+  
+  .register-header {
+    margin-bottom: 16px;
+  }
+}
+
+/* Preferência por redução de movimento */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .register-gradient-sphere,
+  .register-grid-pattern,
+  .register-card-glow,
+  .register-decoration span,
+  .tooltip-icon:hover::after {
+    animation: none !important;
+  }
+  
+  .input-group-register.valid::after {
+    animation: none;
+  }
+}

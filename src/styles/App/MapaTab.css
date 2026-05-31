@@ -1,0 +1,668 @@
+.farm-map-shell {
+  width: min(1320px, calc(100vw - 80px));
+  margin: 0 auto;
+  color: #f8fafc;
+  cursor: default;
+  user-select: none;
+}
+
+.farm-map-shell input {
+  cursor: text;
+  user-select: text;
+}
+
+.farm-map-shell button {
+  user-select: none;
+}
+
+.farm-map-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 560px;
+  gap: 28px;
+  align-items: end;
+  margin-bottom: 24px;
+}
+
+.farm-map-kicker {
+  display: inline-flex;
+  width: fit-content;
+  margin-bottom: 12px;
+  padding: 7px 10px;
+  border: 1px solid rgba(34, 197, 94, 0.28);
+  border-radius: 8px;
+  background: rgba(34, 197, 94, 0.08);
+  color: #86efac;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.farm-map-header h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.farm-map-header p {
+  max-width: 720px;
+  margin: 10px 0 0;
+  color: #a7b4c0;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.farm-map-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.farm-map-summary-item {
+  min-height: 112px;
+  padding: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.88), rgba(8, 13, 22, 0.86));
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.28);
+}
+
+.farm-map-summary-item span {
+  color: #22c55e;
+  font-size: 24px;
+}
+
+.farm-map-summary-item strong {
+  display: block;
+  margin-top: 14px;
+  color: #ffffff;
+  font-size: 1.28rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.farm-map-summary-item small {
+  display: block;
+  margin-top: 5px;
+  color: #8ea0af;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.farm-map-workspace {
+  display: grid;
+  grid-template-columns: 368px minmax(0, 1fr);
+  gap: 18px;
+  align-items: stretch;
+}
+
+.farm-map-panel,
+.farm-map-canvas-card {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 8px;
+  background: rgba(9, 14, 23, 0.84);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+}
+
+.farm-map-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px;
+}
+
+.farm-map-search label,
+.farm-map-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.farm-map-section-title .material-symbols-outlined {
+  color: #22c55e;
+  font-size: 20px;
+}
+
+.farm-map-search > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 112px;
+  gap: 8px;
+}
+
+.farm-map-search input {
+  min-width: 0;
+  height: 46px;
+  padding: 0 13px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 8px;
+  outline: none;
+  background: rgba(2, 6, 12, 0.72);
+  color: #ffffff;
+  font-size: 0.9rem;
+}
+
+.farm-map-search input:focus {
+  border-color: rgba(34, 197, 94, 0.78);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.14);
+}
+
+.farm-map-search input::placeholder {
+  color: #64748b;
+}
+
+.farm-map-search button,
+.farm-map-button,
+.farm-map-clear,
+.farm-map-selected-card button {
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.farm-map-search button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 46px;
+  background: #22c55e;
+  color: #052e16;
+}
+
+.farm-map-search button .material-symbols-outlined {
+  font-size: 19px;
+}
+
+.farm-map-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.farm-map-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  color: #ffffff;
+  font-size: 0.88rem;
+}
+
+.farm-map-button .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.farm-map-button.primary {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #032b13;
+}
+
+.farm-map-button.secondary {
+  border-color: rgba(56, 189, 248, 0.34);
+  background: rgba(14, 165, 233, 0.14);
+  color: #bae6fd;
+}
+
+.farm-map-button.muted {
+  border-color: rgba(148, 163, 184, 0.18);
+  background: rgba(15, 23, 42, 0.78);
+  color: #cbd5e1;
+}
+
+.farm-map-button:hover,
+.farm-map-search button:hover,
+.farm-map-clear:hover,
+.farm-map-selected-card button:hover {
+  transform: translateY(-1px);
+}
+
+.farm-map-button:disabled,
+.farm-map-search button:disabled,
+.farm-map-clear:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+  transform: none;
+}
+
+.farm-map-selected,
+.farm-map-area-list {
+  padding-top: 2px;
+}
+
+.farm-map-empty {
+  margin: 0;
+  padding: 14px;
+  border: 1px dashed rgba(148, 163, 184, 0.22);
+  border-radius: 8px;
+  color: #94a3b8;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  cursor: default;
+  pointer-events: none;
+  user-select: none;
+}
+
+.farm-map-selected-card {
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr) 42px;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid rgba(250, 204, 21, 0.34);
+  border-radius: 8px;
+  background: rgba(250, 204, 21, 0.08);
+  cursor: default;
+}
+
+.farm-map-selected-card > span {
+  width: 12px;
+  height: 44px;
+  border-radius: 6px;
+  cursor: default;
+}
+
+.farm-map-selected-card strong,
+.farm-map-area-item strong {
+  display: block;
+  overflow: hidden;
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.farm-map-name-input {
+  width: 100%;
+  height: 42px;
+  padding: 0 9px;
+  border: 1px solid rgba(250, 204, 21, 0.28);
+  border-radius: 8px;
+  outline: none;
+  background: rgba(2, 6, 12, 0.42);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 42px;
+  cursor: text;
+}
+
+.farm-map-name-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px;
+  gap: 7px;
+  align-items: center;
+}
+
+.farm-map-name-input:focus {
+  border-color: rgba(250, 204, 21, 0.82);
+  box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.13);
+}
+
+.farm-map-name-view {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px;
+  gap: 7px;
+  align-items: center;
+  cursor: default;
+  user-select: none;
+}
+
+.farm-map-name-view strong,
+.farm-map-name-view small {
+  cursor: default;
+  user-select: none;
+}
+
+.farm-map-name-edit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(250, 204, 21, 0.3);
+  border-radius: 8px;
+  background: rgba(250, 204, 21, 0.12);
+  color: #fde68a;
+  cursor: pointer;
+}
+
+.farm-map-name-edit:hover {
+  transform: translateY(-1px);
+  background: rgba(250, 204, 21, 0.18);
+}
+
+.farm-map-name-edit .material-symbols-outlined {
+  display: block;
+  font-size: 19px;
+  line-height: 1;
+}
+
+.farm-map-name-save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid rgba(0, 255, 136, 0.62);
+  border-radius: 8px;
+  background: #00ff88;
+  color: #052e16;
+  cursor: pointer;
+}
+
+.farm-map-name-save:hover {
+  transform: translateY(-1px);
+  background: #20ff98;
+  box-shadow: 0 8px 18px rgba(0, 255, 136, 0.28);
+}
+
+.farm-map-name-save .material-symbols-outlined {
+  display: block;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.farm-map-selected-card small,
+.farm-map-area-item small {
+  display: block;
+  margin-top: 3px;
+  color: #a7b4c0;
+  font-size: 0.8rem;
+}
+
+.farm-map-delete-selected {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  align-self: center;
+  border: 1px solid rgba(248, 113, 113, 0.25);
+  background: rgba(127, 29, 29, 0.26);
+  color: #fca5a5;
+  cursor: pointer;
+}
+
+.farm-map-delete-selected .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.farm-map-area-items {
+  display: flex;
+  max-height: 222px;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  padding-right: 3px;
+}
+
+.farm-map-area-item {
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.58);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.farm-map-area-item.active {
+  border-color: rgba(250, 204, 21, 0.58);
+  background: rgba(250, 204, 21, 0.08);
+}
+
+.farm-map-area-color {
+  width: 12px;
+  height: 42px;
+  border-radius: 6px;
+}
+
+.farm-map-clear {
+  width: 100%;
+  height: 42px;
+  margin-top: 10px;
+  border: 1px solid rgba(248, 113, 113, 0.24);
+  background: rgba(127, 29, 29, 0.18);
+  color: #fca5a5;
+}
+
+.farm-map-canvas-card {
+  position: relative;
+  min-height: 720px;
+  overflow: hidden;
+}
+
+.farm-map-canvas {
+  width: 100%;
+  height: 720px;
+  background: #020617;
+}
+
+.farm-map-status {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100% - 160px);
+  padding: 10px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 8px;
+  background: rgba(2, 6, 12, 0.84);
+  color: #dbeafe;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(12px);
+}
+
+.farm-map-status .material-symbols-outlined {
+  color: #22c55e;
+  font-size: 21px;
+}
+
+.farm-map-status span:last-child {
+  overflow: hidden;
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.farm-map-status.drawing {
+  border-color: rgba(34, 197, 94, 0.42);
+  color: #dcfce7;
+}
+
+.farm-map-status.editing {
+  border-color: rgba(250, 204, 21, 0.5);
+  color: #fef3c7;
+}
+
+.farm-map-tooltip {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.farm-map-polygon-label {
+  min-width: 92px;
+  padding: 6px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 8px;
+  background: rgba(2, 6, 12, 0.76);
+  color: #ffffff;
+  text-align: center;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(10px);
+}
+
+.farm-map-polygon-label strong {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.farm-map-polygon-label span {
+  display: block;
+  margin-top: 2px;
+  color: #86efac;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.farm-map-draw-point {
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.28);
+}
+
+.farm-map-canvas .leaflet-control-layers,
+.farm-map-canvas .leaflet-bar a,
+.farm-map-canvas .leaflet-control-scale-line {
+  border-color: rgba(148, 163, 184, 0.24);
+  background: rgba(2, 6, 12, 0.86);
+  color: #f8fafc;
+  backdrop-filter: blur(10px);
+}
+
+.farm-map-canvas .leaflet-bar a {
+  width: 34px;
+  height: 34px;
+  line-height: 34px;
+}
+
+.farm-map-canvas .leaflet-bar a:hover {
+  background: rgba(34, 197, 94, 0.22);
+  color: #ffffff;
+}
+
+.farm-map-canvas .leaflet-control-attribution {
+  border-radius: 8px 0 0 0;
+  background: rgba(2, 6, 12, 0.74);
+  color: #cbd5e1;
+}
+
+.farm-map-canvas .leaflet-control-attribution a {
+  color: #86efac;
+}
+
+.farm-map-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  background: rgba(2, 6, 12, 0.72);
+  backdrop-filter: blur(14px);
+}
+
+.farm-map-dialog {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  gap: 16px;
+  width: min(460px, 100%);
+  padding: 22px;
+  border: 1px solid rgba(248, 113, 113, 0.28);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(7, 12, 20, 0.98));
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.52);
+}
+
+.farm-map-dialog-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  border-radius: 8px;
+  background: rgba(127, 29, 29, 0.28);
+  color: #fca5a5;
+}
+
+.farm-map-dialog-icon .material-symbols-outlined {
+  font-size: 28px;
+}
+
+.farm-map-dialog h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.12rem;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.farm-map-dialog p {
+  margin: 8px 0 0;
+  color: #a7b4c0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.farm-map-dialog-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.farm-map-dialog-actions button {
+  min-width: 122px;
+  height: 42px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.farm-map-dialog-cancel {
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(15, 23, 42, 0.86);
+  color: #dbeafe;
+}
+
+.farm-map-dialog-confirm {
+  border: 1px solid rgba(248, 113, 113, 0.36);
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.farm-map-dialog-actions button:hover {
+  transform: translateY(-1px);
+}
+
+.farm-map-dialog-confirm:hover {
+  background: #f87171;
+  box-shadow: 0 10px 24px rgba(239, 68, 68, 0.22);
+}

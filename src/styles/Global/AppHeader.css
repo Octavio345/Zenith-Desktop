@@ -1,0 +1,193 @@
+:root {
+  --header-primary: #00ff9c;
+  --header-bg: #0f3a24;           /* fundo sólido (verde escuro) */
+  --header-text: #e6edf3;
+  --header-muted: rgba(230, 237, 243, 0.66);
+}
+
+.header {
+  position: fixed;
+  top: 16px;
+  left: 0;
+  right: 0;
+  z-index: 1050;                  /* maior que qualquer conteúdo */
+  padding: 0 20px;
+  pointer-events: none;
+}
+
+.header-spacer {
+  height: 55px;
+}
+
+.header .container {
+  max-width: 1300px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 12px 18px;
+  border-radius: 18px;
+  background: var(--header-bg) !important;   /* fundo sólido */
+  backdrop-filter: none !important;          /* remove qualquer blur */
+  border: 1px solid rgba(30, 107, 62, 0.5);
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.38);
+  pointer-events: auto;
+}
+
+/* O resto do CSS permanece igual */
+.header .logo {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  justify-self: start;
+  color: var(--header-text);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.header .logo-text {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.header .accent {
+  color: var(--header-primary);
+}
+
+.header .logo-glow {
+  position: absolute;
+  inset: -12px;
+  background: radial-gradient(circle, rgba(0, 255, 156, 0.22), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.header .logo:hover .logo-glow {
+  opacity: 1;
+}
+
+.header .nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.045);
+}
+
+.header .nav-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 106px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  color: var(--header-muted);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 700;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.header .nav-item:hover,
+.header .nav-item.active {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.header .nav-indicator {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 5px;
+  height: 2px;
+  background: var(--header-primary);
+  border-radius: 999px;
+  box-shadow: 0 0 12px rgba(0, 255, 156, 0.6);
+}
+
+.header .right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  justify-self: end;
+  min-width: 84px;
+}
+
+.header .menu-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.header .menu-toggle span {
+  width: 20px;
+  height: 2px;
+  background: white;
+  border-radius: 999px;
+  transition: transform 0.2s ease;
+}
+
+.header .menu-toggle.active span:first-child {
+  transform: translateY(3.5px) rotate(45deg);
+}
+
+.header .menu-toggle.active span:last-child {
+  transform: translateY(-3.5px) rotate(-45deg);
+}
+
+.mobile {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  backdrop-filter: blur(20px);
+  background: rgba(5, 8, 7, 0.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mobile-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.mobile-panel a {
+  font-size: 22px;
+  color: white;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+@media (max-width: 1000px) {
+  .header .container {
+    grid-template-columns: 1fr auto;
+  }
+
+  .header .nav {
+    display: none;
+  }
+
+  .header .right {
+    width: auto;
+    min-width: 0;
+  }
+
+  .header .menu-toggle {
+    display: flex;
+  }
+}

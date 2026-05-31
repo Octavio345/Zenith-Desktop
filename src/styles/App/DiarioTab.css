@@ -1,0 +1,534 @@
+.diario-container {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+  min-height: calc(100vh - 160px);
+  cursor: default;
+  user-select: none;
+}
+
+.diario-container * {
+  cursor: default;
+}
+
+.diario-container button,
+.diario-container button *,
+.diario-card,
+.diario-card * {
+  cursor: pointer;
+}
+
+.diario-container input,
+.diario-container textarea,
+.diario-container select {
+  cursor: text;
+  user-select: text;
+}
+
+.diario-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  margin-bottom: 22px;
+}
+
+.diario-header h2 {
+  font-size: clamp(2rem, 3vw, 2.7rem);
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 6px;
+  letter-spacing: 0;
+}
+
+.diario-header p {
+  font-size: 1rem;
+  color: #8fa3a0;
+  margin: 0;
+}
+
+.diario-add-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 176px;
+  padding: 13px 18px;
+  background: #0d7c4b;
+  border: 1px solid rgba(0, 255, 170, 0.24);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 800;
+  transition: all 0.2s ease;
+  box-shadow: 0 12px 26px rgba(13, 124, 75, 0.18);
+}
+
+.diario-add-btn:hover {
+  background: #0e9c5e;
+  transform: translateY(-2px);
+}
+
+.diario-toolbar,
+.diario-summary-grid {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.diario-toolbar {
+  grid-template-columns: minmax(0, 1fr) 220px;
+}
+
+.diario-search,
+.diario-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background:
+    linear-gradient(145deg, rgba(7, 16, 11, 0.96), rgba(4, 10, 8, 0.98)),
+    radial-gradient(circle at top left, rgba(0, 255, 170, 0.11), transparent 42%);
+  border: 1px solid rgba(0, 255, 170, 0.12);
+  border-radius: 14px;
+  padding: 0 14px;
+  min-height: 48px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.018), 0 10px 22px rgba(0, 0, 0, 0.16);
+}
+
+.diario-search span,
+.diario-filter span {
+  color: #00ffaa;
+}
+
+.diario-search input,
+.diario-filter select {
+  flex: 1;
+  width: 100%;
+  appearance: none;
+  background-color: transparent;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%2300ffaa' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 2px center;
+  background-size: 18px;
+  border: 0;
+  outline: 0;
+  color: #fff;
+  font-size: 0.95rem;
+  font-family: inherit;
+  padding-right: 30px;
+  font-weight: 800;
+}
+
+.diario-filter select option {
+  background: #08120d;
+  color: #e8fff6;
+  font-weight: 700;
+  padding: 12px;
+}
+
+.diario-filter .custom-select {
+  flex: 1;
+}
+
+.diario-filter .custom-select-trigger {
+  min-height: auto;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.diario-filter .custom-select-trigger:hover,
+.diario-filter .custom-select.open .custom-select-trigger {
+  box-shadow: none;
+}
+
+.diario-summary-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.diario-summary-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+  background: rgba(8, 18, 13, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+}
+
+.diario-summary-card > span {
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 12px;
+  color: #00ffaa;
+  background: rgba(0, 255, 170, 0.08);
+}
+
+.diario-summary-card strong {
+  display: block;
+  color: #fff;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.diario-summary-card small {
+  display: block;
+  color: #8fa3a0;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  margin-top: 4px;
+}
+
+.diario-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.diario-card {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr);
+  gap: 16px;
+  padding: 18px;
+  background: linear-gradient(145deg, rgba(9, 24, 17, 0.94), rgba(7, 14, 20, 0.92));
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 18px;
+  transition: all 0.2s ease;
+  min-width: 0;
+}
+
+.diario-card:hover {
+  border-color: rgba(0, 255, 170, 0.34);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.26);
+}
+
+.diario-card-date {
+  min-height: 82px;
+  border-radius: 14px;
+  background: rgba(0, 255, 170, 0.07);
+  border: 1px solid rgba(0, 255, 170, 0.16);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.diario-card-date .day {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.diario-card-date .time {
+  font-size: 0.78rem;
+  color: #8fa3a0;
+  margin-top: 4px;
+}
+
+.diario-card-content,
+.diario-card-header {
+  min-width: 0;
+}
+
+.diario-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.type-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.type-icon span {
+  font-size: 22px;
+}
+
+.diario-card-header h3 {
+  flex: 1;
+  min-width: 0;
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.delete-entry {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: rgba(255, 68, 68, 0.1);
+  border: 1px solid rgba(255, 68, 68, 0.18);
+  color: #ff6b6b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+.diario-card:hover .delete-entry {
+  opacity: 1;
+}
+
+.delete-entry:hover {
+  background: rgba(255, 68, 68, 0.2);
+}
+
+.diario-card-content p {
+  font-size: 0.92rem;
+  color: #9aaca8;
+  line-height: 1.52;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.diario-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+
+.diario-form,
+.diario-detail {
+  max-width: 620px;
+  width: 100%;
+  background: linear-gradient(145deg, rgba(9, 24, 17, 0.98), rgba(7, 14, 20, 0.98));
+  border: 1px solid rgba(0, 255, 170, 0.16);
+  border-radius: 20px;
+  padding: 28px;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+
+.diario-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+}
+
+.diario-form-header h3,
+.detail-header h3 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+}
+
+.close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #8fa3a0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  color: #ff6b6b;
+  border-color: rgba(255, 68, 68, 0.25);
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.78rem;
+  color: #8fa3a0;
+  margin-bottom: 7px;
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 13px 14px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 0.95rem;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.form-group select {
+  appearance: none;
+  background-color: rgba(5, 15, 10, 0.96);
+  border-color: rgba(0, 255, 170, 0.16);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%2300ffaa' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 18px;
+  padding-right: 42px;
+  font-weight: 800;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.018);
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #00ffaa;
+  box-shadow: 0 0 0 3px rgba(0, 255, 170, 0.1);
+}
+
+.form-group select option {
+  background: #08120d;
+  color: #e8fff6;
+  font-weight: 700;
+  padding: 12px;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 14px;
+  background: #0d7c4b;
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.95rem;
+  margin-top: 8px;
+  transition: all 0.2s ease;
+}
+
+.submit-btn:hover {
+  background: #0e9c5e;
+  transform: translateY(-2px);
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding-right: 44px;
+}
+
+.diario-detail > .close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+}
+
+.type-icon.large {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+}
+
+.detail-date {
+  font-size: 0.82rem;
+  color: #8fa3a0;
+  margin: 4px 0 0;
+}
+
+.detail-description {
+  font-size: 0.98rem;
+  color: #c8d4d1;
+  line-height: 1.65;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.edit-form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.edit-form-actions button {
+  flex: 1;
+  border: 0;
+  border-radius: 12px;
+  padding: 13px;
+  font-weight: 800;
+}
+
+.edit-form-actions .cancel-btn {
+  background: rgba(255, 255, 255, 0.06);
+  color: #dce7e2;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.edit-form-actions .save-btn {
+  background: rgba(255, 68, 68, 0.16);
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 68, 68, 0.26);
+}
+
+.diario-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 72px 24px;
+  background: rgba(8, 18, 13, 0.78);
+  border: 1px dashed rgba(0, 255, 170, 0.2);
+  border-radius: 18px;
+}
+
+.diario-empty span {
+  font-size: 52px;
+  color: #00ffaa;
+  margin-bottom: 16px;
+}
+
+.diario-empty p {
+  color: #9aaca8;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.diario-empty .empty-hint {
+  font-size: 0.82rem;
+  margin-top: 8px;
+  opacity: 0.78;
+}
+
+@media (max-width: 900px) {
+  .diario-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .diario-toolbar,
+  .diario-summary-grid,
+  .diario-list {
+    grid-template-columns: 1fr;
+  }
+
+  .delete-entry {
+    opacity: 1;
+  }
+}
