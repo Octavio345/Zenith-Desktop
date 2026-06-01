@@ -178,7 +178,6 @@ export default function CadastroCompleto() {
             <span className="cc-dot" />
             ZENITH
           </div>
-          <span className="cc-mono">// ONBOARDING / {etapa === 1 ? "STEP_01_PRODUCER" : "STEP_02_FARM"}</span>
         </header>
 
         <div className="cc-stepper">

@@ -78,11 +78,13 @@ export default function Login({ setAppLoading }) {
             <span className="auth-brand-dot" />
             ZENITH
           </div>
-          <p className="auth-brand-tag">A sua precisão agrícola no ponto mais alto</p>
+
+          <p className="auth-brand-tag">
+            A sua precisão agrícola no ponto mais alto
+          </p>
         </div>
 
         <div className="auth-side-info">
-          <span className="auth-mono">// PLATFORM_STATUS</span>
           <h1 className="auth-side-title">
             Controle total da sua <span className="hl">operação agrícola</span> em tempo real.
           </h1>
@@ -107,7 +109,6 @@ export default function Login({ setAppLoading }) {
       <main className="auth-main">
         <div className="auth-card">
           <div className="auth-card-head">
-            <span className="auth-mono">// AUTH / SIGN_IN</span>
             <h2>Acessar painel</h2>
             <p>Entre com suas credenciais para continuar.</p>
           </div>

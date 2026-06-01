@@ -21,11 +21,8 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg-0);color:var(--t
   min-height:100vh;
   display:grid;
   grid-template-columns:1.05fr 1fr;
-  background:
-             linear-gradient(90deg,rgba(5,16,12,.92),rgba(5,16,12,.74)),
-             radial-gradient(1200px 600px at 20% 10%,rgba(19,236,128,.1),transparent 60%),
-             radial-gradient(900px 500px at 90% 90%,rgba(19,236,128,.06),transparent 60%),
-             url("/assets/image/Fundo_login.png") center/cover no-repeat,
+  background:radial-gradient(1200px 600px at 20% 10%,rgba(19,236,128,.08),transparent 60%),
+             radial-gradient(900px 500px at 90% 90%,rgba(19,236,128,.05),transparent 60%),
              var(--bg-0);
   position:relative;
   overflow:hidden;
@@ -39,37 +36,56 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg-0);color:var(--t
   background-size:48px 48px;
   mask-image:radial-gradient(ellipse at center,#000 30%,transparent 80%);
 }
+
 .auth-bg-sphere{position:absolute;border-radius:50%;filter:blur(120px);pointer-events:none}
 .auth-bg-sphere-1{width:520px;height:520px;top:-180px;left:-120px;background:radial-gradient(circle,rgba(19,236,128,.25),transparent 70%)}
 .auth-bg-sphere-2{width:420px;height:420px;bottom:-150px;right:-100px;background:radial-gradient(circle,rgba(19,236,128,.18),transparent 70%)}
 .auth-bg-noise{position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E");opacity:.04;pointer-events:none}
 
-/* ===== Side panel ===== */
 .auth-side{
-  position:relative;z-index:2;
+  position:relative;
+  z-index:2;
   padding:48px 56px;
-  display:flex;flex-direction:column;justify-content:space-between;
-  border-right:1px solid var(--line-2);
-  background:linear-gradient(180deg,rgba(10,26,20,.6),rgba(5,16,12,.4));
-  backdrop-filter:blur(8px);
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+
+  background:
+    linear-gradient(rgba(5,16,12,.55),rgba(5,16,12,.82)),
+    url("https://agrobrasildigital.com/wp-content/uploads/2025/07/Drone-monitorando-plantacao-de-soja-no-Brasil-transmitindo-dados-via-tecnologia-5G-para-1024x585.jpeg");
+
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+
+  box-shadow:none;
 }
+
 .auth-brand{display:flex;flex-direction:column;gap:8px}
 .auth-brand-mark{
-  font-family:'JetBrains Mono',monospace;font-weight:600;letter-spacing:.05em;
-  display:flex;align-items:center;gap:10px;color:var(--text);font-size:18px;
+  font-family:'JetBrains Mono',monospace;font-weight:700;letter-spacing:.08em;
+  display:flex;align-items:center;gap:10px;color:var(--text);font-size:19px;
 }
 .auth-brand-dot{width:10px;height:10px;border-radius:50%;background:var(--primary);box-shadow:0 0 12px var(--primary)}
 .auth-brand-accent{color:var(--primary)}
-.auth-brand-tag{color:var(--text-2);font-size:13px}
+.auth-brand-tag{color:#d7eee3;font-size:13px}
 
-.auth-mono{
-  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;
-  color:var(--primary);text-transform:uppercase;
+.auth-side-info{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  max-width:540px;
+  padding:26px;
+  border-radius:20px;
+  background:linear-gradient(180deg,rgba(0,0,0,.38),rgba(0,0,0,.24));
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 24px 70px rgba(0,0,0,.35);
+  backdrop-filter:blur(10px);
 }
-.auth-side-info{display:flex;flex-direction:column;gap:18px;max-width:520px}
-.auth-side-title{font-size:44px;line-height:1.1;font-weight:500;letter-spacing:-.02em}
-.auth-side-title .hl{color:var(--primary)}
-.auth-side-desc{color:var(--text-2);font-size:15px;line-height:1.6}
+
+.auth-side-title{font-size:44px;line-height:1.08;font-weight:650;letter-spacing:-.03em}
+.auth-side-title .hl{color:var(--primary);text-shadow:0 0 18px rgba(19,236,128,.22)}
+.auth-side-desc{color:#d7eee3;font-size:15px;line-height:1.6}
 
 .auth-feature-list{list-style:none;display:flex;flex-direction:column;gap:12px;margin-top:8px}
 .auth-feature-list li{display:flex;align-items:center;gap:12px;color:var(--text);font-size:14px}
@@ -80,17 +96,39 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg-0);color:var(--t
 
 .auth-side-foot{
   display:grid;grid-template-columns:repeat(3,1fr);gap:16px;
-  padding-top:24px;border-top:1px solid var(--line-2);
+  padding-top:24px;border-top:1px solid rgba(255,255,255,.12);
 }
 .auth-side-foot div{display:flex;flex-direction:column}
 .auth-side-foot strong{font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--text)}
-.auth-side-foot span{font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.12em}
+.auth-side-foot span{font-size:11px;color:#b8d0c3;text-transform:uppercase;letter-spacing:.12em}
 
 /* ===== Main / card ===== */
 .auth-main{
   position:relative;z-index:2;
   display:flex;align-items:center;justify-content:center;
   padding:40px;
+}
+.auth-main{
+  position:relative;
+}
+
+.auth-main::before{
+  content:"";
+  position:absolute;
+  left:-220px;
+  top:0;
+  width:350px;
+  height:100%;
+
+  background:linear-gradient(
+    90deg,
+    rgba(5,16,12,0) 0%,
+    rgba(5,16,12,.20) 35%,
+    rgba(5,16,12,.55) 70%,
+    rgba(5,16,12,.95) 100%
+  );
+
+  pointer-events:none;
 }
 .auth-card{
   width:100%;max-width:440px;

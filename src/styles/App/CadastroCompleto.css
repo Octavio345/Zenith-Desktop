@@ -11,10 +11,10 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg-0);color:var(--t
 
 .cc-shell{
   min-height:100vh;position:relative;overflow-x:hidden;
-  background:linear-gradient(180deg,rgba(5,16,12,.86),rgba(5,16,12,.78)),
+  background:linear-gradient(180deg,rgba(5,16,12,.74),rgba(5,16,12,.9)),
              radial-gradient(1000px 600px at 20% 10%,rgba(19,236,128,.09),transparent 60%),
              radial-gradient(900px 500px at 80% 90%,rgba(19,236,128,.06),transparent 60%),
-             url("/assets/image/Fundo_cadastro.png") center/cover no-repeat,
+             url("https://agrobrasildigital.com/wp-content/uploads/2025/07/Drone-monitorando-plantacao-de-soja-no-Brasil-transmitindo-dados-via-tecnologia-5G-para-1024x585.jpeg") center/cover no-repeat fixed,
              var(--bg-0);
   padding:40px 24px 64px;
 }
@@ -34,7 +34,6 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg-0);color:var(--t
 .cc-brand{font-family:'JetBrains Mono',monospace;font-weight:600;display:flex;align-items:center;gap:10px;font-size:18px}
 .cc-dot{width:10px;height:10px;border-radius:50%;background:var(--primary);box-shadow:0 0 12px var(--primary)}
 .cc-accent{color:var(--primary)}
-.cc-mono{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;color:var(--primary);text-transform:uppercase}
 
 /* Stepper */
 .cc-stepper{
