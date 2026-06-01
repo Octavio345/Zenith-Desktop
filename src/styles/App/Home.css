@@ -1894,6 +1894,9 @@ body {
     overflow-wrap: anywhere;
   }
   .profile-sidebar .profile-badge-tech {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     width: fit-content;
     max-width: 100%;
     min-height: 28px;
@@ -1903,11 +1906,18 @@ body {
     border: 1px solid rgba(0, 255, 170, 0.24);
     color: #9fb2ad;
     font-size: 0.78rem;
+    line-height: 1;
     white-space: nowrap;
   }
   .profile-sidebar .profile-badge-tech .material-symbols-outlined {
+    display: block;
+    flex: 0 0 auto;
     font-size: 16px;
+    line-height: 1;
     color: #00ffaa;
+  }
+  .profile-sidebar .profile-badge-tech .membro {
+    line-height: 1;
   }
   .home-profile-info {
     display: grid;
@@ -3881,8 +3891,23 @@ body {
 }
 
 .home-page .profile-sidebar .profile-badge-tech {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   max-width: 100%;
+  line-height: 1;
   white-space: nowrap;
+}
+
+.home-page .profile-sidebar .profile-badge-tech .material-symbols-outlined {
+  display: block;
+  flex: 0 0 auto;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.home-page .profile-sidebar .profile-badge-tech .membro {
+  line-height: 1;
 }
 
 .home-page .home-profile-info {
