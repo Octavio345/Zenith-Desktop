@@ -23,6 +23,7 @@ export default function DiagnosticoTab() {
 
   const [step, setStep] = useState("start")
   const [image, setImage] = useState(null)
+  const [imageFile, setImageFile] = useState(null)
   const [result, setResult] = useState(null)
   const [history, setHistory] = useState([])
   const [showAllHistory, setShowAllHistory] = useState(false)
@@ -92,6 +93,7 @@ export default function DiagnosticoTab() {
     canvas.height = video.videoHeight
     canvas.getContext("2d").drawImage(video, 0, 0)
     setImage(canvas.toDataURL("image/jpeg"))
+    setImageFile(null)
     stopCamera()
     setStep("preview")
   }
@@ -105,50 +107,114 @@ export default function DiagnosticoTab() {
     })
   }
 
+  const loadPreviewImage = (source) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image()
+      img.onload = () => resolve(img)
+      img.onerror = reject
+      img.src = source
+    })
+  }
+
+  const createJpegFromPreview = async (source) => {
+    const previewImage = await loadPreviewImage(source)
+    const canvas = document.createElement("canvas")
+    canvas.width = previewImage.naturalWidth || previewImage.width
+    canvas.height = previewImage.naturalHeight || previewImage.height
+
+    const ctx = canvas.getContext("2d")
+    ctx.fillStyle = "#ffffff"
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+    ctx.drawImage(previewImage, 0, 0)
+
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.92))
+    if (!blob) throw new Error("Nao foi possivel converter a imagem.")
+
+    return new File([blob], "image.jpg", { type: "image/jpeg" })
+  }
+
   const openGallery = () => fileInputRef.current?.click()
+
+  const isImageFile = (file) => file?.type?.startsWith("image/")
 
   const handleGalleryImage = async (e) => {
     const file = e.target.files[0]
     if (!file) return
+    if (!isImageFile(file)) {
+      e.target.value = ""
+      return
+    }
 
     const dataUrl = await readFileAsDataUrl(file)
     setImage(dataUrl)
+    setImageFile(file)
     setStep("preview")
     e.target.value = ""
   }
 
   const handleDragOverImage = (event) => {
     event.preventDefault()
+    event.stopPropagation()
     setIsDraggingImage(true)
   }
 
   const handleDragLeaveImage = (event) => {
     event.preventDefault()
+    event.stopPropagation()
     setIsDraggingImage(false)
   }
 
   const handleDropImage = async (event) => {
     event.preventDefault()
+    event.stopPropagation()
     setIsDraggingImage(false)
 
     const file = event.dataTransfer.files?.[0]
-    if (!file || !file.type?.startsWith("image/")) return
+    if (!isImageFile(file)) return
 
     const dataUrl = await readFileAsDataUrl(file)
     setImage(dataUrl)
-    await analyzeImage(dataUrl)
+    setImageFile(file)
+    await analyzeImage(file, dataUrl)
   }
 
-  const analyzeImage = async (sourceImage) => {
-    const imageToAnalyze = typeof sourceImage === "string" ? sourceImage : image
-    if (!imageToAnalyze) return
+  const appendImageToFormData = async (formData, source) => {
+    if (source instanceof File) {
+      formData.append("file", source, source.name || "image.jpg")
+      return
+    }
+
+    const blob = await fetch(source).then(r => r.blob())
+    const type = blob.type || "image/jpeg"
+    const extension = type.includes("png") ? "png" : type.includes("webp") ? "webp" : "jpg"
+    formData.append("file", new File([blob], `image.${extension}`, { type }))
+  }
+
+  const sendImageToApi = async (source) => {
+    const formData = new FormData()
+    await appendImageToFormData(formData, source)
+    const response = await fetch(API_URL, { method: "POST", body: formData })
+    const data = await response.json().catch(() => null)
+    return { response, data }
+  }
+
+  const analyzeImage = async (source, previewSource = image) => {
+    const fileToAnalyze = source instanceof File ? source : imageFile
+    const imageToAnalyze = typeof source === "string" ? source : previewSource
+    if (!fileToAnalyze && !imageToAnalyze) return
+
     setStep("analysis")
     try {
-      const blob = await fetch(imageToAnalyze).then(r => r.blob())
-      const formData = new FormData()
-      formData.append("file", blob, "image.jpg")
-      const response = await fetch(API_URL, { method: "POST", body: formData })
-      const data = await response.json().catch(() => null)
+      let { response, data } = await sendImageToApi(fileToAnalyze || imageToAnalyze)
+
+      if (!response.ok && response.status === 400 && imageToAnalyze) {
+        try {
+          const jpegFile = await createJpegFromPreview(imageToAnalyze)
+          const retry = await sendImageToApi(jpegFile)
+          response = retry.response
+          data = retry.data
+        } catch { }
+      }
 
       if (!response.ok) {
         setResult({
@@ -173,7 +239,7 @@ export default function DiagnosticoTab() {
     }
   }
 
-  const reset = () => { setImage(null); setResult(null); setStep("start") }
+  const reset = () => { setImage(null); setImageFile(null); setResult(null); setStep("start") }
   const backFromHistory = () => {
     setShowAllHistory(false)
     try {
