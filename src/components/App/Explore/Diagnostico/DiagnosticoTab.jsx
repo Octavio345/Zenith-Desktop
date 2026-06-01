@@ -139,11 +139,12 @@ export default function DiagnosticoTab() {
     await analyzeImage(dataUrl)
   }
 
-  const analyzeImage = async (sourceImage = image) => {
-    if (!sourceImage) return
+  const analyzeImage = async (sourceImage) => {
+    const imageToAnalyze = typeof sourceImage === "string" ? sourceImage : image
+    if (!imageToAnalyze) return
     setStep("analysis")
     try {
-      const blob = await fetch(sourceImage).then(r => r.blob())
+      const blob = await fetch(imageToAnalyze).then(r => r.blob())
       const formData = new FormData()
       formData.append("file", blob, "image.jpg")
       const response = await fetch(API_URL, { method: "POST", body: formData })
@@ -183,7 +184,7 @@ export default function DiagnosticoTab() {
 
   if (showAllHistory) return <AllHistory onBack={backFromHistory} />
   if (step === "camera") return <CameraView videoRef={videoRef} onCapture={capturePhoto} onCancel={reset} />
-  if (step === "preview") return <ImagePreview image={image} onBack={reset} onAnalyze={analyzeImage} />
+  if (step === "preview") return <ImagePreview image={image} onBack={reset} onAnalyze={() => analyzeImage()} />
   if (step === "analysis") return <AnalysisLoader />
   if (step === "result") return <DiagnosisResult result={result} onRestart={reset} />
 
