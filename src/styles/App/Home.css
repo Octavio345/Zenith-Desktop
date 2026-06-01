@@ -1252,6 +1252,11 @@ body {
   color: #ec4899;
 }
 
+.explore-icon.monitoring {
+  background: linear-gradient(135deg, rgba(86, 168, 112, 0.2), rgba(0, 102, 255, 0.1));
+  color: #56a870;
+}
+
 .explore-icon.reports {
   background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1));
   color: #ef4444;
@@ -1632,6 +1637,7 @@ body {
   .module-nav-icon.diary { color: #ffaa00; }
   .module-nav-icon.map { color: #8b5cf6; }
   .module-nav-icon.stock { color: #ec4899; }
+  .module-nav-icon.monitoring { color: #56a870; }
   .module-nav-icon.reports { color: #ef4444; }
   .main-content-column {
     padding: 0 32px;

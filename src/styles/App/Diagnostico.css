@@ -220,6 +220,21 @@
   transform: translateY(-4px);
 }
 
+.option-card.drag-active {
+  border-color: var(--primary);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(0, 255, 170, 0.16), transparent 58%),
+    var(--bg-card);
+  box-shadow: var(--shadow-neon), var(--shadow-card), inset 0 0 0 1px rgba(0, 255, 170, 0.18);
+  transform: translateY(-4px);
+}
+
+.option-card.drag-active .option-icon {
+  background: rgba(0, 255, 170, 0.14);
+  border-color: var(--primary);
+  box-shadow: 0 0 18px var(--primary-glow);
+}
+
 .option-card:active {
   transform: translateY(-2px);
 }

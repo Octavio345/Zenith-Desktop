@@ -10,12 +10,14 @@ import DiarioTab from "../../components/App/Explore/DiarioTab"
 import MapaTab from "../../components/App/Explore/MapaTab"
 import EstoqueTab from "../../components/App/Explore/EstoqueTab"
 import AtividadesTab from "../../components/App/Explore/AtividadesTab"
+import MonitoramentoView from "../../components/App/Explore/Monitoramento/MonitoramentoView"
 import ParticleBackground from "../../components/App/Home/ParticleBackground"
 import MouseGlow from "../../components/App/Home/MouseGlow"
 import "../../styles/App/Explore.css"
 
 const tabs = [
   { id: "diagnostico", label: "Diagnóstico", icon: "eco" },
+  { id: "monitoramento", label: "Monitoramento", icon: "monitoring" },
   { id: "clima", label: "Clima", icon: "cloud" },
   { id: "diario", label: "Diário", icon: "menu_book" },
   { id: "mapa", label: "Mapa", icon: "map" },
@@ -40,14 +42,14 @@ export default function Explore() {
     
     // Prioridade: 1. state, 2. localStorage, 3. padrão
     if (location.state?.activeTab) {
-      console.log("✅ Mudando para tab via state:", location.state.activeTab)
+      console.log("Mudando para tab via state:", location.state.activeTab)
       setActiveTab(location.state.activeTab)
       localStorage.setItem("activeExploreTab", location.state.activeTab)
     } else {
       // Verificar se tem uma tab salva
       const savedTab = localStorage.getItem("activeExploreTab")
       if (savedTab && savedTab !== activeTab) {
-        console.log("✅ Mudando para tab via localStorage:", savedTab)
+        console.log("Mudando para tab via localStorage:", savedTab)
         setActiveTab(savedTab)
       }
     }
@@ -64,6 +66,8 @@ export default function Explore() {
     switch(activeTab) {
       case "diagnostico": 
         return <DiagnosticoTab active={activeTab === "diagnostico"} />
+      case "monitoramento":
+        return <MonitoramentoView />
       case "clima": 
         return <ClimaTab />
       case "diario": 

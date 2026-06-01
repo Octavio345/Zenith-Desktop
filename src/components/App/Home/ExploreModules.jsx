@@ -20,6 +20,15 @@ const modules = [
     sublabel: "Previsão 7 dias", 
     type: "weather" 
   },
+  {
+    id: "monitoramento",
+    path: "/explore",
+    tab: "monitoramento",
+    icon: "monitoring",
+    label: "Monitoramento",
+    sublabel: "Analise de plantio",
+    type: "monitoring"
+  },
   { 
     id: "diario",
     path: "/explore", 
@@ -54,7 +63,7 @@ const modules = [
     icon: "assignment", 
     label: "Atividades", 
     sublabel: "Tarefas do campo", 
-    type: "reports"  // ← Mantendo "reports" para não quebrar o CSS
+    type: "reports"
   }
 ]
 

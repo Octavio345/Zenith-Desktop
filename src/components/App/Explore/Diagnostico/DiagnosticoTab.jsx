@@ -27,6 +27,7 @@ export default function DiagnosticoTab() {
   const [history, setHistory] = useState([])
   const [showAllHistory, setShowAllHistory] = useState(false)
   const [isMobile, setIsMobile] = useState(checkIsMobile)
+  const [isDraggingImage, setIsDraggingImage] = useState(false)
 
   useEffect(() => {
     const handleResize = () => setIsMobile(checkIsMobile())
@@ -95,19 +96,54 @@ export default function DiagnosticoTab() {
     setStep("preview")
   }
 
-  const openGallery = () => fileInputRef.current?.click()
-  const handleGalleryImage = (e) => {
-    const file = e.target.files[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = (ev) => { setImage(ev.target.result); setStep("preview") }
-    reader.readAsDataURL(file)
+  const readFileAsDataUrl = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = (ev) => resolve(ev.target.result)
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
   }
 
-  const analyzeImage = async () => {
+  const openGallery = () => fileInputRef.current?.click()
+
+  const handleGalleryImage = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    const dataUrl = await readFileAsDataUrl(file)
+    setImage(dataUrl)
+    setStep("preview")
+    e.target.value = ""
+  }
+
+  const handleDragOverImage = (event) => {
+    event.preventDefault()
+    setIsDraggingImage(true)
+  }
+
+  const handleDragLeaveImage = (event) => {
+    event.preventDefault()
+    setIsDraggingImage(false)
+  }
+
+  const handleDropImage = async (event) => {
+    event.preventDefault()
+    setIsDraggingImage(false)
+
+    const file = event.dataTransfer.files?.[0]
+    if (!file || !file.type?.startsWith("image/")) return
+
+    const dataUrl = await readFileAsDataUrl(file)
+    setImage(dataUrl)
+    await analyzeImage(dataUrl)
+  }
+
+  const analyzeImage = async (sourceImage = image) => {
+    if (!sourceImage) return
     setStep("analysis")
     try {
-      const blob = await fetch(image).then(r => r.blob())
+      const blob = await fetch(sourceImage).then(r => r.blob())
       const formData = new FormData()
       formData.append("file", blob, "image.jpg")
       const response = await fetch(API_URL, { method: "POST", body: formData })
@@ -181,7 +217,14 @@ export default function DiagnosticoTab() {
         )}
 
         {/* Coluna central - Galeria */}
-        <button className="option-card gallery-card" onClick={openGallery}>
+        <button
+          className={`option-card gallery-card ${isDraggingImage ? "drag-active" : ""}`}
+          onClick={openGallery}
+          onDragEnter={handleDragOverImage}
+          onDragOver={handleDragOverImage}
+          onDragLeave={handleDragLeaveImage}
+          onDrop={handleDropImage}
+        >
           <div className="card-glow" />
           <div className="option-icon-wrapper">
             <div className="option-icon">
@@ -189,7 +232,7 @@ export default function DiagnosticoTab() {
             </div>
           </div>
           <h3>Abrir galeria</h3>
-          <p>Selecione uma imagem salva</p>
+          <p>Selecione uma imagem salva ou arraste uma foto aqui para analisar.</p>
           <div className="card-action">
             <span>Selecionar imagem</span>
             <span className="arrow">→</span>

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 
 const modules = [
   { id: "diagnostico", path: "/explore", tab: "diagnostico", icon: "eco", label: "Diagnóstico", type: "diagnose" },
+  { id: "monitoramento", path: "/explore", tab: "monitoramento", icon: "monitoring", label: "Monitoramento", type: "monitoring" },
   { id: "clima", path: "/explore", tab: "clima", icon: "cloud", label: "Clima", type: "weather" },
   { id: "diario", path: "/explore", tab: "diario", icon: "menu_book", label: "Diário", type: "diary" },
   { id: "mapa", path: "/explore", tab: "mapa", icon: "map", label: "Mapa", type: "map" },
