@@ -18,19 +18,19 @@ import MouseGlow from "../../components/App/Home/MouseGlow"
 import "../../styles/App/Explore.css"
 
 const tabs = [
-  { id: "diagnostico", label: "Diagnóstico", icon: "eco" },
-  { id: "monitoramento", label: "Plantio", icon: "psychiatry" },
+  { id: "diagnostico", label: "Análise IA", icon: "eco" },
+  { id: "monitoramento", label: "Monitoramento", icon: "psychiatry" },
+  { id: "mapa", label: "Mapa", icon: "map" },
   { id: "clima", label: "Clima", icon: "cloud" },
   { id: "diario", label: "Diário", icon: "menu_book" },
-  { id: "mapa", label: "Mapa", icon: "map" },
   { id: "estoque", label: "Estoque", icon: "inventory" },
   { id: "atividades", label: "Atividades", icon: "assignment" },
   { id: "legislacao", label: "Legislação", icon: "gavel" }
 ]
 
 const tabContext = {
-  diagnostico: ["Diagnóstico inteligente", "Identifique sinais na lavoura e acompanhe o histórico das análises."],
-  monitoramento: ["Alinhamento do plantio", "Analise a uniformidade das fileiras com imagens aéreas."],
+  diagnostico: ["Análise da soja por IA", "Use fotos para identificar possíveis problemas na soja. Confirme o resultado em campo."],
+  monitoramento: ["Análise estrutural do plantio", "Monitore a lavoura de soja por imagens e visão computacional."],
   clima: ["Clima da fazenda", "Condições atuais e previsão para apoiar decisões no campo."],
   diario: ["Diário de campo", "Registre ocorrências, observações e aprendizados da operação."],
   mapa: ["Mapa da propriedade", "Visualize áreas, talhões e pontos importantes da fazenda."],

@@ -114,10 +114,10 @@ export default function Home() {
       .sort((a, b) => String(b.createdAt || b.date || "").localeCompare(String(a.createdAt || a.date || "")))
   }, [assignedTasks, isEmployee, lifecycleNow, userData?.uid, visibleActivities])
   const summary = useMemo(() => [
-    { icon: "eco", label: "Saúde da lavoura", value: hasFarm ? "Pronta para análise" : "Cadastre a fazenda", tab: "diagnostico" },
-    { icon: "cloud", label: "Condição do clima", value: weather?.conditionDescription || "Sem dados agora", tab: "clima" },
+    { icon: "eco", label: "Analisar imagens", value: "Triagem de sinais nas folhas", tab: "diagnostico" },
+    { icon: "monitoring", label: "Monitorar plantio", value: "Cobertura e uniformidade", tab: "monitoramento" },
+    { icon: "map", label: "Mapa e talhões", value: "Áreas da sua propriedade", tab: "mapa" },
     { icon: "task_alt", label: "Atividades", value: `${visibleActivities.length} registradas`, tab: "atividades" },
-    { icon: "monitoring", label: "Monitoramento", value: hasFarm ? "Área conectada" : "Aguardando dados", tab: "monitoramento" },
   ], [hasFarm, visibleActivities.length, weather])
 
   const openExplore = (tab) => {
@@ -195,7 +195,7 @@ export default function Home() {
   }[type] || "Tarefa")
 
   return (
-    <div className="zenith-home">
+    <div className="zenith-home zenith-home--focused">
       <AppHeader />
       <main className="zenith-home__content">
         <section className="zenith-home__greeting">
@@ -214,6 +214,7 @@ export default function Home() {
         </section>
 
         <section className="zenith-home__hero-grid">
+
           <article className="weather-hero-card">
             <div className="weather-hero-card__copy">
               <span className="card-label"><span className="material-symbols-outlined">partly_cloudy_day</span> Clima atual</span>
@@ -229,12 +230,12 @@ export default function Home() {
             </div>
           </article>
 
+
           <article className="farm-showcase-card">
             <img src="/assets/image/Fundo_landing.jpg" alt="Lavoura ao pôr do sol" />
             <div className="farm-showcase-card__shade" />
             <div className="farm-showcase-card__top">
               <span><span className="material-symbols-outlined">agriculture</span> Minha fazenda</span>
-              <strong>{farmData?.produtividade || farmData?.rendimento || "7200 kg/ha"}</strong>
             </div>
             <div className="farm-showcase-card__bottom">
               <span><small>Cultura principal</small><strong>{farmData?.plantacao || "Soja"}</strong></span>
@@ -245,7 +246,7 @@ export default function Home() {
         </section>
 
         <section className="zenith-section">
-          <div className="zenith-section__head"><div><span className="material-symbols-outlined">insights</span><span><small>Painel operacional</small><h2>Resumo rápido</h2></span></div><button type="button" onClick={() => openExplore("diagnostico")}>Explorar recursos <span className="material-symbols-outlined">arrow_forward</span></button></div>
+          <div className="zenith-section__head"><div><span className="material-symbols-outlined">insights</span><span><small>Painel operacional</small><h2>O que você quer acompanhar?</h2></span></div><button type="button" onClick={() => openExplore("diagnostico")}>Ver todos os recursos <span className="material-symbols-outlined">arrow_forward</span></button></div>
           <div className="quick-summary-grid">
             {summary.map((item) => (
               <button type="button" key={item.label} onClick={() => openExplore(item.tab)}>
@@ -260,8 +261,8 @@ export default function Home() {
         <FarmCommandCenter activities={visibleActivities} onOpen={openExplore} />
 
         <section className="home-operation-grid">
-          <article className="home-operation-card home-operation-card--feature">
-            <div><span className="card-label card-label--light"><span className="material-symbols-outlined">flight</span> Inteligência aérea</span><h2>Veja sua lavoura por uma nova perspectiva.</h2><p>Envie imagens do drone para diagnóstico e acompanhamento do alinhamento da plantação.</p><button type="button" onClick={() => openExplore("diagnostico")}>Iniciar monitoramento <span className="material-symbols-outlined">arrow_forward</span></button></div>
+          <article className="home-operation-card home-operation-card--feature home-analysis-card">
+            <div><span className="card-label card-label--light"><span className="material-symbols-outlined">flight</span> Análise da lavoura por imagens</span><h2>Um olhar mais atento à sua lavoura.</h2><p>Analise sinais nas folhas com IA e acompanhe o plantio por visão computacional. Confirme os resultados em campo.</p><button type="button" onClick={() => openExplore("diagnostico")}>Analisar imagens <span className="material-symbols-outlined">arrow_forward</span></button></div>
             <img src="/assets/image/drone-plantio.webp" alt="Drone sobrevoando a plantação" />
           </article>
           <article className="home-activity-card">

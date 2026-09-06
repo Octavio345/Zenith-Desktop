@@ -848,7 +848,7 @@ export default function MapaTab() {
           <span className="farm-map-kicker">Serviços / Mapa</span>
           <h2>Demarcação da fazenda</h2>
           <p>
-            Localize a propriedade e demarque talhões, áreas de plantio e seus perímetros diretamente na imagem de satélite. As áreas salvas organizam a fazenda e poderão ser selecionadas nos diagnósticos da lavoura.
+            Localize a propriedade e demarque talhões, áreas de plantio e seus perímetros diretamente na imagem de satélite. As áreas salvas organizam a fazenda e poderão ser selecionadas nas triagens da lavoura.
           </p>
         </div>
 

@@ -20,20 +20,20 @@ function interpretarCobertura(coverage) {
   if (coverage < THRESHOLDS.coverage.critico) {
     return {
       tipo: "perigo",
-      texto: `Cobertura de ${pct}% muito abaixo do esperado. Pode haver falha de germinação ou estande comprometido.`,
+      texto: `Cobertura vegetal de ${pct}% na imagem. Confirme as regiões de baixa densidade em campo.`,
     }
   }
 
   if (coverage < THRESHOLDS.coverage.moderado) {
     return {
       tipo: "aviso",
-      texto: `Cobertura de ${pct}% abaixo do ideal. Acompanhe o desenvolvimento nos próximos dias.`,
+      texto: `Cobertura vegetal de ${pct}% na imagem. Acompanhe o desenvolvimento e confirme em campo.`,
     }
   }
 
   return {
     tipo: "ok",
-    texto: `Cobertura de ${pct}% dentro do esperado para a fase de crescimento.`,
+    texto: `Cobertura vegetal de ${pct}% na imagem. Interprete conforme a fase da cultura em campo.`,
   }
 }
 
@@ -44,20 +44,20 @@ function interpretarFalhas(failureScore, failureLevel) {
   if (nivel === "ALTO") {
     return {
       tipo: "perigo",
-      texto: `${pct}% da área com falhas críticas. Avaliação urgente e possível replantio recomendados.`,
+      texto: `Região de baixa densidade — atenção alta. Índice retornado: ${pct}%. Confirme em campo.`,
     }
   }
 
   if (nivel === "MEDIO") {
     return {
       tipo: "aviso",
-      texto: `${pct}% da área com falhas moderadas. Agende uma visita técnica para avaliação presencial.`,
+      texto: `Região de baixa densidade — atenção moderada. Índice retornado: ${pct}%. Confirme em campo.`,
     }
   }
 
   return {
     tipo: "ok",
-    texto: "Distribuição do plantio em boas condições. Nenhuma falha significativa detectada.",
+    texto: "Baixo nível de atenção indicado na imagem. Mantenha o acompanhamento em campo.",
   }
 }
 
@@ -144,11 +144,11 @@ export function interpretar(result) {
   } = result
 
   const candidatos = [
-    interpretarCobertura(coverage),
-    interpretarFalhas(failure_score, failure_level),
-    interpretarUniformidade(uniformity),
+    result.coverage != null && interpretarCobertura(coverage),
+    result.failure_score != null && result.failure_level != null && interpretarFalhas(failure_score, failure_level),
+    result.uniformity != null && interpretarUniformidade(uniformity),
     interpretarFileiras(rows),
-    interpretarIluminacao(illumination_quality, shadow_coverage),
+    result._apiVersion !== "v1" && interpretarIluminacao(illumination_quality, shadow_coverage),
     interpretarCaminhos(path_coverage),
   ].filter(Boolean)
 
@@ -157,7 +157,7 @@ export function interpretar(result) {
 
   const alertaPrincipal = perigo || aviso || {
     nivel: "ok",
-    texto: "Plantio em boas condições. Nenhuma intervenção urgente necessária.",
+    texto: "Interprete a imagem e confirme as observações em campo antes de qualquer intervenção.",
   }
 
   return {

@@ -1,6 +1,6 @@
+import ReportButton from "../ReportButton"
 import { formatDiagnosisName } from "./diagnosisLabels"
 
-const POSSIBLE_DIAGNOSIS_THRESHOLD = 58
 
 function formatClassName(name) {
   return formatDiagnosisName(name)
@@ -23,16 +23,16 @@ function normalizeResult(result) {
     (probabilityList.length > 0 ? probabilityList[0].name : null) ||
     "Inconclusivo"
 
-  let confidence = result?.confianca || result?.confidence
+  let confidence = result?.confianca ?? result?.confidence
 
   if (confidence === undefined || confidence === null) {
-    confidence = probabilityList.length > 0 ? probabilityList[0].value : 0
+    confidence = probabilityList.length > 0 ? probabilityList[0].value : null
   }
 
   return {
     status,
     disease: formatClassName(rawName),
-    confidence: Math.round(Number(confidence) || 0),
+    confidence: confidence != null && Number.isFinite(Number(confidence)) ? Math.round(Number(confidence)) : null,
     message: result?.mensagem || result?.message || "",
     quality: result?.qualidade || {},
     probabilityList
@@ -45,7 +45,7 @@ function getResultMode(status) {
       icon: "warning",
       badge: "Imagem fora do padrão",
       title: "Essa imagem não parece ser soja",
-      label: "DIAGNÓSTICO NÃO REALIZADO",
+      label: "TRIAGEM NÃO REALIZADA",
       tone: "warning",
       message: "Por favor, selecione uma foto clara de uma folha ou lavoura de soja."
     }
@@ -69,7 +69,7 @@ function getResultMode(status) {
       title: "O modelo não teve certeza suficiente",
       label: "ANÁLISE INCONCLUSIVA",
       tone: "info",
-      message: "Envie outra imagem da folha em melhor ângulo para confirmar o diagnóstico."
+      message: "Envie outra imagem da folha em melhor ângulo e confirme os sinais em campo."
     }
   }
 
@@ -84,126 +84,46 @@ function getResultMode(status) {
     }
   }
 
+  if (status !== "ok") {
+    return { icon: "help", badge: "Inconclusivo", title: "Análise não concluída", label: "ANÁLISE INCONCLUSIVA", tone: "warning", message: "Envie uma imagem melhor e confirme os sinais em campo." }
+  }
+
   return {
     icon: "analytics",
     badge: "Resultado",
     title: "Resultado da análise",
-    label: "DOENÇA ENCONTRADA",
+    label: "CLASSE MAIS PROVÁVEL",
     tone: "success",
     message: ""
   }
 }
 
-function getRecommendations(diseaseName, status, hasPossibleDiagnosis) {
-  if (hasPossibleDiagnosis) {
-    return [
-      "Use o chute apenas como indicação inicial",
-      "Envie uma nova foto mais proxima e bem iluminada para confirmar",
-      "Não aplique defensivos sem validação técnica no campo"
-    ]
-  }
-
-  if (status !== "ok") {
-    return [
-      "Use uma imagem real de folha ou lavoura de soja",
-      "Evite objetos, documentos, canetas, mãos ou fundo sem planta",
-      "Fotografe com boa luz e foco antes de analisar novamente"
-    ]
-  }
-
-  const lowerName = diseaseName.toLowerCase()
-
-  if (lowerName.includes("ferrugem")) {
-    return [
-      "Aplicar fungicidas específicos com orientação técnica",
-      "Monitorar a lavoura a cada 7 dias",
-      "Evitar plantio adensado"
-    ]
-  }
-
-  if (lowerName.includes("cercospora")) {
-    return [
-      "Consultar um engenheiro agrônomo para confirmar a severidade",
-      "Avaliar fungicidas recomendados para a cultura",
-      "Reduzir restos culturais quando aplicável"
-    ]
-  }
-
-  if (lowerName.includes("saudavel") || lowerName.includes("saudável")) {
-    return [
-      "Manter monitoramento preventivo",
-      "Registrar novas imagens em caso de mudança visual",
-      "Manter manejo nutricional equilibrado"
-    ]
-  }
-
-  if (lowerName.includes("lagarta")) {
-    return [
-      "Avaliar nível de infestação antes de aplicar controle",
-      "Usar manejo integrado de pragas",
-      "Monitorar talhões vizinhos"
-    ]
-  }
-
-  return [
-    "Consultar um engenheiro agrônomo",
-    "Coletar novas imagens da área afetada",
-    "Confirmar o diagnóstico antes de qualquer aplicação"
+function getRecommendations(status) {
+  return status === "ok" ? [
+    "Confirme os sinais em campo com um profissional habilitado",
+    "Registre novas imagens para acompanhar a lavoura",
+    "Não realize intervenções com base apenas nesta triagem"
+  ] : [
+    "Envie uma imagem de soja mais próxima, nítida e bem iluminada",
+    "Confira o enquadramento e tente analisar novamente",
+    "Confirme os sinais em campo antes de qualquer intervenção"
   ]
 }
 
-export default function DiagnosisResult({ result, onRestart }) {
+export default function DiagnosisResult({ result, onRestart, onCreateInspection, reportContext, images }) {
   const normalized = normalizeResult(result)
   const mode = getResultMode(normalized.status)
   const isPositiveDiagnosis = normalized.status === "ok"
-  const topGuess = normalized.probabilityList[0] || null
-  const canShowPossibleDiagnosis =
-    !isPositiveDiagnosis &&
-    (normalized.status === "baixa_confianca" || normalized.status === "classes_proximas") &&
-    topGuess &&
-    topGuess.value >= POSSIBLE_DIAGNOSIS_THRESHOLD
-
-  const primaryLabel = isPositiveDiagnosis
-    ? mode.label
-    : canShowPossibleDiagnosis
-      ? "POSSÍVEL DIAGNÓSTICO"
-      : mode.label
-
-  const primaryValue = isPositiveDiagnosis
-    ? normalized.disease
-    : canShowPossibleDiagnosis
-      ? topGuess.name
-      : mode.badge
-
-  const titleMessage = normalized.message || mode.message
-  const primaryMessage = canShowPossibleDiagnosis
-    ? `Chute técnico: ${topGuess.name} apareceu com ${Math.round(topGuess.value)}%, mas ainda precisa de uma imagem melhor para confirmar.`
-    : titleMessage
-
-  const confidenceLabel = isPositiveDiagnosis
-    ? "NÍVEL DE CONFIANÇA"
-    : canShowPossibleDiagnosis
-      ? "CONFIANÇA DO CHUTE"
-      : "STATUS DA ANÁLISE"
-
+  const primaryLabel = mode.label
+  const primaryValue = isPositiveDiagnosis ? normalized.disease : mode.badge
+  const primaryMessage = normalized.message || mode.message
+  const confidenceLabel = isPositiveDiagnosis ? "CONFIANÇA DO MODELO" : "STATUS DA ANÁLISE"
   const confidenceValue = isPositiveDiagnosis
-    ? `${normalized.confidence}%`
-    : canShowPossibleDiagnosis
-      ? `${Math.round(topGuess.value)}%`
-      : formatClassName(normalized.status)
-
-  const confidenceBarValue = isPositiveDiagnosis
-    ? normalized.confidence
-    : canShowPossibleDiagnosis
-      ? Math.round(topGuess.value)
-      : 0
-
-  const shouldShowConfidenceBar = isPositiveDiagnosis || canShowPossibleDiagnosis
-  const recommendations = getRecommendations(
-    normalized.disease,
-    normalized.status,
-    canShowPossibleDiagnosis
-  )
+    ? normalized.confidence == null ? "Não informada" : `${normalized.confidence}%`
+    : mode.badge
+  const confidenceBarValue = normalized.confidence ?? 0
+  const shouldShowConfidenceBar = isPositiveDiagnosis && normalized.confidence != null
+  const recommendations = getRecommendations(normalized.status)
 
   return (
     <div className={`result-container animate-fade-in result-${mode.tone}`}>
@@ -216,7 +136,7 @@ export default function DiagnosisResult({ result, onRestart }) {
         <div className="col-left">
           <div className="premium-card disease-box">
             <span className="material-symbols-outlined icon-highlight">
-              {isPositiveDiagnosis ? "eco" : canShowPossibleDiagnosis ? "tips_and_updates" : mode.icon}
+              {isPositiveDiagnosis ? "eco" : mode.icon}
             </span>
             <div className="disease-info">
               <div className="box-label">{primaryLabel}</div>
@@ -227,7 +147,7 @@ export default function DiagnosisResult({ result, onRestart }) {
 
           <div className="premium-card confidence-box">
             <span className="material-symbols-outlined icon-highlight">
-              {isPositiveDiagnosis ? "speed" : canShowPossibleDiagnosis ? "query_stats" : "verified_user"}
+              {isPositiveDiagnosis ? "speed" : "verified_user"}
             </span>
             <div className="confidence-info">
               <div className="box-label">{confidenceLabel}</div>
@@ -259,7 +179,7 @@ export default function DiagnosisResult({ result, onRestart }) {
                 </div>
               ) : (
                 normalized.probabilityList.map((item, idx) => (
-                  <div key={idx} className={`prob-item ${idx === 0 && canShowPossibleDiagnosis ? "prob-item-guess" : ""}`}>
+                  <div key={idx} className="prob-item">
                     <div className="prob-name">
                       <span className="material-symbols-outlined">eco</span>
                       <span>{item.name}</span>
@@ -295,9 +215,17 @@ export default function DiagnosisResult({ result, onRestart }) {
         </div>
       </div>
 
+      <p className="result-message">Esta análise funciona como apoio à inspeção e deve ser confirmada em campo. O resultado não substitui avaliação agronômica profissional.</p>
+      {onCreateInspection && !["erro_api", "erro_conexao", "erro_processamento", "imagem_invalida", "fora_do_dominio"].includes(normalized.status) && (
+        <button className="restart-btn-premium" onClick={onCreateInspection}>
+          <span className="material-symbols-outlined">assignment_add</span>
+          Criar tarefa de vistoria
+        </button>
+      )}
+      <ReportButton result={result} images={images} context={reportContext} className="restart-btn-premium" />
       <button className="restart-btn-premium" onClick={onRestart}>
         <span className="material-symbols-outlined">refresh</span>
-        Novo diagnóstico
+        Nova triagem
       </button>
 
       <style jsx>{`

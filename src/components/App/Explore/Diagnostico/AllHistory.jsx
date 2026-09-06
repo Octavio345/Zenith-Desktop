@@ -53,7 +53,7 @@ export default function AllHistory({ onBack }) {
           Voltar
         </button>
         <h1>Histórico de Análises</h1>
-        <p>Consulte diagnósticos individuais e levantamentos com múltiplas fotos</p>
+        <p>Consulte triagens individuais e levantamentos com múltiplas fotos</p>
       </div>
 
       {history.length === 0 ? (
@@ -61,7 +61,7 @@ export default function AllHistory({ onBack }) {
           <div className="empty-icon">
             <span className="material-symbols-outlined">history</span>
           </div>
-          <p className="empty-title">Nenhum diagnóstico encontrado</p>
+          <p className="empty-title">Nenhuma triagem encontrada</p>
           <p className="empty-description">Faça uma análise para começar.</p>
           <button className="btn primary" onClick={onBack}>Voltar ao início</button>
         </div>

@@ -287,15 +287,15 @@ export default function ThreeDExperience({ images = [], conditionNames = [] }) {
           <span className="material-symbols-outlined">view_in_ar</span>
         </div>
         <div className="zenith-3d-invitation-copy">
-          <span className="zenith-3d-eyebrow">RECONSTRUÇÃO DO TALHÃO</span>
-          <h2 id="zenith-3d-question">Quer visualizar esta área da lavoura em 3D?</h2>
+          <span className="zenith-3d-eyebrow">RECURSO EXPERIMENTAL</span>
+          <h2 id="zenith-3d-question">Reconstrução 3D Experimental</h2>
           <p>
-            Use as fotografias deste levantamento para reconstruir a área e explorar o terreno por outro ângulo.
+            Reconstrução fotogramétrica experimental a partir de imagens sequenciais do mesmo voo.
             O processamento só começa depois da sua confirmação.
           </p>
           <div className="zenith-3d-quick-warning">
             <span className="material-symbols-outlined">photo_camera</span>
-            <span>Resultado confiável exige fotos originais do mesmo voo, nítidas e com boa sobreposição.</span>
+            <span>Use fotos originais do mesmo voo, nítidas e com boa sobreposição.</span>
           </div>
         </div>
         <div className="zenith-3d-invitation-actions">
@@ -316,7 +316,7 @@ export default function ThreeDExperience({ images = [], conditionNames = [] }) {
       <header className="zenith-3d-workspace-header">
         <div>
           <span className="zenith-3d-eyebrow">ZENITH · FOTOGRAMETRIA</span>
-          <h2 id="zenith-3d-title">Reconstrução 3D da área analisada</h2>
+          <h2 id="zenith-3d-title">Reconstrução 3D Experimental</h2>
           <p>Escolha as melhores imagens do mesmo voo. A análise da IA utilizou o lote completo; o 3D aceita até 40 fotos.</p>
         </div>
         {!task && (

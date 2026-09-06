@@ -58,8 +58,8 @@ export default function AppFooter() {
             </div>
             <p>Informação clara para proteger a lavoura, organizar a operação e tomar decisões melhores no campo.</p>
             <div className="zenith-footer__capabilities">
-              <span><span className="material-symbols-outlined">eco</span> Diagnóstico</span>
-              <span><span className="material-symbols-outlined">deployed_code</span> Reconstrução 3D</span>
+              <span><span className="material-symbols-outlined">eco</span> Triagem IA</span>
+              <span><span className="material-symbols-outlined">monitoring</span> Monitoramento</span>
               <span><span className="material-symbols-outlined">monitoring</span> Gestão</span>
             </div>
           </section>

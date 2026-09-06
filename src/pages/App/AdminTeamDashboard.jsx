@@ -629,7 +629,7 @@ export default function AdminTeamDashboard() {
         <div className="team-hero-copy">
           <span className="team-kicker">Dashboard administrativo</span>
           <h1>Monitoramento da equipe</h1>
-          <p>Controle status, tarefas, horários, produtividade e desempenho de cada funcionário.</p>
+          <p>Controle status, tarefas, horários e conclusão de tarefas de cada funcionário.</p>
         </div>
         <aside className="team-hero-command">
           <div className="team-hero-command__status"><i /><span><small>Central operacional</small><strong>Painel do proprietário</strong></span></div>
@@ -655,7 +655,7 @@ export default function AdminTeamDashboard() {
         </article>
         <article>
           <span className="material-symbols-outlined" aria-hidden="true">monitoring</span>
-          <div><small>Produtividade média</small><strong>{isTeamLoading || totals.productivity === null ? "--" : `${totals.productivity}%`}</strong><p>Com base nas tarefas</p></div>
+          <div><small>Taxa média de conclusão</small><strong>{isTeamLoading || totals.productivity === null ? "--" : `${totals.productivity}%`}</strong><p>Com base nas tarefas</p></div>
         </article>
       </section>
 
@@ -890,7 +890,7 @@ export default function AdminTeamDashboard() {
 
             {detailTab === "summary" && <div className="detail-performance-grid">
               <article className="productivity-card">
-                <small>Produtividade pelas tarefas</small>
+                <small>Taxa de conclusão de tarefas</small>
                 <strong>{selected.productivity === null ? "--" : `${selected.productivity}%`}</strong>
                 <p>{selected.productivity === null ? "Sem tarefas registradas" : "Tarefas concluídas no período"}</p>
                 <div className="productivity-bars">
@@ -1033,7 +1033,7 @@ export default function AdminTeamDashboard() {
         {!selected && !isTeamLoading && (
           <aside className="team-panel team-selection-empty">
             <span className="material-symbols-outlined">manage_accounts</span>
-            <div><small>PAINEL DE DETALHES</small><h2>Selecione um funcionário</h2><p>Os horários, produtividade, drone e tarefas aparecerão aqui.</p></div>
+            <div><small>PAINEL DE DETALHES</small><h2>Selecione um funcionário</h2><p>Os horários, taxa de conclusão, drone e tarefas aparecerão aqui.</p></div>
           </aside>
         )}
       </section>

@@ -49,7 +49,7 @@ export default function BatchImagePreview({
             <div>
               <span className="batch-eyebrow">MISSÃO DE MAPEAMENTO</span>
               <h1 id="batch-preview-title">Fotos prontas para análise</h1>
-              <p>Revise o lote antes de enviar as imagens para a inteligência artificial.</p>
+              <p>Confira as fotos antes de iniciar a análise.</p>
             </div>
           </div>
 
@@ -64,7 +64,7 @@ export default function BatchImagePreview({
             </div>
             <div>
               <strong>{100 - images.length}</strong>
-              <span>vagas no lote</span>
+              <span>fotos que ainda pode adicionar</span>
             </div>
           </div>
         </header>
@@ -143,7 +143,7 @@ export default function BatchImagePreview({
         <footer className="batch-preview-footer">
           <div className="batch-privacy-note">
             <span className="material-symbols-outlined">verified_user</span>
-            <span>O lote será processado em uma única análise consolidada.</span>
+            <span>Você verá um resumo e o resultado de cada foto.</span>
           </div>
           <div className="batch-preview-actions">
             <button type="button" className="batch-button batch-button-secondary" onClick={onBack}>

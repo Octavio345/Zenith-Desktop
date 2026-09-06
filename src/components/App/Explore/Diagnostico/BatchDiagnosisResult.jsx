@@ -1,3 +1,4 @@
+import ReportButton from "../ReportButton"
 import { useMemo, useState } from "react"
 import { formatDiagnosisName } from "./diagnosisLabels"
 import ThreeDExperience from "./ThreeDExperience"
@@ -103,7 +104,7 @@ function getOverallPresentation(general, conditions) {
     return {
       tone: "healthy",
       icon: "verified",
-      eyebrow: "CONDIÇÃO PREDOMINANTE",
+      eyebrow: "CLASSE MAIS PROVÁVEL",
       title: "Lote com predominância saudável",
       description: general?.mensagem || "As imagens confiáveis foram classificadas como soja saudável."
     }
@@ -114,8 +115,8 @@ function getOverallPresentation(general, conditions) {
     return {
       tone: "detected",
       icon: getConditionStyle(predominant).icon,
-      eyebrow: "CONDIÇÃO PREDOMINANTE",
-      title: `${formatDiagnosisName(predominant)} detectada no lote`,
+      eyebrow: "CLASSE MAIS PROVÁVEL",
+      title: formatDiagnosisName(predominant),
       description: general?.mensagem || "A condição apareceu de forma predominante entre as imagens confiáveis."
     }
   }
@@ -158,7 +159,7 @@ function MetricCard({ icon, value, label, tone = "default" }) {
   )
 }
 
-export default function BatchDiagnosisResult({ result, selectedImages = [], onRestart, onCreateInspection }) {
+export default function BatchDiagnosisResult({ result, selectedImages = [], onRestart, onCreateInspection, reportContext }) {
   const [imageFilter, setImageFilter] = useState("all")
   const general = result?.resultado_geral || null
   const conditions = useMemo(() => {
@@ -217,7 +218,7 @@ export default function BatchDiagnosisResult({ result, selectedImages = [], onRe
       : [
           "Priorize a inspeção das imagens com resultado confiável.",
           "Compare o padrão encontrado com outras áreas do mesmo talhão.",
-          "Valide o diagnóstico e o manejo com um profissional habilitado."
+          "Valide a triagem e o manejo com um profissional habilitado."
         ]
 
   return (
@@ -263,19 +264,17 @@ export default function BatchDiagnosisResult({ result, selectedImages = [], onRe
             <MetricCard icon="verified" value={reliable} label="resultados confiáveis" tone="success" />
             <MetricCard icon="warning" value={rejected} label="precisam de atenção" tone={rejected ? "warning" : "default"} />
             <MetricCard icon="handshake" value={`${consensus}%`} label="consenso do lote" />
-            <MetricCard icon="timer" value={`${asNumber(result?.tempo_processamento_ms).toFixed(0)} ms`} label="tempo de processamento" />
+            {result?.tempo_processamento_ms != null && <MetricCard icon="timer" value={`${asNumber(result.tempo_processamento_ms).toFixed(0)} ms`} label="tempo de processamento" />}
           </section>
 
-          {detectedConditionNames.length > 0 && reconstructionImages.length > 0 && (
-            <ThreeDExperience images={reconstructionImages} conditionNames={detectedConditionNames} />
-          )}
+
 
           <div className="batch-result-layout">
             <section className="batch-panel batch-conditions-panel">
               <div className="batch-panel-heading">
                 <div>
                   <span className="batch-eyebrow">LEITURA DO LOTE</span>
-                  <h2>Condições encontradas</h2>
+                  <h2>Classes indicadas pela IA</h2>
                 </div>
                 <span className="batch-section-count">{conditions.length}</span>
               </div>
@@ -402,12 +401,13 @@ export default function BatchDiagnosisResult({ result, selectedImages = [], onRe
                         <span className="batch-image-filename" title={item.arquivo}>{item.arquivo || "Imagem sem nome"}</span>
                         {item.status === "ok" ? (
                           <>
+                            <span className="batch-image-filename">Classe mais provável</span>
                             <div className={`batch-image-condition batch-condition-${conditionStyle.tone}`}>
                               <span className="material-symbols-outlined">{conditionStyle.icon}</span>
                               <strong>{formatDiagnosisName(item.resultado)}</strong>
                             </div>
                             <div className="batch-image-confidence">
-                              <div><span>Confiança</span><strong>{confidence}%</strong></div>
+                              <div><span>Confiança do modelo</span><strong>{confidence}%</strong></div>
                               <div className="batch-probability-track"><span style={{ width: `${confidence}%` }} /></div>
                             </div>
                           </>
@@ -424,19 +424,23 @@ export default function BatchDiagnosisResult({ result, selectedImages = [], onRe
               </div>
             )}
           </section>
+          {detectedConditionNames.length > 0 && reconstructionImages.length > 0 && (
+            <ThreeDExperience images={reconstructionImages} conditionNames={detectedConditionNames} />
+          )}
         </>
       )}
 
       <footer className="batch-result-footer">
         <div className="batch-disclaimer">
           <span className="material-symbols-outlined">clinical_notes</span>
-          <p>{result?.aviso || "Este resultado apoia a triagem e não substitui a confirmação de um engenheiro agrônomo."}</p>
+          <p>{result?.aviso || "Esta análise funciona como apoio à inspeção e deve ser confirmada em campo. O resultado não substitui avaliação agronômica profissional."}</p>
         </div>
         <div className="batch-result-footer-actions">
+          <ReportButton result={result} images={selectedImages} context={reportContext} className="batch-button batch-button-secondary" />
           {onCreateInspection && presentation.tone !== "danger" && (
             <button type="button" className="batch-button batch-button-secondary" onClick={onCreateInspection}>
               <span className="material-symbols-outlined">assignment_add</span>
-              Criar vistoria
+              Criar tarefa de vistoria
             </button>
           )}
           <button type="button" className="batch-button batch-button-primary" onClick={onRestart}>

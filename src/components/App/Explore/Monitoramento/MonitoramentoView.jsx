@@ -1,3 +1,4 @@
+import ReportButton from "../ReportButton"
 import { useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import { useMonitoramento } from "../hooks/useMonitoramento"
@@ -22,8 +23,8 @@ export default function MonitoramentoView() {
   const createFieldInspection = () => {
     const occurrence = createOccurrenceFromAnalysis({ result, source: "monitoramento" })
     saveActivityDraft({
-      title: "Vistoriar alinhamento do plantio",
-      description: `Ocorrência criada pelo monitoramento aéreo. ${occurrence.fieldAreaName}. Revisar a imagem analisada, verificar a área no campo e registrar a ação tomada.`,
+      title: "Vistoriar região de atenção",
+      description: "Análise estrutural realizada pelo Zenith. Vistoriar as regiões de atenção indicadas na imagem e confirmar em campo a possível baixa densidade antes de qualquer intervenção.",
       type: "tarefa",
       priority: "media",
       source: "monitoramento_aereo",
@@ -35,9 +36,9 @@ export default function MonitoramentoView() {
   return (
     <div className={styles.container}>
       <div className={styles.cabecalho}>
-        <h2 className={styles.titulo}>Monitoramento de Plantacao</h2>
+        <h2 className={styles.titulo}>Monitoramento da plantação</h2>
         <p className={styles.subtitulo}>
-          Analise visual por imagem aerea ou galeria.
+          Selecione uma imagem da soja, analise os resultados e confirme em campo.
         </p>
       </div>
 
@@ -61,20 +62,20 @@ export default function MonitoramentoView() {
             </div>
 
             <h3>Analisando plantio</h3>
-            <p>Processando imagem com visao computacional...</p>
+            <p>Processando imagem com visão computacional...</p>
 
             <div className={styles.analysisSteps}>
               <div className={styles.analysisStep}>
                 <span className="material-symbols-outlined">filter_center_focus</span>
-                <span>Pre-processamento</span>
+                <span>Pré-processamento</span>
               </div>
               <div className={styles.analysisStep}>
                 <span className="material-symbols-outlined">monitoring</span>
-                <span>Leitura do talhao</span>
+                <span>Leitura da imagem</span>
               </div>
               <div className={styles.analysisStep}>
                 <span className="material-symbols-outlined">analytics</span>
-                <span>Metricas finais</span>
+                <span>Métricas finais</span>
               </div>
             </div>
 
@@ -94,7 +95,7 @@ export default function MonitoramentoView() {
             warning
           </span>
           <div className={styles.erroTextos}>
-            <p className={styles.erroTitulo}>Nao foi possivel analisar</p>
+            <p className={styles.erroTitulo}>Não foi possível analisar</p>
             <p className={styles.erroMensagem}>{error}</p>
           </div>
           <button
@@ -128,9 +129,10 @@ export default function MonitoramentoView() {
           >
             Analisar nova imagem
           </button>
+          <ReportButton kind="monitoramento" result={result} images={[{ preview }]} className={styles.botaoVistoria} />
           <button type="button" className={styles.botaoVistoria} onClick={createFieldInspection}>
             <span className="material-symbols-outlined">assignment_add</span>
-            Criar vistoria de campo
+            Criar tarefa de vistoria
           </button>
         </div>
       )}

@@ -45,6 +45,7 @@ export default function DiagnosticoTab() {
   const [step, setStep] = useState("start")
   const [selectedImages, setSelectedImages] = useState([])
   const [result, setResult] = useState(null)
+  const [reportContext, setReportContext] = useState({})
   const [history, setHistory] = useState([])
   const [showAllHistory, setShowAllHistory] = useState(false)
   const [isMobile, setIsMobile] = useState(checkIsMobile)
@@ -77,7 +78,9 @@ export default function DiagnosticoTab() {
     if (location.state?.showHistory) setShowAllHistory(true)
     if (location.state?.showResult && location.state?.diagnosticData) {
       const diagnostic = location.state.diagnosticData
+      setReportContext({ analyzedAt: diagnostic.date, id: diagnostic.id, fieldAreaName: diagnostic.fieldAreaName })
       setResult({
+        status: diagnostic.status || "ok",
         doenca: formatDiagnosisName(diagnostic.disease),
         confianca: diagnostic.confidence,
         probabilidades: {}
@@ -157,10 +160,21 @@ export default function DiagnosticoTab() {
       fieldArea,
       imageCount: selectedImages.length
     })
-    const condition = String(occurrence.condition || "ocorrência identificada").replace(/_/g, " ")
+    const general = result?.resultado_geral || result || {}
+    const confidence = general.confianca_media ?? general.confianca ?? general.confidence
+    const condition = (general.status || "ok") === "ok"
+      ? formatDiagnosisName(general.condicao_predominante || general.resultado || general.doenca || general.disease || "Inconclusivo")
+      : "Resultado inconclusivo ou sem classe única; conferir as imagens e confirmar em campo"
+    const description = [
+      "Análise realizada pelo Zenith.",
+      `Classe mais provável: ${condition}.`,
+      confidence != null && Number.isFinite(Number(confidence)) ? `Confiança do modelo: ${Math.round(Number(confidence))}%.` : null,
+      fieldArea?.name ? `Talhão relacionado: ${fieldArea.name}.` : null,
+      "Realizar vistoria em campo para confirmação antes de qualquer intervenção."
+    ].filter(Boolean).join("\n")
     saveActivityDraft({
-      title: `Vistoriar: ${condition}`,
-      description: `Ocorrência gerada pelo diagnóstico por IA. Talhão: ${occurrence.fieldAreaName}. Confiança: ${occurrence.confidence}%. Verificar no campo e registrar a ação tomada.`,
+      title: "Confirmar possível ocorrência fitossanitária",
+      description,
       type: "tarefa",
       priority: occurrence.confidence >= 75 ? "alta" : "media",
       source: "diagnostico_ia",
@@ -332,10 +346,12 @@ export default function DiagnosticoTab() {
 
     const controller = new AbortController()
     requestControllerRef.current = controller
+    setReportContext({ fieldAreaName: getFieldAreaContext()?.name })
     setStep("analysis")
 
     try {
       const data = await diagnosticarLote(selectedImages, { signal: controller.signal })
+      setReportContext((current) => ({ ...current, analyzedAt: new Date().toLocaleString("pt-BR") }))
       setResult(data)
       saveBatchToHistory(data)
     } catch (error) {
@@ -406,30 +422,30 @@ export default function DiagnosticoTab() {
   }
   if (step === "analysis") return <AnalysisLoader imageCount={selectedImages.length} />
   if (step === "result" && result?.resultado_geral) {
-    return <BatchDiagnosisResult result={result} selectedImages={selectedImages} onRestart={reset} onCreateInspection={createInspectionTask} />
+    return <BatchDiagnosisResult result={result} selectedImages={selectedImages} onRestart={reset} onCreateInspection={createInspectionTask} reportContext={reportContext} />
   }
   if (step === "result" && selectedImages.length > 0) {
-    return <BatchDiagnosisResult result={result} selectedImages={selectedImages} onRestart={reset} onCreateInspection={createInspectionTask} />
+    return <BatchDiagnosisResult result={result} selectedImages={selectedImages} onRestart={reset} onCreateInspection={createInspectionTask} reportContext={reportContext} />
   }
-  if (step === "result") return <DiagnosisResult result={result} onRestart={reset} />
+  if (step === "result") return <DiagnosisResult result={result} onRestart={reset} onCreateInspection={createInspectionTask} reportContext={reportContext} />
 
   return (
     <div className="diagnostic-container">
       <div className="diagnostic-header">
         <div className="header-glow" />
-        <span className="batch-eyebrow">VISÃO COMPUTACIONAL PARA O CAMPO</span>
-        <h1 className="diagnostico-title">Diagnóstico aéreo <span className="highlight">por IA</span></h1>
+        <span className="batch-eyebrow">INTELIGÊNCIA ARTIFICIAL NO CAMPO</span>
+        <h1 className="diagnostico-title">Análise da soja <span className="highlight">por IA</span></h1>
         <p>
-          Envie até <span className="highlight">100 fotos do voo</span> e receba uma leitura consolidada do lote,
-          sem perder o resultado individual de cada imagem.
+          Envie até <span className="highlight">100 fotos da soja</span> para identificar possíveis problemas.
+          Veja o resultado de cada foto e confirme em campo com um profissional.
         </p>
       </div>
 
       <section className="diagnostic-field-context" aria-labelledby="diagnostic-field-context-title">
         <span className="material-symbols-outlined">location_on</span>
         <div>
-          <strong id="diagnostic-field-context-title">Talhão do levantamento <em>opcional</em></strong>
-          <small>Selecione o Talhão 1 criado no mapa ou escolha a opção para digitar outro nome. Você poderá revisar isso novamente depois de selecionar as fotos.</small>
+          <strong id="diagnostic-field-context-title">Área das fotos <em>opcional</em></strong>
+          <small>Escolha um talhão salvo no mapa ou digite o nome da área fotografada.</small>
         </div>
         <FieldAreaPicker
           areas={fieldAreas}
@@ -458,7 +474,7 @@ export default function DiagnosticoTab() {
               </div>
             </div>
             <h3>Tirar foto</h3>
-            <p>Capture uma folha no campo e adicione a imagem ao lote.</p>
+            <p>Fotografe uma folha de soja para analisar.</p>
             <div className="card-action">
               <span>Usar câmera</span>
               <span className="material-symbols-outlined arrow" aria-hidden="true">arrow_forward</span>
@@ -482,7 +498,7 @@ export default function DiagnosticoTab() {
             </div>
           </div>
           <h3>Analisar fotos do drone</h3>
-          <p>Selecione várias imagens de uma vez ou arraste o lote completo para esta área.</p>
+          <p>Escolha as fotos no seu dispositivo ou arraste-as para cá.</p>
           <div className="card-action">
             <span>Selecionar imagens</span>
             <span className="material-symbols-outlined arrow" aria-hidden="true">arrow_forward</span>

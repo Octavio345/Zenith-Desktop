@@ -34,7 +34,7 @@ function capitalizeFirst(value) {
 
 export function formatDiagnosisName(value) {
   const rawValue = String(value || "").trim()
-  if (!rawValue) return "Diagnóstico"
+  if (!rawValue) return "Triagem"
 
   const key = normalizeKey(rawValue)
   if (KNOWN_DIAGNOSIS_LABELS[key]) return KNOWN_DIAGNOSIS_LABELS[key]

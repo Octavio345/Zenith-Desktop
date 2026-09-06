@@ -4386,3 +4386,58 @@ body {
   .employee-work-dialog__actions { align-items: stretch; flex-direction: column-reverse; }
   .employee-work-dialog__actions > button { width: 100%; }
 }
+
+/* Home: refinamento restrito ao painel operacional. */
+.zenith-home--focused .zenith-home__hero-grid {
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  align-items: stretch;
+}
+.zenith-home--focused .home-analysis-card {
+  min-height: 365px;
+  padding: clamp(26px, 3vw, 40px);
+  align-items: flex-start;
+}
+.zenith-home--focused .home-analysis-card > div { width: 52%; position: relative; z-index: 2; }
+.zenith-home--focused .home-analysis-card h2 { max-width: 13ch; font-size: clamp(1.8rem, 2.7vw, 2.5rem); }
+.zenith-home--focused .home-analysis-card p { max-width: 34ch; line-height: 1.65; }
+.zenith-home--focused .home-analysis-card > img {
+  width: 48% !important;
+  height: 80% !important;
+  right: 3% !important;
+  bottom: 10% !important;
+  object-position: center !important;
+  object-fit: contain !important;
+  transform-origin: center;
+  animation: zenithDroneHover 5.5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes zenithDroneHover {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-10px) rotate(1deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .zenith-home--focused .home-analysis-card > img {
+    animation: none;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+.zenith-home--focused .quick-summary-grid > button { min-width: 0; align-items: center; }
+.zenith-home--focused .quick-summary-grid > button > span:nth-child(2) { min-width: 0; }
+.zenith-home--focused .quick-summary-grid small { color: var(--zenith-ink); font-size: .88rem; font-weight: 750; }
+.zenith-home--focused .quick-summary-grid strong { color: var(--zenith-muted); font-size: .72rem; font-weight: 500; line-height: 1.5; }
+.zenith-home--focused .quick-summary-grid > button:focus-visible,
+.zenith-home--focused .home-analysis-card button:focus-visible { outline: 3px solid var(--zenith-green); outline-offset: 4px; }
+.zenith-home--focused .home-operation-grid > .farm-showcase-card { min-height: 300px; }
+.zenith-home--focused .farm-showcase-card__top > strong { max-width: 48%; text-align: right; font-size: .8rem; }
+@media (max-width: 900px) {
+  .zenith-home--focused .zenith-home__hero-grid { grid-template-columns: 1fr; }
+  .zenith-home--focused .home-analysis-card { min-height: 320px; }
+}
+@media (max-width: 560px) {
+  .zenith-home--focused .home-analysis-card { min-height: 510px; padding-bottom: 230px; }
+  .zenith-home--focused .home-analysis-card > div { width: 100%; }
+  .zenith-home--focused .home-analysis-card p { max-width: 27ch; }
+  .zenith-home--focused .home-analysis-card > img { width: 70% !important; height: 210px !important; right: 15% !important; bottom: 12px !important; opacity: 1; }
+  .zenith-home--focused .home-analysis-card button { position: relative; z-index: 2; }
+}

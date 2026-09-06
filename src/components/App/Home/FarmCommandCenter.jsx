@@ -72,24 +72,24 @@ export default function FarmCommandCenter({ activities = [], onOpen }) {
       <header className="farm-command-center__head">
         <div>
           <span className="zenith-kicker"><span className="material-symbols-outlined">radar</span> Central da fazenda</span>
-          <h2>Do sinal à ação no campo.</h2>
-          <p>Conecte análises, talhões e tarefas em uma única rotina operacional.</p>
+          <h2>O que precisa de atenção</h2>
+          <p>Acompanhe vistorias pendentes e atividades da propriedade.</p>
         </div>
         <button type="button" onClick={() => onOpen("mapa")}>
-          Abrir mapa operacional <span className="material-symbols-outlined">arrow_forward</span>
+          Ver mapa e talhões <span className="material-symbols-outlined">arrow_forward</span>
         </button>
       </header>
 
       <div className="farm-command-center__metrics">
         <article><span className="material-symbols-outlined">grid_view</span><small>Talhões mapeados</small><strong>{fieldAreas.length}</strong></article>
-        <article className={attentionOccurrences.length ? "is-alert" : ""}><span className="material-symbols-outlined">visibility</span><small>Ocorrências para vistoria</small><strong>{attentionOccurrences.length}</strong></article>
+        <article className={attentionOccurrences.length ? "is-alert" : ""}><span className="material-symbols-outlined">visibility</span><small>Vistorias pendentes</small><strong>{attentionOccurrences.length}</strong></article>
         <article><span className="material-symbols-outlined">assignment_late</span><small>Atividades abertas</small><strong>{pending}</strong></article>
         <article className={highPriority ? "is-alert" : ""}><span className="material-symbols-outlined">priority_high</span><small>Prioridade alta</small><strong>{highPriority}</strong></article>
       </div>
 
       <div className="farm-command-center__body">
         <article className="farm-command-center__timeline">
-          <div className="farm-command-center__section-title"><span className="material-symbols-outlined">timeline</span><div><small>Fluxo operacional</small><h3>Ocorrências recentes</h3></div></div>
+          <div className="farm-command-center__section-title"><span className="material-symbols-outlined">timeline</span><div><small>Acompanhamento</small><h3>Sinais para verificar em campo</h3></div></div>
           {attentionOccurrences.length ? attentionOccurrences.slice(0, 3).map((item) => (
             <button className="operation-event" type="button" key={item.id} onClick={() => onOpen("atividades")}>
               <span className="operation-event__icon material-symbols-outlined">{item.source === "monitoramento" ? "satellite_alt" : "biotech"}</span>
@@ -104,8 +104,8 @@ export default function FarmCommandCenter({ activities = [], onOpen }) {
         <article className="farm-command-center__next-step">
           <span className="material-symbols-outlined">route</span>
           <small>Próximo passo recomendado</small>
-          <h3>{attentionOccurrences.length ? "Envie uma vistoria ao talhão" : "Inicie um novo levantamento"}</h3>
-          <p>{attentionOccurrences.length ? "Converta a ocorrência identificada pela análise em uma tarefa para a equipe." : "Envie imagens do drone ou do campo para gerar um novo ponto de acompanhamento."}</p>
+          <h3>{attentionOccurrences.length ? "Confira as vistorias pendentes" : "Comece por uma imagem"}</h3>
+          <p>{attentionOccurrences.length ? "Converta a ocorrência identificada pela análise em uma tarefa para a equipe." : "Selecione imagens da soja para analisar sinais e acompanhar a lavoura."}</p>
           <button type="button" onClick={() => onOpen(attentionOccurrences.length ? "atividades" : "diagnostico")}>
             {attentionOccurrences.length ? "Ver atividades" : "Fazer análise"}<span className="material-symbols-outlined">arrow_outward</span>
           </button>

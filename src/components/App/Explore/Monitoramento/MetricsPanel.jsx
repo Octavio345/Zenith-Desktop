@@ -92,17 +92,20 @@ function MetricsPanel({ result, insights }) {
         <span className="material-symbols-outlined" aria-hidden="true">
           analytics
         </span>
-        <span>Análise do talhão</span>
+        <span>Análise da imagem</span>
       </div>
 
       <div className={styles.metriasPrincipais}>
+        {(result.coverage != null || result.density != null) && (
         <div className={styles.metricaAnel}>
           <div className={styles.metricaAnelWrapper}>
             <AnelProgresso valor={coverage} cor={corCobertura} />
             <span className={styles.metricaAnelValor}>{coveragePct}%</span>
           </div>
-          <span className={styles.metricaAnelRotulo}>Cobertura</span>
+          <span className={styles.metricaAnelRotulo}>Cobertura vegetal</span>
         </div>
+        )}
+        {result.uniformity != null && (
 
         <div className={styles.metricaAnel}>
           <div className={styles.metricaAnelWrapper}>
@@ -111,6 +114,8 @@ function MetricsPanel({ result, insights }) {
           </div>
           <span className={styles.metricaAnelRotulo}>Uniformidade</span>
         </div>
+        )}
+        {(result.failure_level != null || result.failures != null) && (
 
         <div className={styles.metricaAnel}>
           <div
@@ -121,16 +126,17 @@ function MetricsPanel({ result, insights }) {
               borderColor: coresFalha.borda,
             }}
           >
-            <span className={styles.badgeFalhasRotulo}>Falhas</span>
-            <span className={styles.badgeFalhasNivel}>{failureLevel}</span>
-            <span className={styles.badgeFalhasPct}>{failurePct}%</span>
+            <span className={styles.badgeFalhasRotulo}>Atenção</span>
+            <span className={styles.badgeFalhasNivel}>{{ ALTO: "ALTA", MEDIO: "MODERADA", BAIXO: "BAIXA" }[failureLevel]}</span>
+            {result.failure_score != null && <span className={styles.badgeFalhasPct} title="Índice de baixa densidade retornado pelo processamento">{failurePct}%</span>}
           </div>
-          <span className={styles.metricaAnelRotulo}>Plantio</span>
+          <span className={styles.metricaAnelRotulo}>Baixa densidade</span>
         </div>
+        )}
       </div>
 
       <div className={styles.gridDetalhes}>
-        <CartaoMetrica icon="view_week" rotulo="Fileiras">
+        {(rows || result.alignment) && <CartaoMetrica icon="view_week" rotulo="Fileiras">
           {rows ? (
             rows.detected ? (
               <div className={styles.fileirasDetalhes}>
@@ -160,12 +166,12 @@ function MetricsPanel({ result, insights }) {
               {result.alignment?.aligned ? "Alinhado" : "Desalinhado"}
             </span>
           )}
-        </CartaoMetrica>
+        </CartaoMetrica>}
 
-        <CartaoMetrica icon="image_search" rotulo="Condições da imagem">
-          <span className={`${styles.statusTag} ${iluminacaoInfo.classe}`}>
+        {result._apiVersion !== "v1" && (result.illumination_quality != null || result.shadow_coverage != null || result.path_coverage != null) && <CartaoMetrica icon="image_search" rotulo="Condições da imagem">
+          {result.illumination_quality != null && <span className={`${styles.statusTag} ${iluminacaoInfo.classe}`}>
             {iluminacaoInfo.texto}
-          </span>
+          </span>}
           {sombraPct > 5 && (
             <span className={styles.notaSombra}>{sombraPct}% em sombra</span>
           )}
@@ -174,7 +180,7 @@ function MetricsPanel({ result, insights }) {
               Área excluída: {pathPct}% em caminhos
             </span>
           )}
-        </CartaoMetrica>
+        </CartaoMetrica>}
       </div>
 
       {insights?.length > 0 && (
