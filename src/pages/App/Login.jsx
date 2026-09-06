@@ -5,7 +5,7 @@ import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signOu
 import { doc, setDoc } from "firebase/firestore"
 import { FaEye, FaEyeSlash, FaGoogle } from "react-icons/fa"
 import { ACCOUNT_ROLES, getUserAccessProfile, isAccountBlocked, isOperationalRole, normalizeRole } from "../../services/accessControl"
-import { runIdentityProtectionMigration } from "../../services/accountIdentity"
+import { protectCurrentIdentityData } from "../../services/accountIdentity"
 import "../../styles/App/Login.css"
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -36,6 +36,7 @@ export default function Login() {
             setAlertMessage({ type: "error", text: "Seu acesso foi removido pelo proprietário da fazenda." })
             return
           }
+          await protectCurrentIdentityData(profile, user.uid).catch((error) => console.error("Não foi possível proteger dados antigos:", error))
           navigate("/home", { replace: true })
         } catch {
           await signOut(auth)
@@ -86,8 +87,8 @@ export default function Login() {
     setAlertMessage({ type: "", text: "" })
     try {
       const credential = await signInWithEmailAndPassword(auth, email, password)
-      await validateAccountRole(credential.user)
-      runIdentityProtectionMigration(credential.user.email).catch((error) => console.error("Proteção de dados pendente:", error))
+      const profile = await validateAccountRole(credential.user)
+      await protectCurrentIdentityData(profile, credential.user.uid).catch((error) => console.error("Não foi possível proteger dados antigos:", error))
       if (rememberMe) localStorage.setItem("rememberedEmail", email)
       else localStorage.removeItem("rememberedEmail")
       localStorage.setItem("zenithAccessType", accessType)
@@ -140,8 +141,8 @@ export default function Login() {
         })
       }
 
-      await validateAccountRole(credential.user)
-      runIdentityProtectionMigration(credential.user.email).catch((error) => console.error("Proteção de dados pendente:", error))
+      const profile = await validateAccountRole(credential.user)
+      await protectCurrentIdentityData(profile, credential.user.uid).catch((error) => console.error("Não foi possível proteger dados antigos:", error))
       localStorage.setItem("zenithAccessType", accessType)
       navigate("/home", { replace: true })
     } catch (error) {
