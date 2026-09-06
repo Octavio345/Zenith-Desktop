@@ -5,17 +5,37 @@ const FEATURE_NAMES = {
   monitoring: "Monitoramento da plantação"
 }
 
-export default function FeatureAccessPanel({ feature, access, blocked3D = false }) {
-  if (blocked3D) {
+const PERMANENT_BLOCKS = {
+  "3d": {
+    icon: "deployed_code",
+    eyebrow: "TECNOLOGIA EM DESENVOLVIMENTO",
+    title: "Reconstrução 3D ainda não disponível",
+    description: "Este recurso faz parte do projeto acadêmico Zenith e ainda está em desenvolvimento. Por enquanto, o acesso pelo aplicativo permanece restrito.",
+    badge: "Acesso não liberado"
+  },
+  team: {
+    icon: "groups",
+    eyebrow: "RECURSO RESTRITO DO PROJETO ACADÊMICO",
+    title: "Gestão de equipe não disponível",
+    description: "A criação e a administração de equipes estão restritas nesta versão acadêmica do Zenith. Este acesso permanece liberado somente para as contas responsáveis pelo projeto.",
+    badge: "Acesso restrito"
+  }
+}
+
+export default function FeatureAccessPanel({ feature, access, blocked3D = false, blockedFeature }) {
+  const permanentBlock = PERMANENT_BLOCKS[blockedFeature || (blocked3D ? "3d" : "")]
+  if (permanentBlock) {
     return (
-      <section className="feature-access feature-access--blocked feature-access--3d" aria-labelledby="feature-access-3d-title">
-        <div className="feature-access__icon"><span className="material-symbols-outlined">deployed_code</span></div>
+      <section className="feature-access feature-access--blocked feature-access--permanent" aria-labelledby={`feature-access-${blockedFeature || "3d"}-title`}>
+        <div className="feature-access__glow" aria-hidden="true" />
+        <div className="feature-access__icon"><span className="material-symbols-outlined">{permanentBlock.icon}</span></div>
         <div className="feature-access__copy">
-          <span className="feature-access__eyebrow">PROJETO ACADÊMICO EM DESENVOLVIMENTO</span>
-          <h2 id="feature-access-3d-title">Reconstrução 3D ainda não disponível</h2>
-          <p>Este recurso está funcionando em ambiente de desenvolvimento, mas ainda não foi liberado no aplicativo. Uma prévia da tecnologia pode ser vista no site institucional do Zenith.</p>
+          <span className="feature-access__eyebrow">{permanentBlock.eyebrow}</span>
+          <h2 id={`feature-access-${blockedFeature || "3d"}-title`}>{permanentBlock.title}</h2>
+          <p>{permanentBlock.description}</p>
+          <div className="feature-access__meta"><span><i /> Projeto acadêmico</span><span><i /> Ambiente controlado</span></div>
         </div>
-        <span className="feature-access__badge"><span className="material-symbols-outlined">lock</span> Acesso restrito</span>
+        <span className="feature-access__badge"><span className="material-symbols-outlined">lock</span> {permanentBlock.badge}</span>
       </section>
     )
   }
@@ -48,6 +68,7 @@ export default function FeatureAccessPanel({ feature, access, blocked3D = false 
 
   return (
     <section className="feature-access feature-access--blocked" aria-labelledby={`feature-access-${feature}-title`}>
+      <div className="feature-access__glow" aria-hidden="true" />
       <div className="feature-access__icon"><span className="material-symbols-outlined">lock_clock</span></div>
       <div className="feature-access__copy">
         <span className="feature-access__eyebrow">PROJETO ACADÊMICO EM DESENVOLVIMENTO</span>

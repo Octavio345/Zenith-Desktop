@@ -13,8 +13,10 @@ import Profile from "./pages/App/Profile"
 import ForgotPassword from "./pages/App/ForgotPassword"
 import Explore from "./pages/App/Explore"
 import AdminTeamDashboard from "./pages/App/AdminTeamDashboard"
+import TeamAccessBlocked from "./pages/App/TeamAccessBlocked"
 import { auth, db } from "./services/firebase"
 import { getUserAccessProfile, isAccountBlocked, isOperationalRole } from "./services/accessControl"
+import { hasFullFeatureAccess } from "./services/featureAccess"
 import { InstallAppProvider } from "./contexts/InstallAppContext"
 
 
@@ -102,7 +104,7 @@ function TeamRoute() {
     }
     try {
       const profile = await getUserAccessProfile(user.uid)
-      setAccess(isOperationalRole(profile?.role) ? "denied" : "allowed")
+      setAccess(isOperationalRole(profile?.role) ? "denied" : hasFullFeatureAccess(user) ? "allowed" : "restricted")
     } catch {
       setAccess("denied")
     }
@@ -117,6 +119,7 @@ function TeamRoute() {
       </div>
     )
   }
+  if (access === "restricted") return <TeamAccessBlocked />
   return access === "allowed" ? <AdminTeamDashboard /> : <Navigate to="/home" replace />
 }
 

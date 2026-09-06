@@ -16,6 +16,13 @@ service cloud.firestore {
     }
     function active(profile) { return profile.get("archived", false) != true && profile.get("accessStatus", "active") != "blocked"; }
     function activeAccount() { return profileExists() && active(currentProfile()); }
+    function fullAccessAccount() {
+      return loggedIn() && request.auth.token.email in [
+        "oarsilva6@gmail.com",
+        "leocarrilhom@gmail.com",
+        "samuel.vieirafreitas@outlook.com"
+      ];
+    }
     function isOwner() { return activeAccount() && (!currentProfile().keys().hasAny(["role"]) || currentProfile().role == "admin"); }
     function belongsTo(ownerId) {
       return activeAccount() && (request.auth.uid == ownerId || currentProfile().get("ownerId", "") == ownerId || currentProfile().get("teamId", "") == ownerId);
@@ -67,7 +74,7 @@ service cloud.firestore {
 
     match /employees/{employeeId} {
       allow create: if !request.resource.data.keys().hasAny(["document", "phone"]) && (
-        (isOwner() && request.resource.data.ownerId == request.auth.uid
+        (isOwner() && fullAccessAccount() && request.resource.data.ownerId == request.auth.uid
           && request.resource.data.teamId == request.auth.uid && request.resource.data.role in ["employee", "collaborator"])
         || (loggedIn() && request.auth.uid == employeeId && legacyExists()
           && get(/databases/$(database)/documents/users/$(employeeId)).data.role in ["employee", "collaborator"]
@@ -77,7 +84,7 @@ service cloud.firestore {
           && request.resource.data.email == get(/databases/$(database)/documents/users/$(employeeId)).data.email)
       );
       allow read: if (loggedIn() && request.auth.uid == employeeId) || (isOwner() && resource.data.ownerId == request.auth.uid);
-      allow update: if isOwner() && resource.data.ownerId == request.auth.uid
+      allow update: if isOwner() && fullAccessAccount() && resource.data.ownerId == request.auth.uid
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           "name", "age", "employmentType", "position", "sector", "droneModel",
           "status", "entry", "exit", "hours", "delays", "absences", "lastActivity", "inviteStatus",
