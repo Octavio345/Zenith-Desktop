@@ -7,12 +7,20 @@ import AlertBanner from "./AlertBanner"
 import MetricsPanel from "./MetricsPanel"
 import OverlayResult from "./OverlayResult"
 import UploadImage from "./UploadImage"
+import FeatureAccessPanel from "../FeatureAccessPanel"
+import { useFeatureAccess } from "../../../../hooks/useFeatureAccess"
 import { createOccurrenceFromAnalysis, saveActivityDraft } from "../../../../services/fieldOperations"
 import styles from "../../../../styles/App/MonitoramentoView.module.css"
 
 export default function MonitoramentoView() {
   const { analisar, resetar, result, loading, error, preview } = useMonitoramento()
+  const monitoringAccess = useFeatureAccess("monitoring")
   const navigate = useNavigate()
+
+  const handleAnalyze = async (file) => {
+    const permission = await monitoringAccess.consume()
+    if (permission.allowed) await analisar(file)
+  }
 
   const interpretacao = useMemo(() => {
     return result ? interpretar(result) : null
@@ -42,10 +50,14 @@ export default function MonitoramentoView() {
         </p>
       </div>
 
-      <UploadImage
-        onSelect={analisar}
-        disabled={loading}
-      />
+      <FeatureAccessPanel feature="monitoring" access={{ ...monitoringAccess, refresh: monitoringAccess.refresh }} />
+
+      {(monitoringAccess.fullAccess || monitoringAccess.remaining > 0) && !monitoringAccess.error && (
+        <UploadImage
+          onSelect={handleAnalyze}
+          disabled={loading || monitoringAccess.loading}
+        />
+      )}
 
       {loading && (
         <div className={styles.analysisContainer} aria-live="polite">

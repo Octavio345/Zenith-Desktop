@@ -10,13 +10,13 @@ export default function PersonalInfoView({ userData, user, formatDocument }) {
   const infoItems = [
     { icon: "badge", label: "Nome", value: userData?.name || "Não informado" },
     { icon: "cake", label: "Idade", value: userData?.age ? `${userData.age} anos` : "Não informado" },
-    { icon: "call", label: "Telefone", value: formatPhone(userData?.phone) },
+    { icon: "call", label: "Telefone", value: userData?.phoneMasked || formatPhone(userData?.phone) },
     { icon: "mail", label: "Email", value: user?.email, badge: true },
     {
       icon: "assignment_ind",
       label: userData?.type === "CPF" ? "CPF" : "CNPJ",
-      value: userData?.document ? formatDocument(userData.document) : null,
-      show: userData?.document
+      value: userData?.documentMasked || (userData?.document ? formatDocument(userData.document) : null),
+      show: userData?.documentMasked || userData?.document
     }
   ]
 

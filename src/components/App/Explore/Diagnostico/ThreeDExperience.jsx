@@ -4,6 +4,7 @@ import {
   getModelo3DTask,
   getModelo3DViewerUrl
 } from "../../../../services/modelo3dApi"
+import FeatureAccessPanel from "../FeatureAccessPanel"
 import "../../../../styles/App/ThreeDExperience.css"
 
 const MAX_3D_IMAGES = 40
@@ -125,7 +126,7 @@ function taskStatusCopy(status) {
   }
 }
 
-export default function ThreeDExperience({ images = [], conditionNames = [] }) {
+export default function ThreeDExperience({ images = [], conditionNames = [], accessAllowed = false }) {
   const initialSelection = useMemo(
     () => getInitialSelection(images),
     [images]
@@ -203,6 +204,8 @@ export default function ThreeDExperience({ images = [], conditionNames = [] }) {
       if (pollingTimerRef.current) window.clearTimeout(pollingTimerRef.current)
     }
   }, [task?.task_id, task?.status])
+
+  if (!accessAllowed) return <FeatureAccessPanel blocked3D />
 
   const toggleImage = (imageId) => {
     if (task) return

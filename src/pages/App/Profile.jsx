@@ -14,7 +14,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { getUserAccessProfile, isOperationalRole } from "../../services/accessControl"
 import { BRAZIL_STATE_CODES, BRAZIL_STATE_SET } from "../../constants/brazilStates"
 import { isValidHectares, parseHectaresInput, sanitizeHectaresInput } from "../../utils/hectares"
-import { documentDigits, formatBrazilianDocument, isValidBrazilianDocument } from "../../utils/brazilianDocuments"
+import { formatBrazilianDocument } from "../../utils/brazilianDocuments"
 
 import MenuBar from "../../components/App/Global/MenuBar"
 import AppHeader from "../../components/App/Global/AppHeader"
@@ -233,10 +233,10 @@ export default function Profile() {
           name: data.name || "",
           age: data.age || "",
           type: data.type || "",
-          document: formatDocumentInput(data.document || "", data.type || "CPF"),
+          document: data.documentMasked || formatDocumentInput(data.document || "", data.type || "CPF"),
           email: data.email || "",
           profileIcon: data.profileIcon || "agriculture",
-          phone: formatPhoneInput(data.phone || ""),
+          phone: data.phoneMasked || formatPhoneInput(data.phone || ""),
           city: data.city || "",
           state: data.state || "",
         })
@@ -266,16 +266,16 @@ export default function Profile() {
           data_aquisicao: data.data_aquisicao || "",
           municipio: data.municipio || "",
           plantacao: "Soja",
-          telefone: data.telefone || "",
+          telefone: data.telefone_mascarado || data.telefone || "",
           tipo_proprietario: data.tipo_proprietario || "",
-          documento_proprietario: data.documento_proprietario || "",
+          documento_proprietario: data.documento_proprietario_mascarado || data.documento_proprietario || "",
           uf: data.uf || "",
         }
         setFarmData(farm)
         setFarmForm({
           ...farm,
           cep: formatCEPInput(farm.cep),
-          telefone: formatPhoneInput(farm.telefone),
+          telefone: farm.telefone,
         })
       } else {
         setFarmData(null)
@@ -338,10 +338,10 @@ export default function Profile() {
       name: userData?.name || "",
       age: userData?.age || "",
       type: userData?.type || "",
-      document: formatDocumentInput(userData?.document || "", userData?.type || "CPF"),
+      document: userData?.documentMasked || formatDocumentInput(userData?.document || "", userData?.type || "CPF"),
       email: user?.email || "",
       profileIcon: userData?.profileIcon || "agriculture",
-      phone: formatPhoneInput(userData?.phone || ""),
+      phone: userData?.phoneMasked || formatPhoneInput(userData?.phone || ""),
       city: userData?.city || "",
       state: userData?.state || "",
     })
@@ -355,8 +355,6 @@ export default function Profile() {
     }
     const name = normalizeText(formData.name)
     const email = normalizeText(formData.email || user?.email).toLowerCase()
-    const documentDigits = onlyDigits(formData.document)
-    const phoneDigits = onlyDigits(formData.phone)
     const city = normalizeText(formData.city)
     const state = normalizeText(formData.state).toUpperCase()
 
@@ -366,22 +364,6 @@ export default function Profile() {
     }
     if (!isValidEmail(email)) {
       showAlert("error", "Informe um e-mail válido, como nome@gmail.com.")
-      return
-    }
-    if (phoneDigits && !isValidPhone(formData.phone)) {
-      showAlert("error", "Telefone deve ter DDD e 10 ou 11 números.")
-      return
-    }
-    if (documentDigits && !formData.type) {
-      showAlert("error", "Selecione se o documento é CPF ou CNPJ.")
-      return
-    }
-    if (formData.type === "CPF" && documentDigits && documentDigits.length !== 11) {
-      showAlert("error", "CPF deve ter 11 números.")
-      return
-    }
-    if (formData.type === "PJ" && documentDigits && documentDigits.length !== 14) {
-      showAlert("error", "CNPJ deve ter 14 números.")
       return
     }
     if (city && !isValidCityName(city)) {
@@ -398,11 +380,8 @@ export default function Profile() {
       await updateDoc(doc(db, userData?.profileCollection || "owners", user.uid), {
         name,
         age: parseInt(formData.age) || null,
-        type: formData.type,
-        document: documentDigits,
         email,
         profileIcon: formData.profileIcon,
-        phone: phoneDigits,
         city,
         state,
         updatedAt: new Date().toISOString(),
@@ -425,15 +404,10 @@ export default function Profile() {
       return
     }
     const municipio = normalizeText(farmForm.municipio)
-    const farmPhoneDigits = onlyDigits(farmForm.telefone)
     const cepDigits = onlyDigits(farmForm.cep)
 
     if (municipio && !isValidCityName(municipio)) {
       showAlert("error", "Informe o município completo, sem abreviação.")
-      return
-    }
-    if (farmPhoneDigits && !isValidPhone(farmForm.telefone)) {
-      showAlert("error", "Telefone da fazenda deve ter DDD e 10 ou 11 números.")
       return
     }
     if (cepDigits && cepDigits.length !== 8) {
@@ -448,10 +422,6 @@ export default function Profile() {
       showAlert("error", "Informe uma área total maior que zero.")
       return
     }
-    if (!farmForm.tipo_proprietario || !isValidBrazilianDocument(farmForm.documento_proprietario, farmForm.tipo_proprietario)) {
-      showAlert("error", farmForm.tipo_proprietario === "PJ" ? "Informe um CNPJ válido." : "Informe um CPF válido.")
-      return
-    }
 
     setSavingFarm(true)
     try {
@@ -464,9 +434,6 @@ export default function Profile() {
         bairro: normalizeText(farmForm.bairro),
         cep: formatCEPInput(cepDigits),
         data_aquisicao: farmForm.data_aquisicao || "",
-        telefone: farmPhoneDigits,
-        tipo_proprietario: farmForm.tipo_proprietario || "Proprietário",
-        documento_proprietario: documentDigits(farmForm.documento_proprietario),
         updatedAt: new Date().toISOString(),
       })
       showAlert("success", "Fazenda atualizada com sucesso!")
@@ -811,7 +778,7 @@ export default function Profile() {
                   </div>
                   <div className="pf-field">
                     <label>Telefone</label>
-                    <p>{formData.phone || "—"}</p>
+                    <p>{userData?.phoneMasked || formData.phone || "—"}</p>
                   </div>
                   <div className="pf-field">
                     <label>Idade</label>
@@ -823,7 +790,7 @@ export default function Profile() {
                   </div>
                   <div className="pf-field">
                     <label>Documento</label>
-                    <p>{formatDocument(userData?.document, userData?.type)}</p>
+                    <p>{userData?.documentMasked || formatDocument(userData?.document, userData?.type)}</p>
                   </div>
                   <div className="pf-field">
                     <label>Cidade</label>
@@ -872,6 +839,7 @@ export default function Profile() {
                       placeholder="(00) 00000-0000"
                       inputMode="tel"
                       maxLength={15}
+                      disabled
                     />
                   </div>
                   <div className="pf-field pf-field-input">
@@ -894,6 +862,7 @@ export default function Profile() {
                       name="type"
                       value={formData.type}
                       onChange={handleChange}
+                      disabled
                     >
                       <option value="">Selecione</option>
                       <option value="CPF">Pessoa física (CPF)</option>
@@ -916,6 +885,7 @@ export default function Profile() {
                       }
                       inputMode="numeric"
                       maxLength={formData.type === "PJ" ? 18 : 14}
+                      disabled
                     />
                   </div>
                   <div className="pf-field pf-field-input">
@@ -997,7 +967,7 @@ export default function Profile() {
                           setFarmForm({
                             ...farmData,
                             cep: formatCEPInput(farmData.cep),
-                            telefone: formatPhoneInput(farmData.telefone),
+                            telefone: farmData.telefone,
                           })
                       }}
                       disabled={savingFarm}
@@ -1070,7 +1040,7 @@ export default function Profile() {
                   </div>
                   <div className="pf-field">
                     <label>Telefone</label>
-                    <p>{formatPhoneInput(farmData.telefone) || "—"}</p>
+                    <p>{farmData.telefone || "—"}</p>
                   </div>
                   <div className="pf-field">
                     <label>Tipo de proprietário</label>
@@ -1078,7 +1048,7 @@ export default function Profile() {
                   </div>
                   <div className="pf-field">
                     <label>{farmData.tipo_proprietario === "PJ" ? "CNPJ" : "CPF"}</label>
-                    <p>{farmData.documento_proprietario ? formatBrazilianDocument(farmData.documento_proprietario, farmData.tipo_proprietario) : "—"}</p>
+                    <p>{farmData.documento_proprietario || "—"}</p>
                   </div>
                 </div>
               ) : (
@@ -1172,6 +1142,7 @@ export default function Profile() {
                       placeholder="(00) 00000-0000"
                       inputMode="tel"
                       maxLength={15}
+                      disabled
                     />
                   </div>
                   <div className="pf-field pf-field-input">
@@ -1181,6 +1152,7 @@ export default function Profile() {
                       name="tipo_proprietario"
                       value={farmForm.tipo_proprietario}
                       onChange={handleFarmChange}
+                      disabled
                     >
                       <option value="">Selecione</option>
                       <option value="PF">Pessoa física</option>
@@ -1189,7 +1161,7 @@ export default function Profile() {
                   </div>
                   {farmForm.tipo_proprietario && <div className="pf-field pf-field-input">
                     <label htmlFor="farm-documento">{farmForm.tipo_proprietario === "PJ" ? "CNPJ" : "CPF"}</label>
-                    <input id="farm-documento" name="documento_proprietario" value={formatBrazilianDocument(farmForm.documento_proprietario, farmForm.tipo_proprietario)} onChange={handleFarmChange} inputMode="numeric" maxLength={farmForm.tipo_proprietario === "PJ" ? 18 : 14} placeholder={farmForm.tipo_proprietario === "PJ" ? "00.000.000/0000-00" : "000.000.000-00"} />
+                    <input id="farm-documento" name="documento_proprietario" value={farmForm.documento_proprietario} disabled />
                   </div>}
                 </div>
               )}

@@ -21,12 +21,12 @@ export default function ReportButton({ kind = "triagem", result, images, context
       const digits = String(profile?.document || "").replace(/\D/g, "")
       const isCPF = profile?.type === "CPF" && digits.length === 11
       const isCNPJ = profile?.type === "PJ" && digits.length === 14
-      const userDocument = isCPF ? digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4")
-        : isCNPJ ? digits.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5") : undefined
+      const userDocument = profile?.documentMasked || (isCPF ? digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4")
+        : isCNPJ ? digits.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5") : undefined)
       const { createAnalysisReport } = await import("../../../services/analysisReport")
       const { doc: pdf, filename } = await createAnalysisReport({ kind, result, images, context: {
         ...context, userName: profile?.name || user.displayName || undefined,
-        userDocument, documentLabel: isCPF ? "CPF" : "CNPJ"
+        userDocument, documentLabel: profile?.type === "PJ" ? "CNPJ" : "CPF"
       } })
       pdf.save(filename)
     } catch (e) {

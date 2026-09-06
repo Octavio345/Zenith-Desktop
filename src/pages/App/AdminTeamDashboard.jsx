@@ -10,6 +10,7 @@ import AppHeader from "../../components/App/Global/AppHeader"
 import AppFooter from "../../components/App/Global/AppFooter"
 import DroneIcon from "../../components/App/Global/DroneIcon"
 import { ACCOUNT_ROLES, isAccountBlocked } from "../../services/accessControl"
+import { accountIdentifierMessage, createProfileWithUniqueIdentifiers } from "../../services/accountIdentity"
 import "../../styles/App/TeamAccess.css"
 
 const DRONE_MODELS = [
@@ -238,8 +239,10 @@ export default function AdminTeamDashboard() {
               email: data.email || "",
               age: data.age || "",
               phone: data.phone || "",
+              phoneMasked: data.phoneMasked || "",
               personType: data.type || "CPF",
               document: data.document || "",
+              documentMasked: data.documentMasked || "",
               employmentType: data.employmentType || "CLT",
               position: data.position || "Funcionário de campo",
               sector: data.sector || "Campo",
@@ -427,6 +430,16 @@ export default function AdminTeamDashboard() {
       setEmployeeFormMessage({ type: "error", text: "A senha inicial precisa ter 8 caracteres, maiúscula, minúscula, número e símbolo." })
       return
     }
+    const phoneDigits = onlyDigits(newEmployee.phone)
+    const documentDigits = onlyDigits(newEmployee.document)
+    if (!isValidBrazilianPhone(phoneDigits)) {
+      setEmployeeFormMessage({ type: "error", text: "Informe um telefone brasileiro válido com DDD." })
+      return
+    }
+    if (newEmployee.personType === "PJ" ? !isValidCNPJ(documentDigits) : !isValidCPF(documentDigits)) {
+      setEmployeeFormMessage({ type: "error", text: newEmployee.personType === "PJ" ? "Informe um CNPJ válido." : "Informe um CPF válido." })
+      return
+    }
     if (!auth.currentUser?.uid) {
       setEmployeeFormMessage({ type: "error", text: "A sessão do proprietário expirou. Entre novamente." })
       return
@@ -468,7 +481,7 @@ export default function AdminTeamDashboard() {
     try {
       const credential = await createUserWithEmailAndPassword(secondaryAuth, employeePayload.email, newEmployee.password)
       createdAuthUser = credential.user
-      await setDoc(doc(db, "employees", credential.user.uid), employeePayload)
+      await createProfileWithUniqueIdentifiers({ profileCollection: "employees", userId: credential.user.uid, profileData: employeePayload })
       setSelectedId(credential.user.uid)
       setNewEmployee({ name: "", email: "", password: "", age: "", phone: "", personType: "CPF", document: "", employmentType: "CLT", position: "", sector: "", droneModel: "", role: ACCOUNT_ROLES.EMPLOYEE })
       setShowEmployeePassword(false)
@@ -479,8 +492,7 @@ export default function AdminTeamDashboard() {
       if (createdAuthUser) {
         try { await deleteUser(createdAuthUser) } catch {   }
       }
-      let message = "Não foi possível criar o login do funcionário."
-      if (error.code === "auth/email-already-in-use") message = "Este email já possui uma conta de acesso."
+      let message = accountIdentifierMessage(error) || "Não foi possível criar o login do funcionário."
       if (error.code === "auth/invalid-email") message = "Informe um email válido."
       if (error.code === "auth/weak-password") message = "A senha inicial não atende aos requisitos de segurança."
       setEmployeeFormMessage({ type: "error", text: message })
@@ -531,9 +543,9 @@ export default function AdminTeamDashboard() {
     setEmployeeEdit({
       name: selected.name || "",
       age: selected.age || "",
-      phone: formatBrazilianPhone(selected.phone),
+      phone: selected.phoneMasked || formatBrazilianPhone(selected.phone),
       personType: selected.personType || "CPF",
-      document: formatBrazilianDocument(selected.document, selected.personType || "CPF"),
+      document: selected.documentMasked || formatBrazilianDocument(selected.document, selected.personType || "CPF"),
       employmentType: selected.employmentType || "CLT",
       position: selected.position || "",
       sector: selected.sector || "",
@@ -553,25 +565,9 @@ export default function AdminTeamDashboard() {
       setEmployeeEditMessage({ type: "error", text: "Informe o nome do funcionário." })
       return
     }
-    const phoneDigits = onlyDigits(employeeEdit.phone)
-    const documentDigits = onlyDigits(employeeEdit.document)
-    const expectedDocumentLength = employeeEdit.personType === "PJ" ? 14 : 11
-    if (phoneDigits && !isValidBrazilianPhone(phoneDigits)) {
-      setEmployeeEditMessage({ type: "error", text: "Informe um telefone brasileiro válido, com DDD." })
-      return
-    }
-    const validDocument = employeeEdit.personType === "PJ" ? isValidCNPJ(documentDigits) : isValidCPF(documentDigits)
-    if (documentDigits && (documentDigits.length !== expectedDocumentLength || !validDocument)) {
-      setEmployeeEditMessage({ type: "error", text: employeeEdit.personType === "PJ" ? "Informe um CNPJ válido." : "Informe um CPF válido." })
-      return
-    }
-
     const payload = {
       name: employeeEdit.name.trim(),
       age: Number(employeeEdit.age) || null,
-      phone: phoneDigits,
-      type: employeeEdit.personType,
-      document: documentDigits,
       employmentType: employeeEdit.employmentType,
       position: employeeEdit.position.trim() || "Funcionário de campo",
       sector: employeeEdit.sector.trim() || "Campo",
@@ -584,7 +580,7 @@ export default function AdminTeamDashboard() {
       await updateDoc(doc(db, "employees", selected.id), payload)
       setEmployees((current) => current.map((employee) => (
         employee.id === selected.id
-          ? { ...employee, ...payload, personType: payload.type }
+          ? { ...employee, ...payload }
           : employee
       )))
       setEmployeeEditMessage({ type: "success", text: "Cadastro do funcionário atualizado com sucesso." })
@@ -863,9 +859,9 @@ export default function AdminTeamDashboard() {
                 <div className="employee-edit-form">
                   <label className="employee-edit-field employee-edit-field--wide"><span>Nome completo</span><input value={employeeEdit.name} onChange={(event) => setEmployeeEdit((current) => ({ ...current, name: event.target.value }))} /></label>
                   <label className="employee-edit-field"><span>Idade</span><input inputMode="numeric" value={employeeEdit.age} onChange={(event) => setEmployeeEdit((current) => ({ ...current, age: event.target.value.replace(/\D/g, "").slice(0, 3) }))} placeholder="Idade" /></label>
-                  <label className="employee-edit-field"><span>Telefone</span><input type="tel" inputMode="numeric" maxLength={15} value={employeeEdit.phone} onChange={(event) => setEmployeeEdit((current) => ({ ...current, phone: formatBrazilianPhone(event.target.value) }))} placeholder="(00) 00000-0000" /></label>
-                  <label className="employee-edit-field"><span>Tipo de pessoa</span><select value={employeeEdit.personType} onChange={(event) => setEmployeeEdit((current) => ({ ...current, personType: event.target.value, document: "" }))}><option value="CPF">Pessoa física</option><option value="PJ">Pessoa jurídica</option></select></label>
-                  <label className="employee-edit-field"><span>Documento</span><input inputMode="numeric" maxLength={employeeEdit.personType === "PJ" ? 18 : 14} value={employeeEdit.document} onChange={(event) => setEmployeeEdit((current) => ({ ...current, document: formatBrazilianDocument(event.target.value, current.personType) }))} placeholder={employeeEdit.personType === "PJ" ? "00.000.000/0000-00" : "000.000.000-00"} /></label>
+                  <label className="employee-edit-field"><span>Telefone protegido</span><input value={employeeEdit.phone || "Não informado"} disabled /></label>
+                  <label className="employee-edit-field"><span>Tipo de pessoa</span><select value={employeeEdit.personType} disabled><option value="CPF">Pessoa física</option><option value="PJ">Pessoa jurídica</option></select></label>
+                  <label className="employee-edit-field"><span>Documento protegido</span><input value={employeeEdit.document || "Não informado"} disabled /></label>
                   <label className="employee-edit-field"><span>Vínculo</span><select value={employeeEdit.employmentType} onChange={(event) => setEmployeeEdit((current) => ({ ...current, employmentType: event.target.value }))}><option value="CLT">Contratação CLT</option><option value="PJ">Prestador PJ</option></select></label>
                   <label className="employee-edit-field"><span>Cargo</span><input value={employeeEdit.position} onChange={(event) => setEmployeeEdit((current) => ({ ...current, position: event.target.value }))} placeholder="Funcionário de campo" /></label>
                   <label className="employee-edit-field"><span>Setor</span><input value={employeeEdit.sector} onChange={(event) => setEmployeeEdit((current) => ({ ...current, sector: event.target.value }))} placeholder="Campo" /></label>
@@ -875,8 +871,8 @@ export default function AdminTeamDashboard() {
                 <div className="employee-record__grid">
                   <span><small>Vínculo</small><strong>{selected.employmentType === "PJ" ? "Prestador PJ" : "Contratação CLT"}</strong></span>
                   <span><small>Tipo de pessoa</small><strong>{selected.personType === "PJ" ? "Pessoa jurídica" : "Pessoa física"}</strong></span>
-                  <span><small>Documento</small><strong>{selected.document ? formatBrazilianDocument(selected.document, selected.personType) : "Não informado"}</strong></span>
-                  <span><small>Telefone</small><strong>{selected.phone ? formatBrazilianPhone(selected.phone) : "Não informado"}</strong></span>
+                  <span><small>Documento</small><strong>{selected.documentMasked || (selected.document ? formatBrazilianDocument(selected.document, selected.personType) : "Não informado")}</strong></span>
+                  <span><small>Telefone</small><strong>{selected.phoneMasked || (selected.phone ? formatBrazilianPhone(selected.phone) : "Não informado")}</strong></span>
                   <span><small>Idade</small><strong>{selected.age ? `${selected.age} anos` : "Não informada"}</strong></span>
                   <span><small>Email</small><strong>{selected.email || "Não informado"}</strong></span>
                 </div>

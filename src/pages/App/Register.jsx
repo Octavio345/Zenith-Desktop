@@ -1,10 +1,10 @@
 import { useState } from "react"
-import { auth, db } from "../../services/firebase"
-import { createUserWithEmailAndPassword } from "firebase/auth"
-import { doc, setDoc } from "firebase/firestore"
+import { auth } from "../../services/firebase"
+import { createUserWithEmailAndPassword, deleteUser } from "firebase/auth"
 import CustomSelect from "../../components/App/Global/CustomSelect"
 import HectareInput from "../../components/App/Global/HectareInput"
 import { isValidHectares, parseHectaresInput, sanitizeHectaresInput } from "../../utils/hectares"
+import { accountIdentifierMessage, createProfileWithUniqueIdentifiers } from "../../services/accountIdentity"
 import "../../styles/App/Register.css"
 
 export default function Register() {
@@ -72,6 +72,7 @@ export default function Register() {
     if (!validateForm()) return
 
     setLoading(true)
+    let createdUser = null
 
     try {
       const userCred = await createUserWithEmailAndPassword(
@@ -79,8 +80,9 @@ export default function Register() {
         form.email,
         form.password
       )
+      createdUser = userCred.user
 
-      await setDoc(doc(db, "owners", userCred.user.uid), {
+      await createProfileWithUniqueIdentifiers({ profileCollection: "owners", userId: userCred.user.uid, profileData: {
         name: form.name,
         age: parseInt(form.age),
         type: form.type,
@@ -89,7 +91,7 @@ export default function Register() {
         email: form.email,
         createdAt: new Date().toISOString(),
         profileIcon: "👨‍🌾"
-      })
+      } })
 
       setAlertMessage({ type: "success", text: "Conta criada com sucesso!" })
 
@@ -107,10 +109,13 @@ export default function Register() {
         window.location.href = "/login"
       }, 2000)
     } catch (error) {
+      if (createdUser && auth.currentUser?.uid === createdUser.uid) {
+        try { await deleteUser(createdUser) } catch { /* O perfil não foi criado; a limpeza pode ser repetida pelo administrador. */ }
+      }
       let errorMessage = "Erro ao criar conta. Tente novamente."
 
-      if (error.code === "auth/email-already-in-use") {
-        errorMessage = "Este email já está em uso."
+      if (accountIdentifierMessage(error)) {
+        errorMessage = accountIdentifierMessage(error)
       } else if (error.code === "auth/invalid-email") {
         errorMessage = "Email inválido."
       } else if (error.code === "auth/weak-password") {

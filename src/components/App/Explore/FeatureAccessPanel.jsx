@@ -1,0 +1,60 @@
+import "../../../styles/App/FeatureAccessPanel.css"
+
+const FEATURE_NAMES = {
+  diagnosis: "Análise da soja por IA",
+  monitoring: "Monitoramento da plantação"
+}
+
+export default function FeatureAccessPanel({ feature, access, blocked3D = false }) {
+  if (blocked3D) {
+    return (
+      <section className="feature-access feature-access--blocked feature-access--3d" aria-labelledby="feature-access-3d-title">
+        <div className="feature-access__icon"><span className="material-symbols-outlined">deployed_code</span></div>
+        <div className="feature-access__copy">
+          <span className="feature-access__eyebrow">PROJETO ACADÊMICO EM DESENVOLVIMENTO</span>
+          <h2 id="feature-access-3d-title">Reconstrução 3D ainda não disponível</h2>
+          <p>Este recurso está funcionando em ambiente de desenvolvimento, mas ainda não foi liberado no aplicativo. Uma prévia da tecnologia pode ser vista no site institucional do Zenith.</p>
+        </div>
+        <span className="feature-access__badge"><span className="material-symbols-outlined">lock</span> Acesso restrito</span>
+      </section>
+    )
+  }
+
+  if (!access || access.fullAccess) return null
+
+  if (access.loading) {
+    return <div className="feature-access feature-access--status" role="status"><span className="feature-access__spinner" /> Verificando acesso...</div>
+  }
+
+  if (access.error) {
+    return (
+      <section className="feature-access feature-access--blocked" role="alert">
+        <div className="feature-access__icon"><span className="material-symbols-outlined">wifi_off</span></div>
+        <div className="feature-access__copy"><h2>Acesso temporariamente indisponível</h2><p>{access.error}</p></div>
+        <button type="button" className="feature-access__button" onClick={access.refresh}>Tentar novamente</button>
+      </section>
+    )
+  }
+
+  if (access.remaining > 0) {
+    return (
+      <aside className="feature-access feature-access--quota" aria-label="Limite de uso do projeto acadêmico">
+        <span className="material-symbols-outlined">school</span>
+        <div><strong>Acesso acadêmico</strong><p>{access.remaining} de 3 {access.remaining === 1 ? "utilização disponível" : "utilizações disponíveis"} em {FEATURE_NAMES[feature]}.</p></div>
+        <div className="feature-access__dots" aria-hidden="true">{[0, 1, 2].map((index) => <i key={index} className={index < access.remaining ? "is-active" : ""} />)}</div>
+      </aside>
+    )
+  }
+
+  return (
+    <section className="feature-access feature-access--blocked" aria-labelledby={`feature-access-${feature}-title`}>
+      <div className="feature-access__icon"><span className="material-symbols-outlined">lock_clock</span></div>
+      <div className="feature-access__copy">
+        <span className="feature-access__eyebrow">PROJETO ACADÊMICO EM DESENVOLVIMENTO</span>
+        <h2 id={`feature-access-${feature}-title`}>Limite de uso alcançado</h2>
+        <p>Por ser um projeto acadêmico em desenvolvimento, o acesso a {FEATURE_NAMES[feature]} está limitado a três utilizações por conta. Você já utilizou as três análises disponíveis.</p>
+      </div>
+      <span className="feature-access__badge"><span className="material-symbols-outlined">verified_user</span> 3 de 3 utilizadas</span>
+    </section>
+  )
+}

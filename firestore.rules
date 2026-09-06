@@ -39,32 +39,40 @@ service cloud.firestore {
       return resource.data.status == "em_andamento" && request.resource.data.status == "concluida"
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "completedAt", "updatedAt"]);
     }
-
+    function validUsageCounts(data) {
+      return data.get("diagnosisUses", 0) is int
+        && data.get("monitoringUses", 0) is int
+        && data.get("diagnosisUses", 0) >= 0 && data.get("diagnosisUses", 0) <= 3
+        && data.get("monitoringUses", 0) >= 0 && data.get("monitoringUses", 0) <= 3;
+    }
     match /owners/{ownerId} {
       allow create: if loggedIn() && request.auth.uid == ownerId && request.resource.data.email == request.auth.token.email
-        && (!request.resource.data.keys().hasAny(["role"]) || request.resource.data.role == "admin");
+        && (!request.resource.data.keys().hasAny(["role"]) || request.resource.data.role == "admin")
+        && !request.resource.data.keys().hasAny(["document", "phone"]);
       allow read: if loggedIn() && (request.auth.uid == ownerId || (employeeExists() && belongsTo(ownerId)));
       allow update: if isOwner() && request.auth.uid == ownerId
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          "name", "age", "type", "document", "email", "profileIcon", "phone", "city", "state",
+          "name", "age", "email", "profileIcon", "city", "state",
           "hectares", "plan", "planName", "updatedAt"
         ]);
       allow delete: if false;
     }
 
     match /employees/{employeeId} {
-      allow create: if (isOwner() && request.resource.data.ownerId == request.auth.uid
-        && request.resource.data.teamId == request.auth.uid && request.resource.data.role in ["employee", "collaborator"])
+      allow create: if !request.resource.data.keys().hasAny(["document", "phone"]) && (
+        (isOwner() && request.resource.data.ownerId == request.auth.uid
+          && request.resource.data.teamId == request.auth.uid && request.resource.data.role in ["employee", "collaborator"])
         || (loggedIn() && request.auth.uid == employeeId && legacyExists()
           && get(/databases/$(database)/documents/users/$(employeeId)).data.role in ["employee", "collaborator"]
           && request.resource.data.role == get(/databases/$(database)/documents/users/$(employeeId)).data.role
           && request.resource.data.ownerId == get(/databases/$(database)/documents/users/$(employeeId)).data.ownerId
           && request.resource.data.teamId == get(/databases/$(database)/documents/users/$(employeeId)).data.teamId
-          && request.resource.data.email == get(/databases/$(database)/documents/users/$(employeeId)).data.email);
+          && request.resource.data.email == get(/databases/$(database)/documents/users/$(employeeId)).data.email)
+      );
       allow read: if (loggedIn() && request.auth.uid == employeeId) || (isOwner() && resource.data.ownerId == request.auth.uid);
       allow update: if isOwner() && resource.data.ownerId == request.auth.uid
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          "name", "age", "phone", "type", "document", "employmentType", "position", "sector", "droneModel",
+          "name", "age", "employmentType", "position", "sector", "droneModel",
           "status", "entry", "exit", "hours", "delays", "absences", "lastActivity", "inviteStatus",
           "archived", "archivedAt", "accessStatus", "updatedAt"
         ]);
@@ -84,9 +92,13 @@ service cloud.firestore {
     }
 
     match /farms/{farmId} {
-      allow create: if isOwner() && request.resource.data.ownerId == request.auth.uid;
+      allow create: if isOwner() && request.resource.data.ownerId == request.auth.uid
+        && !request.resource.data.keys().hasAny(["documento_proprietario", "telefone"]);
       allow read: if belongsTo(resource.data.ownerId);
-      allow update, delete: if isOwner() && resource.data.ownerId == request.auth.uid && request.resource.data.ownerId == resource.data.ownerId;
+      allow update: if isOwner() && resource.data.ownerId == request.auth.uid
+        && request.resource.data.ownerId == resource.data.ownerId
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(["documento_proprietario", "telefone"]);
+      allow delete: if isOwner() && resource.data.ownerId == request.auth.uid;
     }
 
     match /activities/{activityId} {
@@ -109,6 +121,28 @@ service cloud.firestore {
     match /tasks/{taskId} {
       allow create, update: if false;
       allow read, delete: if isOwner() && resource.data.ownerId == request.auth.uid;
+    }
+
+    match /featureUsage/{userId} {
+      allow read: if activeAccount() && request.auth.uid == userId;
+      allow create: if activeAccount() && request.auth.uid == userId
+        && request.resource.data.keys().hasOnly(["diagnosisUses", "monitoringUses", "updatedAt"])
+        && validUsageCounts(request.resource.data)
+        && request.resource.data.get("diagnosisUses", 0) + request.resource.data.get("monitoringUses", 0) == 1
+        && request.resource.data.updatedAt == request.time;
+      allow update: if activeAccount() && request.auth.uid == userId
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["diagnosisUses", "monitoringUses", "updatedAt"])
+        && validUsageCounts(request.resource.data)
+        && request.resource.data.get("diagnosisUses", 0) >= resource.data.get("diagnosisUses", 0)
+        && request.resource.data.get("monitoringUses", 0) >= resource.data.get("monitoringUses", 0)
+        && request.resource.data.get("diagnosisUses", 0) + request.resource.data.get("monitoringUses", 0)
+          == resource.data.get("diagnosisUses", 0) + resource.data.get("monitoringUses", 0) + 1
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
+    match /accountIdentifiers/{claimId} {
+      allow read, write: if false;
     }
 
     match /{document=**} { allow read, write: if false; }

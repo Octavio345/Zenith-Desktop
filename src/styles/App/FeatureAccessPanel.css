@@ -1,0 +1,97 @@
+.feature-access {
+  --access-green: #276b45;
+  --access-deep: #123e2a;
+  position: relative;
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  width: 100%;
+  margin: 18px 0 24px;
+  padding: 20px 22px;
+  overflow: hidden;
+  border: 1px solid rgba(39, 107, 69, 0.16);
+  border-radius: 22px;
+  color: #173326;
+  background: linear-gradient(135deg, rgba(242, 249, 239, 0.98), rgba(226, 241, 220, 0.92));
+  box-shadow: 0 16px 38px rgba(28, 73, 45, 0.09);
+}
+
+.feature-access::after {
+  position: absolute;
+  right: -45px;
+  bottom: -70px;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(73, 143, 91, 0.18), transparent 68%);
+  content: "";
+  pointer-events: none;
+}
+
+.feature-access__icon {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  flex: 0 0 58px;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  border-radius: 18px;
+  color: #fff;
+  background: linear-gradient(145deg, #39815a, #164a31);
+  box-shadow: 0 10px 24px rgba(22, 74, 49, 0.22);
+}
+
+.feature-access__icon .material-symbols-outlined { font-size: 29px; }
+.feature-access__copy { position: relative; z-index: 1; flex: 1; min-width: 0; }
+.feature-access__copy h2 { margin: 2px 0 6px; color: var(--access-deep); font-size: clamp(1.12rem, 2vw, 1.45rem); line-height: 1.2; }
+.feature-access__copy p { max-width: 760px; margin: 0; color: #50675a; font-size: 0.9rem; line-height: 1.55; }
+.feature-access__eyebrow { color: var(--access-green); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.11em; }
+
+.feature-access__badge {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 6px;
+  align-items: center;
+  padding: 9px 12px;
+  border: 1px solid rgba(39, 107, 69, 0.14);
+  border-radius: 999px;
+  color: var(--access-deep);
+  background: rgba(255, 255, 255, 0.68);
+  font-size: 0.75rem;
+  font-weight: 750;
+}
+
+.feature-access__badge .material-symbols-outlined { font-size: 16px; }
+.feature-access--quota { padding: 15px 18px; border-radius: 17px; }
+.feature-access--quota > .material-symbols-outlined { color: var(--access-green); font-size: 25px; }
+.feature-access--quota strong { color: var(--access-deep); font-size: 0.86rem; }
+.feature-access--quota p { margin: 2px 0 0; color: #607267; font-size: 0.78rem; }
+.feature-access__dots { display: flex; gap: 6px; margin-left: auto; }
+.feature-access__dots i { width: 24px; height: 6px; border-radius: 999px; background: rgba(39, 107, 69, 0.16); }
+.feature-access__dots i.is-active { background: #39815a; }
+.feature-access--status { justify-content: center; color: #50675a; font-size: 0.85rem; }
+.feature-access__spinner { width: 17px; height: 17px; border: 2px solid rgba(39, 107, 69, 0.2); border-top-color: var(--access-green); border-radius: 50%; animation: feature-access-spin 700ms linear infinite; }
+.feature-access__button { position: relative; z-index: 1; min-height: 42px; padding: 10px 16px; border: 0; border-radius: 12px; color: #fff; background: var(--access-green); cursor: pointer; font: inherit; font-weight: 700; }
+.feature-access--3d { margin-top: 14px; color: #eef8f2; border-color: rgba(95, 173, 119, 0.22); background: radial-gradient(circle at 90% 0, rgba(72, 150, 95, 0.18), transparent 34%), linear-gradient(135deg, #10291d, #08150f); box-shadow: 0 22px 58px rgba(0, 0, 0, 0.22); }
+.feature-access--3d .feature-access__copy h2 { color: #f3faf5; }
+.feature-access--3d .feature-access__copy p { color: #a9bdb0; }
+.feature-access--3d .feature-access__eyebrow { color: #7cc997; }
+.feature-access--3d .feature-access__badge { color: #d7eadf; border-color: rgba(124, 201, 151, 0.18); background: rgba(255, 255, 255, 0.05); }
+
+@keyframes feature-access-spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 720px) {
+  .feature-access { align-items: flex-start; padding: 18px; }
+  .feature-access__icon { flex-basis: 48px; width: 48px; height: 48px; border-radius: 15px; }
+  .feature-access__badge { display: none; }
+  .feature-access__dots { align-self: center; }
+}
+
+@media (max-width: 480px) {
+  .feature-access { gap: 13px; }
+  .feature-access--quota { flex-wrap: wrap; }
+  .feature-access__dots { width: 100%; margin: 2px 0 0 38px; }
+}

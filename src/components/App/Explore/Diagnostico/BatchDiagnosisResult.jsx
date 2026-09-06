@@ -159,7 +159,7 @@ function MetricCard({ icon, value, label, tone = "default" }) {
   )
 }
 
-export default function BatchDiagnosisResult({ result, selectedImages = [], onRestart, onCreateInspection, reportContext }) {
+export default function BatchDiagnosisResult({ result, selectedImages = [], onRestart, onCreateInspection, reportContext, allowThreeD = false }) {
   const [imageFilter, setImageFilter] = useState("all")
   const general = result?.resultado_geral || null
   const conditions = useMemo(() => {
@@ -425,7 +425,7 @@ export default function BatchDiagnosisResult({ result, selectedImages = [], onRe
             )}
           </section>
           {detectedConditionNames.length > 0 && reconstructionImages.length > 0 && (
-            <ThreeDExperience images={reconstructionImages} conditionNames={detectedConditionNames} />
+            <ThreeDExperience images={reconstructionImages} conditionNames={detectedConditionNames} accessAllowed={allowThreeD} />
           )}
         </>
       )}

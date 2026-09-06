@@ -91,12 +91,12 @@ export default function ProfileSidebar({ userData, farmData }) {
 
         <div className="home-profile-info">
           <InfoItem icon="cake" label="Idade" value={userData?.age ? `${userData.age} anos` : "Não informado"} />
-          <InfoItem icon="phone" label="Telefone" value={formatPhone(userData?.phone)} />
+          <InfoItem icon="phone" label="Telefone" value={userData?.phoneMasked || formatPhone(userData?.phone)} />
           <InfoItem icon="mail" label="Email" value={userData?.email || "Não informado"} long />
           <InfoItem
             icon="assignment_ind"
             label={userData?.type === "CPF" ? "CPF" : "CNPJ"}
-            value={formatDocument(userData?.document, userData?.type)}
+            value={userData?.documentMasked || formatDocument(userData?.document, userData?.type)}
           />
         </div>
 

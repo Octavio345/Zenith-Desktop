@@ -6,7 +6,8 @@ import CustomSelect from "../../components/App/Global/CustomSelect"
 import HectareInput from "../../components/App/Global/HectareInput"
 import { BRAZIL_STATE_OPTIONS } from "../../constants/brazilStates"
 import { isValidHectares, parseHectaresInput, sanitizeHectaresInput } from "../../utils/hectares"
-import { documentDigits, formatBrazilianDocument, isValidBrazilianDocument } from "../../utils/brazilianDocuments"
+import { formatBrazilianDocument, isValidBrazilianDocument } from "../../utils/brazilianDocuments"
+import { maskAccountDocument, maskAccountPhone } from "../../services/accountIdentity"
 import "../../styles/App/CadastrarFazenda.css"
 
 const OWNER_TYPES = [{ value: "PF", label: "Pessoa Física" }, { value: "PJ", label: "Pessoa Jurídica" }]
@@ -56,7 +57,8 @@ export default function CadastrarFazenda() {
       setLoading(true)
       const existing = await getDocs(query(collection(db, "farms"), where("ownerId", "==", user.uid)))
       if (!existing.empty) { navigate("/home"); return }
-      await addDoc(collection(db, "farms"), { ...formData, documento_proprietario: documentDigits(formData.documento_proprietario), area_total: parseHectaresInput(formData.area_total), ownerId: user.uid, createdAt: new Date().toISOString() })
+      const { documento_proprietario, telefone, ...safeFarm } = formData
+      await addDoc(collection(db, "farms"), { ...safeFarm, documento_proprietario_mascarado: maskAccountDocument(documento_proprietario), telefone_mascarado: maskAccountPhone(telefone), area_total: parseHectaresInput(formData.area_total), ownerId: user.uid, createdAt: new Date().toISOString() })
       navigate("/home")
     } catch (error) { console.error(error); setNotice("Não foi possível salvar a fazenda. Revise os dados e tente novamente.") } finally { setLoading(false) }
   }

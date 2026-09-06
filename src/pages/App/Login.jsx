@@ -5,6 +5,7 @@ import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signOu
 import { doc, setDoc } from "firebase/firestore"
 import { FaEye, FaEyeSlash, FaGoogle } from "react-icons/fa"
 import { ACCOUNT_ROLES, getUserAccessProfile, isAccountBlocked, isOperationalRole, normalizeRole } from "../../services/accessControl"
+import { runIdentityProtectionMigration } from "../../services/accountIdentity"
 import "../../styles/App/Login.css"
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -86,6 +87,7 @@ export default function Login() {
     try {
       const credential = await signInWithEmailAndPassword(auth, email, password)
       await validateAccountRole(credential.user)
+      runIdentityProtectionMigration(credential.user.email).catch((error) => console.error("Proteção de dados pendente:", error))
       if (rememberMe) localStorage.setItem("rememberedEmail", email)
       else localStorage.removeItem("rememberedEmail")
       localStorage.setItem("zenithAccessType", accessType)
@@ -139,6 +141,7 @@ export default function Login() {
       }
 
       await validateAccountRole(credential.user)
+      runIdentityProtectionMigration(credential.user.email).catch((error) => console.error("Proteção de dados pendente:", error))
       localStorage.setItem("zenithAccessType", accessType)
       navigate("/home", { replace: true })
     } catch (error) {

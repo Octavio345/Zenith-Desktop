@@ -4,6 +4,7 @@ import { auth, db } from "../../services/firebase"
 import { createUserWithEmailAndPassword, deleteUser } from "firebase/auth"
 import { doc, setDoc, addDoc, collection } from "firebase/firestore"
 import { ACCOUNT_ROLES } from "../../services/accessControl"
+import { accountIdentifierMessage, attachUniquePhoneToProfile, createProfileWithUniqueIdentifiers, maskAccountDocument, maskAccountPhone } from "../../services/accountIdentity"
 import CustomSelect from "../../components/App/Global/CustomSelect"
 import HectareInput from "../../components/App/Global/HectareInput"
 import { BRAZIL_STATE_OPTIONS, BRAZIL_STATE_SET } from "../../constants/brazilStates"
@@ -233,11 +234,11 @@ export default function CadastroCompleto() {
       const userCred = await createUserWithEmailAndPassword(auth, userData.email, userData.password)
       createdUser = userCred.user
       const selectedPlan = PLAN_OPTIONS.find((plan) => plan.id === userData.plan) || PLAN_OPTIONS[0]
-      await setDoc(doc(db, "owners", userCred.user.uid), {
+      await createProfileWithUniqueIdentifiers({ profileCollection: "owners", userId: userCred.user.uid, profileData: {
         name: userData.name,
         age: parseInt(userData.age),
         type: userData.type,
-        document: userData.document,
+        document: userData.document.replace(/\D/g, ""),
         email: userData.email,
         role: ACCOUNT_ROLES.ADMIN,
         plan: selectedPlan.id,
@@ -245,7 +246,7 @@ export default function CadastroCompleto() {
         hectares: 0,
         createdAt: new Date().toISOString(),
         profileIcon: "agriculture"
-      })
+      } })
 
       localStorage.setItem("zenithAccessType", "owner")
       setUserId(userCred.user.uid)
@@ -258,8 +259,7 @@ export default function CadastroCompleto() {
       if (createdUser && auth.currentUser?.uid === createdUser.uid) {
         try { await deleteUser(createdUser) } catch {   }
       }
-      let msg = "Erro no cadastro. Tente novamente."
-      if (error.code === "auth/email-already-in-use") msg = "Este email já está cadastrado."
+      let msg = accountIdentifierMessage(error) || "Erro no cadastro. Tente novamente."
       setAlertMessage({ type: "error", text: msg })
     } finally { setLoading(false) }
   }
@@ -268,9 +268,22 @@ export default function CadastroCompleto() {
     if (!(await validateFarmData())) return
     setLoading(true)
     try {
+      await attachUniquePhoneToProfile({
+        userId,
+        phone: farmData.telefone,
+        updates: { updatedAt: new Date().toISOString() }
+      })
       await addDoc(collection(db, "farms"), {
-        ...farmData,
-        documento_proprietario: farmData.documento_proprietario.replace(/\D/g, ""),
+        name: farmData.name,
+        tipo_proprietario: farmData.tipo_proprietario,
+        documento_proprietario_mascarado: maskAccountDocument(farmData.documento_proprietario),
+        data_aquisicao: farmData.data_aquisicao,
+        cep: farmData.cep,
+        bairro: farmData.bairro,
+        municipio: farmData.municipio,
+        uf: farmData.uf,
+        telefone_mascarado: maskAccountPhone(farmData.telefone),
+        plantacao: farmData.plantacao,
         area_total: parseHectaresInput(farmData.area_total),
         ownerId: userId,
         ownerName: userData.name,
@@ -280,7 +293,7 @@ export default function CadastroCompleto() {
       navigate("/home", { replace: true })
     } catch (error) {
       console.error(error)
-      setAlertMessage({ type: "error", text: "Erro ao cadastrar fazenda." })
+      setAlertMessage({ type: "error", text: accountIdentifierMessage(error) || "Erro ao cadastrar fazenda." })
     } finally { setLoading(false) }
   }
 

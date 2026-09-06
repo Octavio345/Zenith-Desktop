@@ -7,7 +7,9 @@ import AnalysisLoader from "./AnalysisLoader"
 import DiagnosisResult from "./DiagnosisResult"
 import AllHistory from "./AllHistory"
 import FieldAreaPicker from "./FieldAreaPicker"
+import FeatureAccessPanel from "../FeatureAccessPanel"
 import { formatDiagnosisName } from "./diagnosisLabels"
+import { useFeatureAccess } from "../../../../hooks/useFeatureAccess"
 import { diagnosticarLote } from "../../../../services/sojaApi"
 import { createOccurrenceFromAnalysis, saveActivityDraft } from "../../../../services/fieldOperations"
 import "../../../../styles/App/Diagnostico.css"
@@ -41,6 +43,7 @@ export default function DiagnosticoTab() {
   const requestControllerRef = useRef(null)
   const location = useLocation()
   const navigate = useNavigate()
+  const diagnosisAccess = useFeatureAccess("diagnosis")
 
   const [step, setStep] = useState("start")
   const [selectedImages, setSelectedImages] = useState([])
@@ -344,6 +347,15 @@ export default function DiagnosticoTab() {
   const analyzeBatch = async () => {
     if (selectedImages.length === 0) return
 
+    const permission = await diagnosisAccess.consume()
+    if (!permission.allowed) {
+      if (permission.limitReached) setStep("start")
+      else if (!permission.pending) {
+        setSelectionNotice({ type: "warning", text: "Não foi possível verificar o acesso à análise. Tente novamente." })
+      }
+      return
+    }
+
     const controller = new AbortController()
     requestControllerRef.current = controller
     setReportContext({ fieldAreaName: getFieldAreaContext()?.name })
@@ -422,10 +434,10 @@ export default function DiagnosticoTab() {
   }
   if (step === "analysis") return <AnalysisLoader imageCount={selectedImages.length} />
   if (step === "result" && result?.resultado_geral) {
-    return <BatchDiagnosisResult result={result} selectedImages={selectedImages} onRestart={reset} onCreateInspection={createInspectionTask} reportContext={reportContext} />
+    return <BatchDiagnosisResult result={result} selectedImages={selectedImages} onRestart={reset} onCreateInspection={createInspectionTask} reportContext={reportContext} allowThreeD={diagnosisAccess.fullAccess} />
   }
   if (step === "result" && selectedImages.length > 0) {
-    return <BatchDiagnosisResult result={result} selectedImages={selectedImages} onRestart={reset} onCreateInspection={createInspectionTask} reportContext={reportContext} />
+    return <BatchDiagnosisResult result={result} selectedImages={selectedImages} onRestart={reset} onCreateInspection={createInspectionTask} reportContext={reportContext} allowThreeD={diagnosisAccess.fullAccess} />
   }
   if (step === "result") return <DiagnosisResult result={result} onRestart={reset} onCreateInspection={createInspectionTask} reportContext={reportContext} />
 
@@ -440,6 +452,10 @@ export default function DiagnosticoTab() {
           Veja o resultado de cada foto e confirme em campo com um profissional.
         </p>
       </div>
+
+      <FeatureAccessPanel feature="diagnosis" access={{ ...diagnosisAccess, refresh: diagnosisAccess.refresh }} />
+
+      {(diagnosisAccess.fullAccess || diagnosisAccess.remaining > 0) && !diagnosisAccess.error && <>
 
       <section className="diagnostic-field-context" aria-labelledby="diagnostic-field-context-title">
         <span className="material-symbols-outlined">location_on</span>
@@ -551,6 +567,7 @@ export default function DiagnosticoTab() {
       </div>
 
       {galleryInput}
+      </>}
     </div>
   )
 }
