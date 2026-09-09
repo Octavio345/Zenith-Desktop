@@ -134,18 +134,34 @@ export default function MonitoramentoView() {
             </div>
           </div>
 
-          <button
-            type="button"
-            className={styles.botaoNova}
-            onClick={resetar}
-          >
-            Analisar nova imagem
-          </button>
-          <ReportButton kind="monitoramento" result={result} images={[{ preview }]} className={styles.botaoVistoria} />
-          <button type="button" className={styles.botaoVistoria} onClick={createFieldInspection}>
-            <span className="material-symbols-outlined">assignment_add</span>
-            Criar tarefa de vistoria
-          </button>
+          <div className={styles.acoesResultado} aria-label="Ações do resultado">
+            <button
+              type="button"
+              className={`${styles.botaoResultado} ${styles.botaoResultadoPrimario}`}
+              onClick={resetar}
+            >
+              <span className="material-symbols-outlined" aria-hidden="true">refresh</span>
+              Analisar nova imagem
+            </button>
+
+            <div className={styles.acaoRelatorio}>
+              <ReportButton
+                kind="monitoramento"
+                result={result}
+                images={[{ preview }]}
+                className={`${styles.botaoResultado} ${styles.botaoResultadoSecundario}`}
+              />
+            </div>
+
+            <button
+              type="button"
+              className={`${styles.botaoResultado} ${styles.botaoResultadoVistoria}`}
+              onClick={createFieldInspection}
+            >
+              <span className="material-symbols-outlined" aria-hidden="true">assignment_add</span>
+              Criar tarefa de vistoria
+            </button>
+          </div>
         </div>
       )}
     </div>

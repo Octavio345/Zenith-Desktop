@@ -44,14 +44,14 @@ function interpretarFalhas(failureScore, failureLevel) {
   if (nivel === "ALTO") {
     return {
       tipo: "perigo",
-      texto: `Região de baixa densidade — atenção alta. Índice retornado: ${pct}%. Confirme em campo.`,
+      texto: `Baixa densidade identificada — atenção alta. Índice de baixa densidade: ${pct}%. Confirme em campo.`,
     }
   }
 
   if (nivel === "MEDIO") {
     return {
       tipo: "aviso",
-      texto: `Região de baixa densidade — atenção moderada. Índice retornado: ${pct}%. Confirme em campo.`,
+      texto: `Baixa densidade identificada — atenção moderada. Índice de baixa densidade: ${pct}%. Confirme em campo.`,
     }
   }
 
@@ -173,27 +173,27 @@ export function coresNivelFalha(level) {
   switch (normalizarNivelFalha(level)) {
     case "ALTO":
       return {
-        fundo: "rgba(255, 77, 77, 0.12)",
-        texto: "#ff4d4d",
-        borda: "rgba(255, 77, 77, 0.35)",
+        fundo: "#fff1f0",
+        texto: "#a61b14",
+        borda: "#e7a29d",
       }
     case "MEDIO":
       return {
-        fundo: "rgba(255, 170, 0, 0.12)",
-        texto: "#ffaa00",
-        borda: "rgba(255, 170, 0, 0.35)",
+        fundo: "#fff7e6",
+        texto: "#9a5100",
+        borda: "#e6b45c",
       }
     default:
       return {
-        fundo: "rgba(86, 168, 112, 0.08)",
-        texto: "#56a870",
-        borda: "rgba(86, 168, 112, 0.25)",
+        fundo: "#edf7ef",
+        texto: "#245f39",
+        borda: "#9bc8a7",
       }
   }
 }
 
 export function corPorValor(value, { bom, aviso }) {
-  if (value >= bom) return "#56a870"
-  if (value >= aviso) return "#ffaa00"
-  return "#ff4d4d"
+  if (value >= bom) return "#348454"
+  if (value >= aviso) return "#b86600"
+  return "#b42318"
 }

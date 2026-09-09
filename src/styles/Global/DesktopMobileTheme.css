@@ -196,6 +196,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .explore-container--monitoramento [class*="_analysisContent_"] p,.explore-container--monitoramento [class*="_cartaoMetricaLabel_"],.explore-container--monitoramento [class*="_interpretacaoTitulo_"] { color:#718077!important; }
 .explore-container--monitoramento [class*="_cartaoMetrica_"] { background:#f5f9f2!important;border-color:#e0e9de!important;color:var(--zenith-ink)!important; }
 .explore-container--monitoramento [class*="_botaoNova_"] { background:var(--zenith-green)!important;color:white!important;border-radius:999px!important;box-shadow:0 10px 24px rgba(39,108,71,.2)!important; }
+.explore-container--monitoramento [class*="_alertBanner_aviso_"] { background:#fff8e8!important;border-color:#e3b761!important; }
+.explore-container--monitoramento [class*="_alertBanner_perigo_"] { background:#fff4f2!important;border-color:#e6aaa5!important; }
+.explore-container--monitoramento [class*="_alertBanner_ok_"] { background:#f2f9f3!important;border-color:#b9d6c0!important; }
 
 .clima-premium-dashboard { width:min(1240px,calc(100% - 68px))!important;max-width:none!important;margin:0 auto!important;padding:0 0 50px!important;color:var(--zenith-ink)!important; }
 .clima-main-desktop-grid { gap:18px!important; }
