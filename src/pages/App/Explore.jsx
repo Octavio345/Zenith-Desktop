@@ -6,6 +6,7 @@ import AppHeader from "../../components/App/Global/AppHeader"
 import MenuBar from "../../components/App/Global/MenuBar"
 import AppFooter from "../../components/App/Global/AppFooter"
 import DiagnosticoTab from "../../components/App/Explore/Diagnostico/DiagnosticoTab"
+import MultispectralAnalysis from "../../components/App/Explore/Multispectral/MultispectralAnalysis"
 import ClimaTab from "../../components/App/Explore/ClimaTab"
 import DiarioTab from "../../components/App/Explore/DiarioTab"
 import MapaTab from "../../components/App/Explore/MapaTab"
@@ -19,6 +20,7 @@ import "../../styles/App/Explore.css"
 
 const tabs = [
   { id: "diagnostico", label: "Análise IA", icon: "eco" },
+  { id: "multiespectral", label: "Multiespectral", icon: "satellite_alt" },
   { id: "monitoramento", label: "Monitoramento", icon: "psychiatry" },
   { id: "mapa", label: "Mapa", icon: "map" },
   { id: "clima", label: "Clima", icon: "cloud" },
@@ -30,6 +32,7 @@ const tabs = [
 
 const tabContext = {
   diagnostico: ["Análise da soja por IA", "Use fotos para identificar possíveis problemas na soja. Confirme o resultado em campo."],
+  multiespectral: ["Análise multiespectral", "Analise bandas de drone e priorize áreas para inspeção em campo."],
   monitoramento: ["Análise estrutural do plantio", "Monitore a lavoura de soja por imagens e visão computacional."],
   clima: ["Clima da fazenda", "Condições atuais e previsão para apoiar decisões no campo."],
   diario: ["Diário de campo", "Registre ocorrências, observações e aprendizados da operação."],
@@ -78,6 +81,8 @@ export default function Explore() {
     switch(activeTab) {
       case "diagnostico":
         return <DiagnosticoTab active={activeTab === "diagnostico"} />
+      case "multiespectral":
+        return <MultispectralAnalysis />
       case "monitoramento":
         return <MonitoramentoView />
       case "clima":
@@ -130,12 +135,14 @@ export default function Explore() {
         </aside>
       </section>
 
-      <div className="explore-tabs-modern">
+      <nav className="explore-tabs-modern" aria-label="Módulos do Explore">
         {tabs.map((tab) => (
           <button
             key={tab.id}
+            type="button"
             className={`explore-tab ${activeTab === tab.id ? "active" : ""}`}
             onClick={() => selectTab(tab.id)}
+            aria-current={activeTab === tab.id ? "page" : undefined}
           >
             <span className="explore-tab-icon material-symbols-outlined">
               {tab.icon}
@@ -143,7 +150,7 @@ export default function Explore() {
             <span className="explore-tab-label">{tab.label}</span>
           </button>
         ))}
-      </div>
+      </nav>
 
       <AnimatePresence mode="wait">
         <motion.div

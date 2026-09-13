@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { doc, getDoc } from "firebase/firestore"
 import { auth, db } from "../../../services/firebase"
+import { createMultispectralReport } from "../../../services/multispectralReport"
 
 export default function ReportButton({ kind = "triagem", result, images, context, className }) {
   const [busy, setBusy] = useState(false)
@@ -23,11 +24,18 @@ export default function ReportButton({ kind = "triagem", result, images, context
       const isCNPJ = profile?.type === "PJ" && digits.length === 14
       const userDocument = profile?.documentMasked || (isCPF ? digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4")
         : isCNPJ ? digits.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5") : undefined)
-      const { createAnalysisReport } = await import("../../../services/analysisReport")
-      const { doc: pdf, filename } = await createAnalysisReport({ kind, result, images, context: {
+      const reportContext = {
         ...context, userName: profile?.name || user.displayName || undefined,
         userDocument, documentLabel: profile?.type === "PJ" ? "CNPJ" : "CPF"
-      } })
+      }
+      let generatedReport
+      if (kind === "multiespectral") {
+        generatedReport = await createMultispectralReport({ result, context: reportContext })
+      } else {
+        const report = await import("../../../services/analysisReport")
+        generatedReport = await report.createAnalysisReport({ kind, result, images, context: reportContext })
+      }
+      const { doc: pdf, filename } = generatedReport
       pdf.save(filename)
     } catch (e) {
       setError(e?.message || "Não foi possível gerar o relatório. Tente novamente.")

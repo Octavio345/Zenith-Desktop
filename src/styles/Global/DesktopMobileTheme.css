@@ -1097,3 +1097,59 @@ html,body,button,input,select,textarea,h1,h2,h3,h4,h5,h6,p,a,label,strong,small,
     min-height: auto !important;
   }
 }
+
+/* Explore module navigation: all entries remain visible without clipping. */
+.explore-container > .explore-tabs-modern {
+  display: grid !important;
+  grid-template-columns: repeat(9, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+  overflow: visible !important;
+}
+
+.explore-container > .explore-tabs-modern > .explore-tab {
+  width: 100% !important;
+  min-width: 0 !important;
+  gap: 4px !important;
+  padding-inline: 4px !important;
+}
+
+.explore-container > .explore-tabs-modern .explore-tab-label {
+  min-width: 0;
+  overflow: visible;
+  font-size: .74rem !important;
+  white-space: nowrap;
+}
+
+.explore-container > .explore-tabs-modern .explore-tab-icon {
+  flex: 0 0 auto;
+  font-size: 15px !important;
+}
+
+@media (min-width: 761px) and (max-width: 1100px) {
+  .explore-container > .explore-tabs-modern {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .explore-container > .explore-tabs-modern {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    padding: 8px 12px !important;
+  }
+
+  .explore-container > .explore-tabs-modern > .explore-tab {
+    min-height: 42px !important;
+    height: 42px !important;
+    padding-inline: 5px !important;
+  }
+
+  .explore-container > .explore-tabs-modern .explore-tab-icon {
+    display: none !important;
+  }
+
+  .explore-container > .explore-tabs-modern .explore-tab-label {
+    overflow: visible;
+    font-size: .7rem !important;
+    text-overflow: clip;
+  }
+}
