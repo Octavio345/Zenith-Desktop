@@ -113,9 +113,12 @@ export default function MultispectralAnalysis() {
         </aside>
       </header>
 
-      <div className="ms-context-banner">
-        <span className="material-symbols-outlined">compare_arrows</span>
-        <p><strong>Este fluxo é diferente do diagnóstico por foto RGB.</strong> Aqui, o Zenith analisa bandas multiespectrais capturadas por drone para identificar possíveis alterações fisiológicas.</p>
+      <div className="ms-context-banner" role="note" aria-label="Requisito para a análise multiespectral">
+        <span className="material-symbols-outlined" aria-hidden="true">photo_camera</span>
+        <div>
+          <strong>Importante: esta análise exige um drone equipado com câmera multiespectral.</strong>
+          <p>A câmera deve gerar arquivos separados das bandas Verde (Green), Vermelha (Red), Red Edge e Infravermelho Próximo (NIR). Fotos comuns RGB, mesmo feitas por drone, não são suficientes.</p>
+        </div>
       </div>
 
       {isAnalyzing ? (

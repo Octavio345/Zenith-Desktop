@@ -73,14 +73,15 @@
 }
 .ms-context-banner {
   margin: 14px 0 20px;
-  padding: 13px 17px;
-  border: 1px solid rgba(22, 242, 154, 0.16);
+  padding: 15px 17px;
+  border: 1px solid rgba(250, 204, 21, 0.26);
   border-radius: 16px;
-  background: rgba(5, 18, 11, 0.72);
+  background: rgba(120, 83, 15, 0.13);
 }
-.ms-context-banner > span { color: var(--ms-primary); }
-.ms-context-banner p { margin: 0; color: rgba(248, 250, 252, 0.72); font-size: 0.82rem; line-height: 1.55; }
-.ms-context-banner strong { color: var(--ms-text); }
+.ms-context-banner > span { flex: 0 0 auto; color: #facc15; }
+.ms-context-banner > div { min-width: 0; }
+.ms-context-banner strong { display: block; color: var(--ms-text); font-size: 0.84rem; line-height: 1.45; }
+.ms-context-banner p { margin: 4px 0 0; color: rgba(248, 250, 252, 0.72); font-size: 0.78rem; line-height: 1.55; }
 
 .ms-upload-panel,
 .ms-map-panel,
@@ -367,12 +368,12 @@
 .ms-page-header aside small { color: #738078; }
 
 .ms-context-banner {
-  border-color: #d3e3d1;
-  background: #edf5e9;
+  border-color: #e8d9a4;
+  background: #fff9e9;
   box-shadow: 0 8px 22px rgba(39, 78, 48, 0.045);
 }
-.ms-context-banner > span { color: var(--zenith-green, #286c47); }
-.ms-context-banner p { color: #627168; }
+.ms-context-banner > span { color: #9b6b2c; }
+.ms-context-banner p { color: #705920; }
 .ms-context-banner strong { color: var(--zenith-forest, #153f2a); }
 
 .ms-upload-panel,
