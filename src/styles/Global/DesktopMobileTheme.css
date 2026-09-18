@@ -1170,9 +1170,9 @@ html,body,button,input,select,textarea,h1,h2,h3,h4,h5,h6,p,a,label,strong,small,
 
 .zenith-footer__institutional-inner {
   width: min(1380px, calc(100% - 68px));
-  min-height: 146px;
+  min-height: 138px;
   margin: 0 auto;
-  padding: 22px 0;
+  padding: 18px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1225,54 +1225,23 @@ html,body,button,input,select,textarea,h1,h2,h3,h4,h5,h6,p,a,label,strong,small,
   line-height: 1.4;
 }
 
-.zenith-footer__institutional-logos {
+.zenith-footer__institutional-signature {
+  width: min(310px, 29vw);
   min-width: 0;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 24px;
-}
-
-.zenith-footer__institutional-logo {
-  min-height: 90px;
-  padding: 10px 16px;
+  padding: 11px 15px;
   display: grid;
   place-items: center;
-  border: 1px solid rgba(255, 255, 255, .28);
-  border-radius: 17px;
-  background: linear-gradient(145deg, #fff, #f5f7f3);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, .14), inset 0 1px rgba(255, 255, 255, .9);
+  border: 1px solid rgba(255, 255, 255, .42);
+  border-radius: 14px;
+  background: linear-gradient(145deg, #fff, #f4f6f3);
+  box-shadow: 0 10px 24px rgba(4, 29, 16, .14);
 }
 
-.zenith-footer__institutional-logo img {
-  display: block;
-  max-width: 100%;
-  object-fit: contain;
-}
-
-.zenith-footer__institutional-logo--etec img {
-  width: 118px;
-  max-height: 70px;
-}
-
-.zenith-footer__institutional-logo--etec {
-  width: 166px;
-}
-
-.zenith-footer__institutional-logo--cps {
-  width: min(420px, 34vw);
-}
-
-.zenith-footer__institutional-logo--cps img {
+.zenith-footer__institutional-signature img {
   width: 100%;
-  max-height: 68px;
-}
-
-.zenith-footer__institutional-divider {
-  width: 1px;
-  height: 62px;
-  flex: 0 0 auto;
-  background: rgba(255, 255, 255, .15);
+  height: auto;
+  display: block;
+  object-fit: contain;
 }
 
 @media (max-width: 1050px) and (min-width: 761px) {
@@ -1281,16 +1250,8 @@ html,body,button,input,select,textarea,h1,h2,h3,h4,h5,h6,p,a,label,strong,small,
     gap: 24px;
   }
 
-  .zenith-footer__institutional-logo--etec img {
-    width: 104px;
-  }
-
-  .zenith-footer__institutional-logo--etec {
-    width: 148px;
-  }
-
-  .zenith-footer__institutional-logo--cps {
-    width: min(350px, 37vw);
+  .zenith-footer__institutional-signature {
+    width: min(290px, 39vw);
   }
 }
 
@@ -1301,13 +1262,8 @@ html,body,button,input,select,textarea,h1,h2,h3,h4,h5,h6,p,a,label,strong,small,
     flex-direction: column;
   }
 
-  .zenith-footer__institutional-logos {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .zenith-footer__institutional-logo--cps {
-    width: min(390px, 55vw);
+  .zenith-footer__institutional-signature {
+    width: min(310px, 100%);
   }
 }
 

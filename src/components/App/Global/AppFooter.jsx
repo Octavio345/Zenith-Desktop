@@ -3,8 +3,7 @@ import { Link } from "react-router-dom"
 import { onAuthStateChanged } from "firebase/auth"
 import { auth } from "../../../services/firebase"
 import { getUserAccessProfile, isOperationalRole } from "../../../services/accessControl"
-import etecAmericanaLogo from "../../../../logo_etec_americana.png"
-import cpsSaoPauloLogo from "../../../../2026_regua_logo_cps_brasao_horizontal_regua_brasao+cps_cor.png"
+import academicSignature from "../../../../assinatura-etec-cps.png"
 
 const links = [
   { label: "Início", path: "/home", icon: "home" },
@@ -103,14 +102,11 @@ export default function AppFooter() {
               </span>
             </div>
 
-            <div className="zenith-footer__institutional-logos" role="list">
-              <div className="zenith-footer__institutional-logo zenith-footer__institutional-logo--etec" role="listitem">
-                <img src={etecAmericanaLogo} alt="Etec Polivalente de Americana — São Paulo" />
-              </div>
-              <span className="zenith-footer__institutional-divider" aria-hidden="true" />
-              <div className="zenith-footer__institutional-logo zenith-footer__institutional-logo--cps" role="listitem">
-                <img src={cpsSaoPauloLogo} alt="Centro Paula Souza e Governo do Estado de São Paulo" />
-              </div>
+            <div className="zenith-footer__institutional-signature">
+              <img
+                src={academicSignature}
+                alt="Etec Polivalente de Americana e Centro Paula Souza"
+              />
             </div>
           </div>
         </div>
