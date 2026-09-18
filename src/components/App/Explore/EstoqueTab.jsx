@@ -198,17 +198,18 @@ export default function EstoqueTab() {
 
   return (
     <div className="estoque-container">
-
-      <div className="estoque-header">
-        <div>
-          <h2>Estoque</h2>
-          <p>Gerencie insumos, defensivos, sementes e equipamentos.</p>
+      <section className="estoque-hero" aria-labelledby="estoque-title">
+        <div className="estoque-header">
+          <div>
+            <h2 id="estoque-title">Estoque</h2>
+            <p>Gerencie insumos, defensivos, sementes e equipamentos.</p>
+          </div>
+          <button className="add-product-btn" onClick={() => setShowForm(true)}>
+            <span className="material-symbols-outlined">add</span>
+            Novo produto
+          </button>
         </div>
-        <button className="add-product-btn" onClick={() => setShowForm(true)}>
-          <span className="material-symbols-outlined">add</span>
-          Novo produto
-        </button>
-      </div>
+      </section>
 
 
       <div className="estoque-controls">

@@ -42,17 +42,28 @@ export default function MonitoramentoView() {
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.cabecalho}>
-        <h2 className={styles.titulo}>Monitoramento da plantação</h2>
-        <p className={styles.subtitulo}>
-          Selecione uma imagem da soja, analise os resultados e confirme em campo.
-        </p>
-      </div>
+    <div className={`${styles.container} ${!mostrarResultados ? styles.containerUpload : ""}`}>
+      {!mostrarResultados ? (
+        <section className={styles.hero} aria-labelledby="monitoramento-title">
+          <div className={styles.cabecalho}>
+            <h2 id="monitoramento-title" className={styles.titulo}>Alinhamento da Plantação</h2>
+            <p className={styles.subtitulo}>
+              Analise o alinhamento e a uniformidade das fileiras
+            </p>
+          </div>
+        </section>
+      ) : (
+        <div className={styles.cabecalho}>
+          <h2 className={styles.titulo}>Monitoramento da plantação</h2>
+          <p className={styles.subtitulo}>
+            Selecione uma imagem da soja, analise os resultados e confirme em campo.
+          </p>
+        </div>
+      )}
 
       <FeatureAccessPanel feature="monitoring" access={{ ...monitoringAccess, refresh: monitoringAccess.refresh }} />
 
-      {(monitoringAccess.fullAccess || monitoringAccess.remaining > 0) && !monitoringAccess.error && (
+      {!mostrarResultados && (monitoringAccess.fullAccess || monitoringAccess.remaining > 0) && !monitoringAccess.error && (
         <UploadImage
           onSelect={handleAnalyze}
           disabled={loading || monitoringAccess.loading}

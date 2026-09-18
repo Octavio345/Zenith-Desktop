@@ -329,7 +329,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 .team-page{padding-top:30px!important}.team-hero{margin-top:0!important}
 
-
 .explore-tab.active .explore-tab-label,.explore-tab.active .explore-tab-icon{color:#fff!important}
 
 
@@ -372,8 +371,15 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .clima-hero-card { background:linear-gradient(95deg,rgba(239,248,229,.97),rgba(220,239,209,.8)),url('/assets/image/imagem-fundo-clima.webp') center/cover!important; }
 .clima-location h2,.clima-condition-main h3,.clima-section-header h3,.clima-rec-card h4,.clima-rec-card strong,.clima-metric-card strong,.clima-quick-card strong { color:#173d2b!important; }
 .clima-location p,.clima-condition-main p,.clima-field-name,.clima-footer-meta,.clima-rec-card p,.clima-metric-card small,.clima-quick-card small { color:#6c7d72!important; }
-.clima-temperature-block { background:linear-gradient(145deg,#347b4e,#235f3d)!important;box-shadow:0 16px 35px rgba(39,108,71,.2)!important; }
-.clima-temperature-block strong,.clima-temperature-block span { color:#fff!important; }
+.clima-temperature-block {
+  border:1px solid rgba(255,255,255,.14)!important;
+  background:rgba(5,24,15,.72)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 16px 36px rgba(2,16,9,.2)!important;
+  backdrop-filter:blur(12px) saturate(115%);
+  -webkit-backdrop-filter:blur(12px) saturate(115%);
+}
+.clima-temperature-block strong { color:#fff!important; }
+.clima-temperature-block span { color:rgba(255,255,255,.86)!important; }
 .clima-quick-card,.clima-rec-card,.clima-metric-card { background:#f8faf5!important; }
 
 .pf-page { --pf-green:#2e6f46!important;--pf-green-dim:#e2f0df!important;--pf-text:#173326!important;--pf-text-2:#6d7c72!important;--pf-text-3:#9aa69e!important;--pf-border:#dce7da!important;--pf-border-2:#cfdecc!important;min-height:calc(100vh - 76px)!important;padding-bottom:80px!important;background:linear-gradient(180deg,#f8fbf4,#edf5e9)!important;color:#173326!important; }
@@ -1152,4 +1158,597 @@ html,body,button,input,select,textarea,h1,h2,h3,h4,h5,h6,p,a,label,strong,small,
     font-size: .7rem !important;
     text-overflow: clip;
   }
+}
+
+/* Academic origin: the logos remain protected in individual light cards while
+   the section continues the footer's green visual language. */
+.zenith-footer__institutional {
+  border-top: 1px solid rgba(255, 255, 255, .1);
+  background: transparent;
+  color: #fff;
+}
+
+.zenith-footer__institutional-inner {
+  width: min(1380px, calc(100% - 68px));
+  min-height: 146px;
+  margin: 0 auto;
+  padding: 22px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 36px;
+}
+
+.zenith-footer__institutional-heading {
+  max-width: 430px;
+  flex: 0 1 430px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.zenith-footer__institutional-heading > .material-symbols-outlined {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1px solid rgba(255, 255, 255, .13);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .07);
+  color: #a9d8a6;
+  font-size: 22px;
+}
+
+.zenith-footer__institutional-heading > span:last-child {
+  display: grid;
+  gap: 4px;
+}
+
+.zenith-footer__institutional-heading small {
+  color: #9bd19a;
+  font-size: .58rem;
+  font-weight: 900;
+  letter-spacing: .14em;
+}
+
+.zenith-footer__institutional-heading strong {
+  color: #f5faf5;
+  font-size: .76rem;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.zenith-footer__institutional-heading > span:last-child > span {
+  color: rgba(255, 255, 255, .54);
+  font-size: .65rem;
+  line-height: 1.4;
+}
+
+.zenith-footer__institutional-logos {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 24px;
+}
+
+.zenith-footer__institutional-logo {
+  min-height: 90px;
+  padding: 10px 16px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, .28);
+  border-radius: 17px;
+  background: linear-gradient(145deg, #fff, #f5f7f3);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, .14), inset 0 1px rgba(255, 255, 255, .9);
+}
+
+.zenith-footer__institutional-logo img {
+  display: block;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.zenith-footer__institutional-logo--etec img {
+  width: 118px;
+  max-height: 70px;
+}
+
+.zenith-footer__institutional-logo--etec {
+  width: 166px;
+}
+
+.zenith-footer__institutional-logo--cps {
+  width: min(420px, 34vw);
+}
+
+.zenith-footer__institutional-logo--cps img {
+  width: 100%;
+  max-height: 68px;
+}
+
+.zenith-footer__institutional-divider {
+  width: 1px;
+  height: 62px;
+  flex: 0 0 auto;
+  background: rgba(255, 255, 255, .15);
+}
+
+@media (max-width: 1050px) and (min-width: 761px) {
+  .zenith-footer__institutional-inner {
+    width: calc(100% - 60px);
+    gap: 24px;
+  }
+
+  .zenith-footer__institutional-logo--etec img {
+    width: 104px;
+  }
+
+  .zenith-footer__institutional-logo--etec {
+    width: 148px;
+  }
+
+  .zenith-footer__institutional-logo--cps {
+    width: min(350px, 37vw);
+  }
+}
+
+@media (max-width: 850px) and (min-width: 761px) {
+  .zenith-footer__institutional-inner {
+    padding: 22px 0;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .zenith-footer__institutional-logos {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .zenith-footer__institutional-logo--cps {
+    width: min(390px, 55vw);
+  }
+}
+
+/* Footer finishing details. */
+.zenith-footer__surface {
+  position: relative;
+  isolation: isolate;
+}
+
+.zenith-footer__surface::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(177, 220, 169, .42), transparent);
+}
+
+.zenith-footer__brand-line img {
+  outline: 1px solid rgba(162, 211, 158, .12);
+  outline-offset: 4px;
+}
+
+.zenith-footer__capabilities > span,
+.zenith-footer__navigation nav a,
+.zenith-footer__contact-list > a,
+.zenith-footer__contact-list > div {
+  backdrop-filter: blur(8px);
+}
+
+.zenith-footer__institutional-heading strong {
+  letter-spacing: -.01em;
+}
+
+/* Fundos editoriais do Mobile aplicados aos módulos equivalentes no Desktop. */
+.diagnostic-container > .diagnostic-hero {
+  background:
+    linear-gradient(90deg,rgba(7,31,19,.94) 0%,rgba(11,48,29,.78) 42%,rgba(7,31,19,.18) 100%),
+    url('/assets/image/imagem-fundo-diagnostico.png') center 58%/cover no-repeat !important;
+}
+
+.diagnostic-container > .diagnostic-hero .diagnostic-header {
+  min-height:0 !important;
+  margin:0 !important;
+  padding:48px clamp(30px,5vw,68px) !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+
+.diagnostic-container > .diagnostic-hero .batch-eyebrow { color:#d8f1d4 !important; }
+.diagnostic-container > .diagnostic-hero .diagnostico-title { color:#fff !important;text-shadow:0 3px 24px rgba(3,18,10,.28) !important; }
+.diagnostic-container > .diagnostic-hero .diagnostico-title .highlight,
+.diagnostic-container > .diagnostic-hero .diagnostic-header p .highlight { color:#b9e4b5 !important; }
+.diagnostic-container > .diagnostic-hero .diagnostic-header p { color:rgba(244,249,239,.9) !important;text-shadow:0 2px 12px rgba(3,18,10,.34) !important; }
+
+.diario-hero {
+  background:
+    linear-gradient(90deg,rgba(9,42,24,.9) 0%,rgba(14,59,34,.65) 44%,rgba(14,59,34,.12) 100%),
+    url('/assets/image/imagem-fundo-diario.png') center 62%/cover no-repeat !important;
+}
+
+.estoque-hero {
+  background:
+    linear-gradient(90deg,rgba(8,34,20,.92) 0%,rgba(10,43,25,.68) 42%,rgba(8,34,20,.12) 100%),
+    url('/assets/image/imagem-fundo-estoque.png') center 58%/cover no-repeat !important;
+}
+
+.diario-hero .diario-header,
+.estoque-hero .estoque-header {
+  margin:0 !important;
+  padding:40px 42px !important;
+  border-radius:0 !important;
+  background:transparent !important;
+}
+
+.diario-hero .diario-header h2,
+.estoque-hero .estoque-header h2 { color:#fff !important; }
+.diario-hero .diario-header p,
+.estoque-hero .estoque-header p { color:rgba(247,251,244,.9) !important; }
+
+.diario-hero .diario-add-btn,
+.estoque-hero .add-product-btn {
+  border:1px solid rgba(255,255,255,.54) !important;
+  background:rgba(255,255,255,.94) !important;
+  color:#245f3b !important;
+  box-shadow:0 12px 30px rgba(3,18,10,.24) !important;
+}
+
+.clima-hero-card {
+  background:
+    linear-gradient(90deg,rgba(5,24,15,.92) 0%,rgba(7,32,20,.76) 48%,rgba(7,22,15,.34) 100%),
+    url('/assets/image/imagem-fundo-clima.png') center 58%/cover no-repeat !important;
+}
+
+.clima-hero-card .clima-location h2,
+.clima-hero-card .clima-condition-main h3,
+.clima-hero-card .clima-quick-card strong { color:#fff !important; }
+.clima-hero-card .clima-location p,
+.clima-hero-card .clima-condition-main p,
+.clima-hero-card .clima-field-name,
+.clima-hero-card .clima-quick-card small { color:rgba(239,247,238,.76) !important; }
+.clima-hero-card .clima-quick-card { background:rgba(5,18,11,.62) !important;border-color:rgba(255,255,255,.12) !important; }
+
+.farm-map-header {
+  background:
+    linear-gradient(90deg,rgba(8,38,22,.94) 0%,rgba(15,62,36,.72) 47%,rgba(15,62,36,.18) 100%),
+    url('/assets/image/imagem-fundo-clima.png') center 68%/cover no-repeat !important;
+}
+
+.drone-law-hero {
+  background:
+    linear-gradient(90deg,rgba(10,47,25,.88) 0%,rgba(18,56,32,.62) 45%,rgba(18,56,32,.12) 100%),
+    url('/assets/image/imagem-fundo-alinhamento-mobile-2026.png') center 43%/cover no-repeat !important;
+}
+
+.drone-law-hero h2 { color:#fff !important;text-shadow:0 3px 22px rgba(3,18,10,.3) !important; }
+.drone-law-hero p { color:rgba(255,255,255,.88) !important;text-shadow:0 2px 8px rgba(3,18,10,.36) !important; }
+.drone-law-hero .drone-law-kicker { color:#d8f1d4 !important; }
+.drone-law-hero .drone-law-hero-icon { border-color:rgba(255,255,255,.4) !important;background:rgba(255,255,255,.16) !important;color:#fff !important;backdrop-filter:blur(10px); }
+
+.explore-container--monitoramento .tab-content > div[class*="_containerUpload_"] {
+  border:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+
+.explore-container--monitoramento [class*="_containerUpload_"] [class*="_hero_"] {
+  background:
+    linear-gradient(90deg,rgba(6,31,18,.94) 0%,rgba(9,43,25,.74) 48%,rgba(7,31,19,.2) 100%),
+    url('/assets/image/imagem-fundo-alinhamento-2026.png') center 58%/cover no-repeat !important;
+}
+
+.explore-container--monitoramento [class*="_containerUpload_"] [class*="_hero_"] [class*="_cabecalho_"] { margin:0 !important; }
+.explore-container--monitoramento [class*="_containerUpload_"] [class*="_hero_"] [class*="_titulo_"] { color:#fff !important;text-shadow:0 3px 24px rgba(3,18,10,.32) !important; }
+.explore-container--monitoramento [class*="_containerUpload_"] [class*="_hero_"] [class*="_subtitulo_"] { color:rgba(247,251,244,.9) !important; }
+
+@media(max-width:760px){
+  .diagnostic-container > .diagnostic-hero .diagnostic-header,
+  .diario-hero .diario-header,
+  .estoque-hero .estoque-header { padding:32px 24px !important; }
+  .explore-container--monitoramento [class*="_containerUpload_"] [class*="_hero_"] {
+    background:
+      linear-gradient(180deg,rgba(6,31,18,.9),rgba(7,31,19,.3)),
+      url('/assets/image/imagem-fundo-alinhamento-mobile-2026.png') center/cover no-repeat !important;
+  }
+}
+
+/* O seletor de imagem replica o fluxo do Mobile; estes seletores específicos
+   impedem as regras legadas do tema Desktop de trocar o ícone por outra arte. */
+.explore-container--monitoramento [class*="_containerUpload_"] [class*="_uploadArea_"] {
+  align-items:stretch !important;
+  gap:15px !important;
+  min-height:0 !important;
+  padding:16px !important;
+  border:1px solid #cadbc7 !important;
+  border-radius:22px !important;
+  background:rgba(255,255,255,.96) !important;
+  box-shadow:0 18px 46px rgba(34,78,47,.1) !important;
+}
+
+.explore-container--monitoramento [class*="_containerUpload_"] [class*="_uploadArea_"]::before {
+  display:none !important;
+}
+
+.explore-container--monitoramento [class*="_containerUpload_"] [class*="_uploadDropZone_"] {
+  display:flex !important;
+  min-height:270px !important;
+  padding:26px 20px !important;
+  border:1.5px dashed rgba(45,97,64,.24) !important;
+  border-radius:22px !important;
+  background:rgba(255,255,255,.48) !important;
+}
+
+.explore-container--monitoramento [class*="_containerUpload_"] [class*="_uploadVisual_"] {
+  width:88px !important;
+  height:88px !important;
+  border:1px solid rgba(255,255,255,.86) !important;
+  border-radius:50% !important;
+  background:rgba(202,235,211,.72) !important;
+  color:#286b43 !important;
+  box-shadow:inset 0 1px 16px rgba(255,255,255,.32),0 18px 32px rgba(45,112,71,.18),0 0 42px rgba(86,168,112,.24) !important;
+}
+
+.explore-container--monitoramento [class*="_containerUpload_"] [class*="_uploadVisual_"]::before {
+  display:block !important;
+  inset:2px !important;
+  border:0 !important;
+  border-radius:50% !important;
+  background:linear-gradient(145deg,rgba(255,255,255,.52),rgba(255,255,255,0) 52%) !important;
+}
+
+.explore-container--monitoramento [class*="_containerUpload_"] [class*="_uploadVisual_"]::after {
+  display:none !important;
+}
+
+.explore-container--monitoramento [class*="_containerUpload_"] [class*="_uploadTexto_"] {
+  color:#173326 !important;
+  font-size:1rem !important;
+}
+
+.explore-container--monitoramento [class*="_containerUpload_"] [class*="_uploadDica_"] {
+  color:#7a877f !important;
+}
+
+.explore-container--monitoramento [class*="_containerUpload_"] [class*="_uploadArea_"] [class*="_uploadAcoes_"] {
+  display:grid !important;
+  grid-template-columns:minmax(0,.9fr) minmax(0,1.25fr) !important;
+  gap:12px !important;
+  margin:0 !important;
+}
+
+.explore-container--monitoramento [class*="_containerUpload_"] [class*="_uploadCancelar_"],
+.explore-container--monitoramento [class*="_containerUpload_"] [class*="_uploadAcao_"] {
+  width:100% !important;
+  min-height:52px !important;
+}
+
+@media(max-width:600px){
+  .explore-container--monitoramento [class*="_containerUpload_"] [class*="_uploadArea_"] [class*="_uploadAcoes_"] {
+    grid-template-columns:1fr !important;
+  }
+}
+
+/* Escala tipográfica comum dos módulos operacionais: Mapa até Legislação. */
+:is(
+  .farm-map-shell,
+  .clima-premium-dashboard,
+  .diario-container,
+  .estoque-container,
+  .atividades-container,
+  .drone-law-container
+) {
+  --module-font:Inter,"Segoe UI",sans-serif;
+  --module-title-size:clamp(2.15rem,3.2vw,3rem);
+  --module-subtitle-size:.95rem;
+  --module-section-size:1rem;
+  --module-card-title-size:.92rem;
+  --module-body-size:.82rem;
+  --module-meta-size:.72rem;
+  font-family:var(--module-font) !important;
+}
+
+:is(
+  .farm-map-header h2,
+  .clima-location h2,
+  .diario-header h2,
+  .estoque-header h2,
+  .atividades-header h2,
+  .drone-law-hero h2
+) {
+  margin-top:0 !important;
+  color:#fff !important;
+  font-family:var(--module-font) !important;
+  font-size:var(--module-title-size) !important;
+  font-weight:850 !important;
+  line-height:1.02 !important;
+  letter-spacing:-.035em !important;
+}
+
+:is(
+  .farm-map-header p,
+  .clima-location p,
+  .diario-header p,
+  .estoque-header p,
+  .atividades-header p,
+  .drone-law-hero p
+) {
+  font-family:var(--module-font) !important;
+  font-size:var(--module-subtitle-size) !important;
+  font-weight:550 !important;
+  line-height:1.55 !important;
+  letter-spacing:0 !important;
+}
+
+:is(.farm-map-kicker,.drone-law-kicker) {
+  font-family:var(--module-font) !important;
+  font-size:.68rem !important;
+  font-weight:850 !important;
+  line-height:1.2 !important;
+  letter-spacing:.1em !important;
+  text-transform:uppercase !important;
+}
+
+:is(
+  .farm-map-search label,
+  .farm-map-section-title,
+  .clima-section-title,
+  .drone-law-section-title h3
+) {
+  font-family:var(--module-font) !important;
+  font-size:var(--module-section-size) !important;
+  font-weight:800 !important;
+  line-height:1.25 !important;
+  letter-spacing:-.01em !important;
+}
+
+:is(
+  .farm-map-selected-card strong,
+  .farm-map-area-item strong,
+  .clima-rec-card strong,
+  .diario-card h3,
+  .estoque-container .product-info h3,
+  .atividades-container .activity-info h3,
+  .drone-law-card h4,
+  .drone-law-agency h4,
+  .drone-law-links strong
+) {
+  font-family:var(--module-font) !important;
+  font-size:var(--module-card-title-size) !important;
+  font-weight:800 !important;
+  line-height:1.3 !important;
+  letter-spacing:-.01em !important;
+}
+
+:is(
+  .farm-map-empty,
+  .farm-map-selected-card p,
+  .farm-map-area-item p,
+  .clima-rec-card p,
+  .diario-card p,
+  .atividades-container .activity-description,
+  .drone-law-card p,
+  .drone-law-agency p,
+  .drone-law-alert p
+) {
+  font-family:var(--module-font) !important;
+  font-size:var(--module-body-size) !important;
+  font-weight:500 !important;
+  line-height:1.5 !important;
+  letter-spacing:0 !important;
+}
+
+:is(
+  .farm-map-summary-item small,
+  .farm-map-selected-card small,
+  .farm-map-area-item small,
+  .clima-quick-card small,
+  .clima-metric-card small,
+  .diario-summary-card small,
+  .diario-card small,
+  .estoque-container .product-category,
+  .atividades-container .activity-type,
+  .atividades-container .activity-date,
+  .atividades-container .activity-meta,
+  .drone-law-links small,
+  .drone-law-note
+) {
+  font-family:var(--module-font) !important;
+  font-size:var(--module-meta-size) !important;
+  font-weight:650 !important;
+  line-height:1.35 !important;
+  letter-spacing:0 !important;
+}
+
+:is(
+  .farm-map-summary-item strong,
+  .clima-quick-card strong,
+  .clima-metric-card strong,
+  .diario-summary-card strong,
+  .estoque-stats .stat-card strong,
+  .atividades-stats .stat-card strong
+) {
+  font-family:var(--module-font) !important;
+  font-size:1.35rem !important;
+  font-weight:800 !important;
+  line-height:1.08 !important;
+  letter-spacing:-.025em !important;
+}
+
+:is(
+  .estoque-stats .stat-card p,
+  .atividades-stats .stat-card p
+) {
+  font-family:var(--module-font) !important;
+  font-size:var(--module-meta-size) !important;
+  font-weight:700 !important;
+  line-height:1.3 !important;
+  letter-spacing:0 !important;
+  text-transform:none !important;
+}
+
+:is(
+  .farm-map-search input,
+  .farm-map-search button,
+  .farm-map-button,
+  .clima-refresh-btn,
+  .diario-search input,
+  .diario-filter,
+  .diario-container .diario-add-btn,
+  .estoque-container .search-bar input,
+  .estoque-container .filter-chip,
+  .estoque-container .add-product-btn,
+  .atividades-container .search-bar input,
+  .atividades-container .filter-select,
+  .atividades-container .add-activity-btn
+) {
+  font-family:var(--module-font) !important;
+  font-size:.82rem !important;
+  font-weight:750 !important;
+  letter-spacing:0 !important;
+}
+
+@media(max-width:760px){
+  :is(
+    .farm-map-shell,
+    .clima-premium-dashboard,
+    .diario-container,
+    .estoque-container,
+    .atividades-container,
+    .drone-law-container
+  ) {
+    --module-title-size:clamp(1.8rem,8vw,2.35rem);
+    --module-subtitle-size:.86rem;
+    --module-section-size:.95rem;
+    --module-card-title-size:.88rem;
+    --module-body-size:.78rem;
+    --module-meta-size:.68rem;
+  }
+}
+
+/* Subtítulos sobre os fundos fotográficos precisam manter contraste uniforme. */
+:is(
+  .diagnostic-container > .diagnostic-hero .diagnostic-header > p,
+  .explore-container--monitoramento [class*="_containerUpload_"] [class*="_hero_"] [class*="_subtitulo_"],
+  .clima-hero-card .clima-location p,
+  .diario-hero .diario-header p,
+  .estoque-hero .estoque-header p,
+  .atividades-container > .atividades-header p,
+  .farm-map-header p,
+  .drone-law-hero p
+) {
+  color:#fff !important;
+  opacity:1 !important;
+  text-shadow:0 2px 10px rgba(3,18,10,.46) !important;
+}
+
+.diagnostic-container > .diagnostic-hero .diagnostic-header > p .highlight {
+  color:#fff !important;
 }

@@ -10,6 +10,7 @@ export default function ClimaTab() {
   const [weatherData, setWeatherData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [selectedForecastDay, setSelectedForecastDay] = useState(null)
 
   const fetchWeather = async () => {
     if (!farmData) {
@@ -26,6 +27,7 @@ export default function ClimaTab() {
 
     setLoading(true)
     setError(null)
+    setSelectedForecastDay(null)
 
     try {
       const city = encodeURIComponent(farmData.municipio)
@@ -43,17 +45,70 @@ export default function ClimaTab() {
 
       let minTempDay = weather.main.temp
       let maxTempDay = weather.main.temp
+      let dailyForecast = []
 
       if (forecast.cod === "200") {
-        const today = new Date().toISOString().split("T")[0]
-        const todayList = forecast.list.filter(item =>
-          item.dt_txt.startsWith(today)
-        )
+        const timezoneOffset = Number(forecast.city?.timezone ?? weather.timezone ?? 0)
+        const localDate = (unixTime) => new Date((unixTime + timezoneOffset) * 1000)
+        const localDateKey = (unixTime) => localDate(unixTime).toISOString().split("T")[0]
+        const nowUnix = Math.floor(Date.now() / 1000)
+        const today = localDateKey(nowUnix)
+        const tomorrowDate = localDate(nowUnix)
+        tomorrowDate.setUTCDate(tomorrowDate.getUTCDate() + 1)
+        const tomorrow = tomorrowDate.toISOString().split("T")[0]
+        const todayList = forecast.list.filter(item => localDateKey(item.dt) === today)
+
         if (todayList.length > 0) {
-          const temps = todayList.map(item => item.main.temp)
-          minTempDay = Math.min(...temps)
-          maxTempDay = Math.max(...temps)
+          minTempDay = Math.min(...todayList.map(item => item.main.temp_min))
+          maxTempDay = Math.max(...todayList.map(item => item.main.temp_max))
         }
+
+        const groupedDays = forecast.list.reduce((days, item) => {
+          const key = localDateKey(item.dt)
+          if (key === today) return days
+          if (!days[key]) days[key] = []
+          days[key].push(item)
+          return days
+        }, {})
+
+        dailyForecast = Object.entries(groupedDays).slice(0, 5).map(([key, items]) => {
+          const average = (values) => values.reduce((sum, value) => sum + value, 0) / values.length
+          const representative = items.reduce((closest, item) => {
+            const itemHour = localDate(item.dt).getUTCHours()
+            const closestHour = localDate(closest.dt).getUTCHours()
+            return Math.abs(itemHour - 12) < Math.abs(closestHour - 12) ? item : closest
+          }, items[0])
+          const date = new Date(`${key}T12:00:00Z`)
+          const weekday = date.toLocaleDateString("pt-BR", {
+            weekday: "short",
+            timeZone: "UTC",
+          }).replace(".", "")
+
+          return {
+            key,
+            day: key === tomorrow
+              ? "Amanhã"
+              : weekday.charAt(0).toUpperCase() + weekday.slice(1),
+            date: date.toLocaleDateString("pt-BR", {
+              day: "2-digit",
+              month: "2-digit",
+              timeZone: "UTC",
+            }),
+            tempMin: Math.round(Math.min(...items.map(item => item.main.temp_min))),
+            tempMax: Math.round(Math.max(...items.map(item => item.main.temp_max))),
+            rainChance: Math.round(Math.max(...items.map(item => item.pop || 0)) * 100),
+            rainVolume: items.reduce((total, item) => total + (item.rain?.["3h"] || 0), 0),
+            humidity: Math.round(average(items.map(item => item.main.humidity))),
+            pressure: Math.round(average(items.map(item => item.main.pressure))),
+            windSpeed: average(items.map(item => item.wind.speed || 0)),
+            windDeg: representative.wind.deg || 0,
+            windGust: Math.max(...items.map(item => item.wind.gust || item.wind.speed || 0)),
+            visibility: average(items.map(item => (item.visibility || 0) / 1000)),
+            clouds: Math.round(average(items.map(item => item.clouds.all || 0))),
+            description: representative.weather[0].description,
+            icon: representative.weather[0].icon,
+          }
+        })
       }
 
       if (weather.cod === 200) {
@@ -88,7 +143,8 @@ export default function ClimaTab() {
             day: "numeric",
             month: "long",
           }),
-          updatedAt: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
+          updatedAt: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
+          dailyForecast,
         })
       } else {
         setError("Cidade não encontrada")
@@ -199,6 +255,34 @@ export default function ClimaTab() {
   }
 
   const recommendations = getRecommendations()
+  const selectedForecast = weatherData?.dailyForecast?.find(day => day.key === selectedForecastDay) || null
+  const displayedMetrics = selectedForecast
+    ? [
+        { icon: "humidity_percentage", label: "Umidade média", value: `${selectedForecast.humidity}%` },
+        { icon: "air", label: "Vento médio", value: `${formatDecimal(selectedForecast.windSpeed)} m/s ${getWindDirection(selectedForecast.windDeg)}` },
+        { icon: "speed", label: "Pressão média", value: `${selectedForecast.pressure} hPa` },
+        { icon: "rainy", label: "Chuva prevista", value: `${formatDecimal(selectedForecast.rainVolume)} mm` },
+        { icon: "airwave", label: "Rajada máxima", value: `${formatDecimal(selectedForecast.windGust)} m/s` },
+        { icon: "visibility", label: "Visibilidade média", value: `${formatDecimal(selectedForecast.visibility)} km` },
+        { icon: "cloud", label: "Nuvens", value: `${selectedForecast.clouds}%` },
+        { icon: "device_thermostat", label: "Máxima", value: `${selectedForecast.tempMax}°C` },
+        { icon: "device_thermostat", label: "Mínima", value: `${selectedForecast.tempMin}°C` },
+        { icon: "water_drop", label: "Chance de chuva", value: `${selectedForecast.rainChance}%` },
+      ]
+    : weatherData
+      ? [
+          { icon: "humidity_percentage", label: "Umidade", value: `${weatherData.humidity}%` },
+          { icon: "air", label: "Vento", value: `${formatDecimal(weatherData.windSpeed)} m/s ${getWindDirection(weatherData.windDeg)}` },
+          { icon: "speed", label: "Pressão", value: `${weatherData.pressure} hPa` },
+          { icon: "rainy", label: "Chuva", value: `${formatDecimal(weatherData.rain)} mm` },
+          { icon: "airwave", label: "Rajada", value: `${formatDecimal(weatherData.windGust)} m/s` },
+          { icon: "visibility", label: "Visibilidade", value: `${formatDecimal(weatherData.visibility)} km` },
+          { icon: "cloud", label: "Nuvens", value: `${weatherData.clouds}%` },
+          { icon: "sunny", label: "Nascer do sol", value: weatherData.sunrise },
+          { icon: "nightlight", label: "Pôr do sol", value: weatherData.sunset },
+          { icon: "update", label: "Atualizado", value: weatherData.updatedAt },
+        ]
+      : []
 
 
   if (loading || farmLoading) {
@@ -291,6 +375,10 @@ export default function ClimaTab() {
           flex-direction: column;
           justify-content: space-between;
           gap: 1.6rem;
+          background:
+            linear-gradient(90deg, rgba(5, 24, 15, 0.92) 0%, rgba(7, 32, 20, 0.76) 48%, rgba(7, 22, 15, 0.34) 100%),
+            url("/assets/image/imagem-fundo-clima.png") center 58% / cover no-repeat;
+          box-shadow: 0 24px 58px rgba(5, 24, 15, 0.28);
         }
 
         .clima-hero-header,
@@ -380,13 +468,18 @@ export default function ClimaTab() {
           justify-content: center;
           gap: 0.15rem;
           padding: 1.15rem 1.35rem;
+          border: 1px solid rgba(255, 255, 255, 0.14);
           border-radius: 18px;
-          background: linear-gradient(135deg, #347b4e, #235f3d);
-          box-shadow: 0 22px 42px rgba(39, 108, 71, 0.20);
+          background: rgba(5, 24, 15, 0.72);
+          box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.08),
+            0 16px 36px rgba(2, 16, 9, 0.2);
+          backdrop-filter: blur(12px) saturate(115%);
+          -webkit-backdrop-filter: blur(12px) saturate(115%);
         }
 
         .clima-temperature-block strong {
-          color: #04120c;
+          color: #ffffff;
           font-size: clamp(3.4rem, 5vw, 4.7rem);
           font-weight: 850;
           letter-spacing: 0;
@@ -395,7 +488,7 @@ export default function ClimaTab() {
 
         .clima-temperature-block span {
           margin-top: 0.2rem;
-          color: #04120c;
+          color: rgba(255, 255, 255, 0.86);
           font-size: 1.3rem;
           font-weight: 800;
         }
@@ -547,6 +640,185 @@ export default function ClimaTab() {
           gap: 1rem;
         }
 
+        .clima-forecast-section {
+          padding: 1.35rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .clima-forecast-range {
+          color: #7d918d;
+          font-size: 0.74rem;
+          font-weight: 650;
+        }
+
+        .clima-forecast-grid {
+          display: grid;
+          grid-template-columns: repeat(5, minmax(0, 1fr));
+          gap: 0.8rem;
+          position: relative;
+          z-index: 1;
+        }
+
+        .clima-forecast-card {
+          min-width: 0;
+          width: 100%;
+          padding: 1rem;
+          display: grid;
+          grid-template-areas:
+            "date icon"
+            "condition condition"
+            "temperature temperature"
+            "rain rain";
+          grid-template-columns: minmax(0, 1fr) auto;
+          align-items: center;
+          gap: 0.62rem 0.75rem;
+          border: 1px solid #d4e2d0;
+          border-radius: 16px;
+          background: #f1f6ed;
+          color: inherit;
+          font: inherit;
+          text-align: left;
+          appearance: none;
+          cursor: pointer;
+          transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .clima-forecast-card * {
+          cursor: pointer;
+        }
+
+        .clima-forecast-card.is-selected {
+          border-color: #86aa8b;
+          background: #e5f1df;
+          box-shadow: inset 0 0 0 1px rgba(46, 111, 70, 0.18), 0 12px 26px rgba(39, 78, 48, 0.08);
+        }
+
+        .clima-forecast-card:hover {
+          transform: translateY(-2px);
+          border-color: rgba(46, 111, 70, 0.34);
+          box-shadow: 0 12px 26px rgba(39, 78, 48, 0.08);
+        }
+
+        .clima-forecast-card:focus-visible {
+          outline: 3px solid rgba(46, 111, 70, 0.24);
+          outline-offset: 3px;
+        }
+
+        .clima-forecast-date {
+          grid-area: date;
+          display: grid;
+          gap: 0.12rem;
+        }
+
+        .clima-forecast-date strong {
+          color: #214f34;
+          font-size: 0.86rem;
+          line-height: 1.2;
+        }
+
+        .clima-forecast-date small {
+          color: #7d8b82;
+          font-size: 0.68rem;
+          font-weight: 650;
+        }
+
+        .clima-forecast-card img {
+          grid-area: icon;
+          width: 44px;
+          height: 44px;
+          padding: 4px;
+          box-sizing: border-box;
+          object-fit: contain;
+          border: 1px solid #c6dbc3;
+          border-radius: 12px;
+          background: #d8e9d5;
+          filter: drop-shadow(0 7px 10px rgba(34, 77, 49, 0.12));
+        }
+
+        .clima-forecast-condition {
+          grid-area: condition;
+          min-height: 2.2em;
+          margin: 0;
+          color: #697970;
+          font-size: 0.74rem;
+          font-weight: 600;
+          line-height: 1.35;
+          text-transform: capitalize;
+        }
+
+        .clima-forecast-temperatures {
+          grid-area: temperature;
+          display: flex;
+          align-items: baseline;
+          gap: 0.45rem;
+          color: #214f34;
+        }
+
+        .clima-forecast-temperatures strong {
+          font-size: 1.24rem;
+          font-weight: 850;
+        }
+
+        .clima-forecast-temperatures span {
+          color: #7b8a80;
+          font-size: 0.8rem;
+          font-weight: 700;
+        }
+
+        .clima-forecast-rain {
+          grid-area: rain;
+          display: flex;
+          align-items: center;
+          gap: 0.35rem;
+          padding-top: 0.58rem;
+          border-top: 1px solid #e1e9df;
+          color: #39708a;
+          font-size: 0.68rem;
+          font-weight: 750;
+        }
+
+        .clima-forecast-rain .material-symbols-outlined {
+          font-size: 1rem;
+        }
+
+        .clima-metrics-context {
+          display: flex;
+          align-items: center;
+          gap: 0.55rem;
+        }
+
+        .clima-metrics-context > span {
+          min-height: 30px;
+          padding: 0 0.72rem;
+          display: inline-flex;
+          align-items: center;
+          border: 1px solid #d6e4d4;
+          border-radius: 999px;
+          background: #eef6ea;
+          color: #2e6f46;
+          font-size: 0.7rem;
+          font-weight: 800;
+        }
+
+        .clima-metrics-context button {
+          min-height: 30px;
+          padding: 0 0.72rem;
+          border: 0;
+          border-radius: 999px;
+          background: transparent;
+          color: #5f7166;
+          font-size: 0.7rem;
+          font-weight: 750;
+          cursor: pointer;
+        }
+
+        .clima-metrics-context button:hover {
+          background: #eef3eb;
+          color: #245c39;
+        }
+
         .clima-metric-grid {
           display: grid;
           grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -613,6 +885,10 @@ export default function ClimaTab() {
             grid-template-columns: 1fr;
           }
 
+          .clima-forecast-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+          }
+
           .clima-metric-grid {
             grid-template-columns: repeat(3, minmax(0, 1fr));
           }
@@ -620,12 +896,19 @@ export default function ClimaTab() {
 
         @media (max-width: 720px) {
           .clima-quick-row,
+          .clima-forecast-grid,
           .clima-metric-grid {
             grid-template-columns: 1fr;
           }
 
           .clima-hero-header {
             align-items: flex-start;
+          }
+
+          .clima-forecast-section .clima-section-header,
+          .clima-metrics-section .clima-section-header {
+            align-items: flex-start;
+            flex-direction: column;
           }
         }
       `}</style>
@@ -709,27 +992,65 @@ export default function ClimaTab() {
         </aside>
       </div>
 
-      <section className="clima-metrics-section">
+      {weatherData.dailyForecast.length > 0 && (
+        <section className="clima-panel clima-forecast-section" aria-labelledby="clima-forecast-title">
+          <div className="clima-section-header">
+            <div className="clima-section-title" id="clima-forecast-title">
+              <span className="material-symbols-outlined">calendar_month</span>
+              PRÓXIMOS DIAS
+            </div>
+            <span className="clima-forecast-range">Previsão diária para planejamento</span>
+          </div>
+
+          <div className="clima-forecast-grid">
+            {weatherData.dailyForecast.map(day => (
+              <button
+                key={day.key}
+                type="button"
+                className={`clima-forecast-card${selectedForecastDay === day.key ? " is-selected" : ""}`}
+                aria-pressed={selectedForecastDay === day.key}
+                aria-label={`Mostrar métricas meteorológicas de ${day.day}, ${day.date}`}
+                onClick={() => setSelectedForecastDay(current => current === day.key ? null : day.key)}
+              >
+                <div className="clima-forecast-date">
+                  <strong>{day.day}</strong>
+                  <small>{day.date}</small>
+                </div>
+                <img
+                  src={`https://openweathermap.org/img/wn/${day.icon}@2x.png`}
+                  alt={day.description}
+                />
+                <p className="clima-forecast-condition">{day.description}</p>
+                <div className="clima-forecast-temperatures" aria-label={`Máxima de ${day.tempMax} graus e mínima de ${day.tempMin} graus`}>
+                  <strong>{day.tempMax}°</strong>
+                  <span>{day.tempMin}°</span>
+                </div>
+                <div className="clima-forecast-rain">
+                  <span className="material-symbols-outlined">water_drop</span>
+                  <span>{day.rainChance}% · {formatDecimal(day.rainVolume)} mm</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section className="clima-metrics-section" aria-live="polite">
         <div className="clima-section-header">
           <div className="clima-section-title">
             <span className="material-symbols-outlined">analytics</span>
             MÉTRICAS METEOROLÓGICAS
           </div>
+          <div className="clima-metrics-context">
+            <span>{selectedForecast ? `${selectedForecast.day} · ${selectedForecast.date}` : "Hoje"}</span>
+            {selectedForecast && (
+              <button type="button" onClick={() => setSelectedForecastDay(null)}>Mostrar hoje</button>
+            )}
+          </div>
         </div>
 
         <div className="clima-metric-grid">
-          {[
-            { icon: "humidity_percentage", label: "Umidade", value: `${weatherData.humidity}%` },
-            { icon: "air", label: "Vento", value: `${formatDecimal(weatherData.windSpeed)} m/s ${getWindDirection(weatherData.windDeg)}` },
-            { icon: "speed", label: "Pressão", value: `${weatherData.pressure} hPa` },
-            { icon: "rainy", label: "Chuva", value: `${formatDecimal(weatherData.rain)} mm` },
-            { icon: "airwave", label: "Rajada", value: `${formatDecimal(weatherData.windGust)} m/s` },
-            { icon: "visibility", label: "Visibilidade", value: `${formatDecimal(weatherData.visibility)} km` },
-            { icon: "cloud", label: "Nuvens", value: `${weatherData.clouds}%` },
-            { icon: "sunny", label: "Nascer do sol", value: weatherData.sunrise },
-            { icon: "nightlight", label: "Pôr do sol", value: weatherData.sunset },
-            { icon: "update", label: "Atualizado", value: weatherData.updatedAt }
-          ].map(item => (
+          {displayedMetrics.map(item => (
             <div key={item.label} className="clima-metric-card">
               <span className="material-symbols-outlined">{item.icon}</span>
               <div>

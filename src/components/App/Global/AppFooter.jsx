@@ -3,6 +3,8 @@ import { Link } from "react-router-dom"
 import { onAuthStateChanged } from "firebase/auth"
 import { auth } from "../../../services/firebase"
 import { getUserAccessProfile, isOperationalRole } from "../../../services/accessControl"
+import etecAmericanaLogo from "../../../../logo_etec_americana.png"
+import cpsSaoPauloLogo from "../../../../2026_regua_logo_cps_brasao_horizontal_regua_brasao+cps_cor.png"
 
 const links = [
   { label: "Início", path: "/home", icon: "home" },
@@ -60,7 +62,7 @@ export default function AppFooter() {
             <div className="zenith-footer__capabilities">
               <span><span className="material-symbols-outlined">eco</span> Triagem IA</span>
               <span><span className="material-symbols-outlined">monitoring</span> Monitoramento</span>
-              <span><span className="material-symbols-outlined">monitoring</span> Gestão</span>
+              <span><span className="material-symbols-outlined">dashboard</span> Gestão</span>
             </div>
           </section>
 
@@ -88,6 +90,29 @@ export default function AppFooter() {
               })}
             </div>
           </section>
+        </div>
+
+        <div className="zenith-footer__institutional" aria-label="Origem acadêmica do projeto">
+          <div className="zenith-footer__institutional-inner">
+            <div className="zenith-footer__institutional-heading">
+              <span className="material-symbols-outlined" aria-hidden="true">school</span>
+              <span>
+                <small>ORIGEM DO PROJETO</small>
+                <strong>TCC desenvolvido por estudantes da Etec Polivalente de Americana</strong>
+                <span>Da formação técnica à construção de uma agtech.</span>
+              </span>
+            </div>
+
+            <div className="zenith-footer__institutional-logos" role="list">
+              <div className="zenith-footer__institutional-logo zenith-footer__institutional-logo--etec" role="listitem">
+                <img src={etecAmericanaLogo} alt="Etec Polivalente de Americana — São Paulo" />
+              </div>
+              <span className="zenith-footer__institutional-divider" aria-hidden="true" />
+              <div className="zenith-footer__institutional-logo zenith-footer__institutional-logo--cps" role="listitem">
+                <img src={cpsSaoPauloLogo} alt="Centro Paula Souza e Governo do Estado de São Paulo" />
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="zenith-footer__bottom">

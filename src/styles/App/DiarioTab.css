@@ -47,6 +47,66 @@
   margin: 0;
 }
 
+.diario-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 270px;
+  margin-bottom: 22px;
+  overflow: hidden;
+  border: 1px solid rgba(163, 200, 162, 0.22);
+  border-radius: 24px;
+  background:
+    linear-gradient(90deg, rgba(9, 42, 24, 0.9) 0%, rgba(14, 59, 34, 0.65) 44%, rgba(14, 59, 34, 0.12) 100%),
+    url("/assets/image/imagem-fundo-diario.png") center 62% / cover no-repeat;
+  box-shadow: 0 22px 54px rgba(5, 24, 15, 0.24);
+}
+
+.diario-hero .diario-header {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin: 0;
+  padding: 38px 42px;
+  align-items: center;
+}
+
+.diario-hero .diario-header h2 {
+  color: #ffffff;
+  font-size: clamp(2.5rem, 4vw, 3.7rem);
+  line-height: 1;
+  text-shadow: 0 3px 22px rgba(3, 18, 10, 0.32);
+}
+
+.diario-hero .diario-header p {
+  max-width: 560px;
+  color: rgba(247, 251, 244, 0.9);
+  text-shadow: 0 2px 12px rgba(3, 18, 10, 0.34);
+}
+
+.diario-hero .diario-add-btn {
+  border-color: rgba(255, 255, 255, 0.54);
+  background: rgba(255, 255, 255, 0.94);
+  color: #245f3b;
+  box-shadow: 0 12px 30px rgba(3, 18, 10, 0.24);
+}
+
+.diario-hero .diario-add-btn:hover {
+  background: #ffffff;
+}
+
+@media (max-width: 720px) {
+  .diario-hero {
+    min-height: 300px;
+    background-position: 62% center;
+  }
+
+  .diario-hero .diario-header {
+    align-items: flex-start;
+    padding: 32px 24px;
+  }
+}
+
 .diario-add-btn {
   display: inline-flex;
   align-items: center;

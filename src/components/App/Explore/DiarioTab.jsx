@@ -115,16 +115,18 @@ export default function DiarioTab() {
 
   return (
     <div className="diario-container">
-      <div className="diario-header">
-        <div>
-          <h2>Diário de Campo</h2>
-          <p>Registre observações, aplicações e ocorrências importantes da fazenda.</p>
+      <section className="diario-hero" aria-labelledby="diario-title">
+        <div className="diario-header">
+          <div>
+            <h2 id="diario-title">Diário de Campo</h2>
+            <p>Registre observações, aplicações e ocorrências importantes da fazenda.</p>
+          </div>
+          <button className="diario-add-btn" onClick={() => setShowForm(true)}>
+            <span className="material-symbols-outlined">add</span>
+            Nova entrada
+          </button>
         </div>
-        <button className="diario-add-btn" onClick={() => setShowForm(true)}>
-          <span className="material-symbols-outlined">add</span>
-          Nova entrada
-        </button>
-      </div>
+      </section>
 
       <div className="diario-toolbar">
         <div className="diario-search">

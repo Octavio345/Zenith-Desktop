@@ -443,15 +443,17 @@ export default function DiagnosticoTab() {
 
   return (
     <div className="diagnostic-container">
-      <div className="diagnostic-header">
-        <div className="header-glow" />
-        <span className="batch-eyebrow">INTELIGÊNCIA ARTIFICIAL NO CAMPO</span>
-        <h1 className="diagnostico-title">Análise da soja <span className="highlight">por IA</span></h1>
-        <p>
-          Envie até <span className="highlight">100 fotos da soja</span> para identificar possíveis problemas.
-          Veja o resultado de cada foto e confirme em campo com um profissional.
-        </p>
-      </div>
+      <section className="diagnostic-hero" aria-labelledby="diagnostic-title">
+        <div className="diagnostic-header">
+          <div className="header-glow" />
+          <span className="batch-eyebrow">INTELIGÊNCIA ARTIFICIAL NO CAMPO</span>
+          <h1 id="diagnostic-title" className="diagnostico-title">Análise da soja <span className="highlight">por IA</span></h1>
+          <p>
+            Envie até <span className="highlight">100 fotos da soja</span> para identificar possíveis problemas.
+            Veja o resultado de cada foto e confirme em campo com um profissional.
+          </p>
+        </div>
+      </section>
 
       <FeatureAccessPanel feature="diagnosis" access={{ ...diagnosisAccess, refresh: diagnosisAccess.refresh }} />
 
