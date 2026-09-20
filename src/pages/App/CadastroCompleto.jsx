@@ -16,11 +16,6 @@ const PERSON_TYPE_OPTIONS = [
   { value: "PJ", label: "Pessoa Jurídica (CNPJ)" },
 ]
 
-const OWNER_TYPE_OPTIONS = [
-  { value: "PF", label: "Pessoa Física" },
-  { value: "PJ", label: "Pessoa Jurídica" },
-]
-
 const PLAN_OPTIONS = [
   {
     id: "agro-vision",
@@ -115,7 +110,7 @@ export default function CadastroCompleto() {
     name: "", age: "", type: "", document: "", email: "", password: "", confirmPassword: "", plan: "agro-vision"
   })
   const [farmData, setFarmData] = useState({
-    name: "", tipo_proprietario: "", documento_proprietario: "", data_aquisicao: "", cep: "",
+    name: "", tipo_proprietario: "PJ", documento_proprietario: "", data_aquisicao: "", cep: "",
     bairro: "", municipio: "", uf: "", area_total: "", telefone: "", plantacao: "Soja"
   })
 
@@ -149,11 +144,6 @@ export default function CadastroCompleto() {
   }
   const handleFarmChange = (e) => {
     const { name, value } = e.target
-    if (name === "tipo_proprietario") {
-      setFarmData({ ...farmData, tipo_proprietario: value, documento_proprietario: "" })
-      setAlertMessage({ type: "", text: "" })
-      return
-    }
     let formatted = value
     if (name === "name") formatted = value.replace(/\s+/g, " ").slice(0, 80)
     if (name === "cep") { formatted = formatCEP(value); setCepData(null) }
@@ -161,7 +151,7 @@ export default function CadastroCompleto() {
     if (name === "uf") formatted = value.replace(/[^a-zA-Z]/g, "").toUpperCase().slice(0, 2)
     if (name === "bairro" || name === "municipio") formatted = value.replace(/[^a-zA-ZÀ-ÿ\s'-]/g, "").replace(/\s+/g, " ").slice(0, 80)
     if (name === "area_total") formatted = sanitizeHectaresInput(value)
-    if (name === "documento_proprietario") formatted = formatDocument(value, farmData.tipo_proprietario === "PF" ? "CPF" : "PJ")
+    if (name === "documento_proprietario") formatted = formatDocument(value, "PJ")
     setFarmData({ ...farmData, [name]: formatted })
     setAlertMessage({ type: "", text: "" })
   }
@@ -212,7 +202,7 @@ export default function CadastroCompleto() {
     }
     if (!isValidHectares(f.area_total)) { setAlertMessage({ type: "error", text: "Informe uma área total maior que zero." }); return false }
     const ownerDocument = f.documento_proprietario.replace(/\D/g, "")
-    if (f.tipo_proprietario === "PF" ? !isValidCPF(ownerDocument) : !isValidCNPJ(ownerDocument)) { setAlertMessage({ type: "error", text: f.tipo_proprietario === "PJ" ? "Informe um CNPJ válido." : "Informe um CPF válido." }); return false }
+    if (!isValidCNPJ(ownerDocument)) { setAlertMessage({ type: "error", text: "Informe um CNPJ rural válido." }); return false }
     if (!hasMinLetters(f.name, 3)) { setAlertMessage({ type: "error", text: "Informe um nome de fazenda válido." }); return false }
     const cepDigits = f.cep.replace(/\D/g, "")
     if (cepDigits.length !== 8) { setAlertMessage({ type: "error", text: "Informe um CEP válido com 8 dígitos." }); return false }
@@ -475,15 +465,8 @@ export default function CadastroCompleto() {
 
                 <div className="cc-row">
                   <div className="cc-field">
-                    <label>Tipo proprietário</label>
-                    <CustomSelect
-                      name="tipo_proprietario"
-                      value={farmData.tipo_proprietario}
-                      onChange={handleFarmChange}
-                      options={OWNER_TYPE_OPTIONS}
-                      placeholder="Selecione o proprietário"
-                      className="cc-custom-select"
-                    />
+                    <label>Documento da fazenda</label>
+                    <div className="cc-fixed-field"><span className="material-symbols-outlined" aria-hidden="true">verified</span><span>CNPJ rural</span><small>Cadastro de Produtor Rural</small></div>
                   </div>
                   <div className="cc-field">
                     <label>Data de aquisição</label>
@@ -491,10 +474,11 @@ export default function CadastroCompleto() {
                   </div>
                 </div>
 
-                {farmData.tipo_proprietario && <div className="cc-field">
-                  <label>{farmData.tipo_proprietario === "PJ" ? "CNPJ" : "CPF"}</label>
-                  <input type="text" name="documento_proprietario" value={farmData.documento_proprietario} onChange={handleFarmChange} inputMode="numeric" maxLength={farmData.tipo_proprietario === "PJ" ? 18 : 14} placeholder={farmData.tipo_proprietario === "PJ" ? "00.000.000/0000-00" : "000.000.000-00"}/>
-                </div>}
+                <div className="cc-field">
+                  <label>CNPJ rural</label>
+                  <input type="text" name="documento_proprietario" value={farmData.documento_proprietario} onChange={handleFarmChange} inputMode="numeric" maxLength={18} placeholder="00.000.000/0000-00"/>
+                  <small className="cc-field-help">Inscrição do produtor rural associada ao CNPJ da fazenda.</small>
+                </div>
 
                 <div className="cc-row">
                   <div className="cc-field">

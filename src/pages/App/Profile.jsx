@@ -14,7 +14,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { getUserAccessProfile, isOperationalRole } from "../../services/accessControl"
 import { BRAZIL_STATE_CODES, BRAZIL_STATE_SET } from "../../constants/brazilStates"
 import { isValidHectares, parseHectaresInput, sanitizeHectaresInput } from "../../utils/hectares"
-import { formatBrazilianDocument } from "../../utils/brazilianDocuments"
+import { maskAccountDocument } from "../../services/accountIdentity"
 
 import MenuBar from "../../components/App/Global/MenuBar"
 import AppHeader from "../../components/App/Global/AppHeader"
@@ -26,6 +26,11 @@ import "../../styles/App/Profile.css"
 
 
 const onlyDigits = (v) => String(v || "").replace(/\D/g, "")
+const protectedFarmDocument = (value) => {
+  const text = String(value || "").trim()
+  if (!text) return ""
+  return text.includes("*") ? text : maskAccountDocument(text)
+}
 
 const formatPhoneInput = (value) => {
   const d = onlyDigits(value).slice(0, 11)
@@ -199,7 +204,7 @@ export default function Profile() {
     cep: "",
     data_aquisicao: "",
     telefone: "",
-    tipo_proprietario: "",
+    tipo_proprietario: "PJ",
     documento_proprietario: "",
   })
 
@@ -269,8 +274,8 @@ export default function Profile() {
           municipio: data.municipio || "",
           plantacao: "Soja",
           telefone: data.telefone_mascarado || data.telefone || "",
-          tipo_proprietario: data.tipo_proprietario || "",
-          documento_proprietario: data.documento_proprietario_mascarado || data.documento_proprietario || "",
+          tipo_proprietario: "PJ",
+          documento_proprietario: protectedFarmDocument(data.documento_proprietario_mascarado || data.documento_proprietario),
           uf: data.uf || "",
         }
         setFarmData(farm)
@@ -327,11 +332,6 @@ export default function Profile() {
     if (name === "uf")
       next = value.replace(/[^a-zA-Z]/g, "").toUpperCase().slice(0, 2)
     if (name === "area_total") next = sanitizeHectaresInput(value)
-    if (name === "tipo_proprietario") {
-      setFarmForm({ ...farmForm, tipo_proprietario: value, documento_proprietario: "" })
-      return
-    }
-    if (name === "documento_proprietario") next = formatBrazilianDocument(value, farmForm.tipo_proprietario)
     setFarmForm({ ...farmForm, [name]: next })
   }
 
@@ -1045,11 +1045,11 @@ export default function Profile() {
                     <p>{farmData.telefone || "—"}</p>
                   </div>
                   <div className="pf-field">
-                    <label>Tipo de proprietário</label>
-                    <p>{farmData.tipo_proprietario === "PJ" ? "Pessoa jurídica" : farmData.tipo_proprietario === "PF" ? "Pessoa física" : "—"}</p>
+                    <label>Documento da fazenda</label>
+                    <p>CNPJ rural · Cadastro de Produtor Rural</p>
                   </div>
                   <div className="pf-field">
-                    <label>{farmData.tipo_proprietario === "PJ" ? "CNPJ" : "CPF"}</label>
+                    <label>CNPJ rural</label>
                     <p>{farmData.documento_proprietario || "—"}</p>
                   </div>
                 </div>
@@ -1148,23 +1148,10 @@ export default function Profile() {
                     />
                   </div>
                   <div className="pf-field pf-field-input">
-                    <label htmlFor="farm-tipo">Tipo de proprietário</label>
-                    <select
-                      id="farm-tipo"
-                      name="tipo_proprietario"
-                      value={farmForm.tipo_proprietario}
-                      onChange={handleFarmChange}
-                      disabled
-                    >
-                      <option value="">Selecione</option>
-                      <option value="PF">Pessoa física</option>
-                      <option value="PJ">Pessoa jurídica</option>
-                    </select>
+                    <label htmlFor="farm-documento">CNPJ rural</label>
+                    <input id="farm-documento" value={farmForm.documento_proprietario || "Documento protegido"} disabled />
+                    <small className="pf-field-help">Cadastro de Produtor Rural · documento protegido</small>
                   </div>
-                  {farmForm.tipo_proprietario && <div className="pf-field pf-field-input">
-                    <label htmlFor="farm-documento">{farmForm.tipo_proprietario === "PJ" ? "CNPJ" : "CPF"}</label>
-                    <input id="farm-documento" name="documento_proprietario" value={farmForm.documento_proprietario} disabled />
-                  </div>}
                 </div>
               )}
               </div>

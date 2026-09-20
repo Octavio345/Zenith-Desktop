@@ -650,6 +650,12 @@ body:has(.pf-page) .header .nav-item.active {
   word-break: break-word;
 }
 
+.pf-field-help {
+  color: var(--pf-text-2);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
 .pf-field-input input,
 .pf-field-input select {
   width: 100%;
