@@ -190,8 +190,6 @@ export default function Profile() {
     email: "",
     profileIcon: "agriculture",
     phone: "",
-    city: "",
-    state: "",
   })
 
   const [farmForm, setFarmForm] = useState({
@@ -203,7 +201,6 @@ export default function Profile() {
     bairro: "",
     cep: "",
     data_aquisicao: "",
-    telefone: "",
     tipo_proprietario: "PJ",
     documento_proprietario: "",
   })
@@ -244,8 +241,6 @@ export default function Profile() {
           email: data.email || "",
           profileIcon: data.profileIcon || "agriculture",
           phone: data.phoneMasked || formatPhoneInput(data.phone || ""),
-          city: data.city || "",
-          state: data.state || "",
         })
         return data
       }
@@ -273,7 +268,6 @@ export default function Profile() {
           data_aquisicao: data.data_aquisicao || "",
           municipio: data.municipio || "",
           plantacao: "Soja",
-          telefone: data.telefone_mascarado || data.telefone || "",
           tipo_proprietario: "PJ",
           documento_proprietario: protectedFarmDocument(data.documento_proprietario_mascarado || data.documento_proprietario),
           uf: data.uf || "",
@@ -282,7 +276,6 @@ export default function Profile() {
         setFarmForm({
           ...farm,
           cep: formatCEPInput(farm.cep),
-          telefone: farm.telefone,
         })
       } else {
         setFarmData(null)
@@ -317,16 +310,12 @@ export default function Profile() {
     if (name === "phone") next = formatPhoneInput(value)
     if (name === "document") next = formatDocumentInput(value, formData.type)
     if (name === "email") next = value.trim().toLowerCase().slice(0, 120)
-    if (name === "city") next = formatCityInput(value)
-    if (name === "state")
-      next = value.replace(/[^a-zA-Z]/g, "").toUpperCase().slice(0, 2)
     setFormData({ ...formData, [name]: next })
   }
 
   const handleFarmChange = (e) => {
     const { name, value } = e.target
     let next = value
-    if (name === "telefone") next = formatPhoneInput(value)
     if (name === "cep") next = formatCEPInput(value)
     if (name === "municipio") next = formatCityInput(value)
     if (name === "uf")
@@ -344,8 +333,6 @@ export default function Profile() {
       email: user?.email || "",
       profileIcon: userData?.profileIcon || "agriculture",
       phone: userData?.phoneMasked || formatPhoneInput(userData?.phone || ""),
-      city: userData?.city || "",
-      state: userData?.state || "",
     })
   }
 
@@ -357,8 +344,6 @@ export default function Profile() {
     }
     const name = normalizeText(formData.name)
     const email = normalizeText(formData.email || user?.email).toLowerCase()
-    const city = normalizeText(formData.city)
-    const state = normalizeText(formData.state).toUpperCase()
 
     if (name.split(" ").filter(Boolean).length < 2) {
       showAlert("error", "Informe o nome completo.")
@@ -368,15 +353,6 @@ export default function Profile() {
       showAlert("error", "Informe um e-mail válido, como nome@gmail.com.")
       return
     }
-    if (city && !isValidCityName(city)) {
-      showAlert("error", "Informe o nome completo da cidade, sem abreviação.")
-      return
-    }
-    if (state && !BRAZIL_STATE_SET.has(state)) {
-      showAlert("error", "Selecione uma UF válida.")
-      return
-    }
-
     setSaving(true)
     try {
       await updateDoc(doc(db, userData?.profileCollection || "owners", user.uid), {
@@ -384,8 +360,6 @@ export default function Profile() {
         age: parseInt(formData.age) || null,
         email,
         profileIcon: formData.profileIcon,
-        city,
-        state,
         updatedAt: new Date().toISOString(),
       })
       showAlert("success", "Perfil atualizado com sucesso!")
@@ -721,7 +695,7 @@ export default function Profile() {
             <div className="pf-card" style={{ animationDelay: "0ms" }}>
               <div className="pf-card-header">
                 <span className="material-symbols-outlined">person</span>
-                <div className="pf-personal-heading"><h2>Informações pessoais</h2><p>Mantenha cidade e telefone atualizados para personalizar os recursos da plataforma.</p></div>
+                <div className="pf-personal-heading"><h2>Informações pessoais</h2><p>Mantenha seu telefone fictício atualizado para a demonstração.</p></div>
                 {!isEmployeeAccount && !editing && (
                   <button
                     className="pf-btn pf-btn-primary"
@@ -793,14 +767,6 @@ export default function Profile() {
                   <div className="pf-field">
                     <label>Documento</label>
                     <p>{userData?.documentMasked || formatDocument(userData?.document, userData?.type)}</p>
-                  </div>
-                  <div className="pf-field">
-                    <label>Cidade</label>
-                    <p>
-                      {userData?.city
-                        ? `${userData.city}${userData.state ? ` - ${userData.state}` : ""}`
-                        : "—"}
-                    </p>
                   </div>
                 </div>
               ) : (
@@ -890,33 +856,6 @@ export default function Profile() {
                       disabled
                     />
                   </div>
-                  <div className="pf-field pf-field-input">
-                    <label htmlFor="city">Cidade</label>
-                    <input
-                      id="city"
-                      name="city"
-                      value={formData.city}
-                      onChange={handleChange}
-                      placeholder="Sua cidade"
-                      autoComplete="address-level2"
-                      maxLength={60}
-                    />
-                  </div>
-                  <div className="pf-field pf-field-input">
-                    <label htmlFor="state">UF</label>
-                    <select
-                      id="state"
-                      name="state"
-                      value={formData.state}
-                      onChange={handleChange}
-                      autoComplete="address-level1"
-                    >
-                      <option value="">Selecione</option>
-                      {BRAZIL_STATE_CODES.map((uf) => (
-                        <option key={uf} value={uf}>{uf}</option>
-                      ))}
-                    </select>
-                  </div>
                   <div className="pf-field pf-field-full pf-field-input">
                     <label>Ícone do perfil</label>
                     <div className="pf-icon-picker">
@@ -969,7 +908,6 @@ export default function Profile() {
                           setFarmForm({
                             ...farmData,
                             cep: formatCEPInput(farmData.cep),
-                            telefone: farmData.telefone,
                           })
                       }}
                       disabled={savingFarm}
@@ -1039,10 +977,6 @@ export default function Profile() {
                   <div className="pf-field">
                     <label>Data de aquisição</label>
                     <p>{farmData.data_aquisicao || "—"}</p>
-                  </div>
-                  <div className="pf-field">
-                    <label>Telefone</label>
-                    <p>{farmData.telefone || "—"}</p>
                   </div>
                   <div className="pf-field">
                     <label>Documento da fazenda</label>
@@ -1132,19 +1066,6 @@ export default function Profile() {
                       type="date"
                       value={farmForm.data_aquisicao}
                       onChange={handleFarmChange}
-                    />
-                  </div>
-                  <div className="pf-field pf-field-input">
-                    <label htmlFor="farm-telefone">Telefone</label>
-                    <input
-                      id="farm-telefone"
-                      name="telefone"
-                      value={farmForm.telefone}
-                      onChange={handleFarmChange}
-                      placeholder="(00) 00000-0000"
-                      inputMode="tel"
-                      maxLength={15}
-                      disabled
                     />
                   </div>
                   <div className="pf-field pf-field-input">

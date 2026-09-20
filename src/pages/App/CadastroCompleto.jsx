@@ -4,7 +4,7 @@ import { auth, db } from "../../services/firebase"
 import { createUserWithEmailAndPassword, deleteUser } from "firebase/auth"
 import { doc, setDoc, addDoc, collection } from "firebase/firestore"
 import { ACCOUNT_ROLES } from "../../services/accessControl"
-import { accountIdentifierMessage, attachUniquePhoneToProfile, createProfileWithUniqueIdentifiers, maskAccountDocument, maskAccountPhone } from "../../services/accountIdentity"
+import { accountIdentifierMessage, createProfileWithUniqueIdentifiers, maskAccountDocument } from "../../services/accountIdentity"
 import CustomSelect from "../../components/App/Global/CustomSelect"
 import HectareInput from "../../components/App/Global/HectareInput"
 import { BRAZIL_STATE_OPTIONS, BRAZIL_STATE_SET } from "../../constants/brazilStates"
@@ -57,8 +57,6 @@ const PLAN_OPTIONS = [
 
 const PLAN_NOTICE = "Valores simbólicos para demonstração acadêmica. Nenhuma cobrança real é realizada."
 
-const VALID_DDDS = new Set(["11","12","13","14","15","16","17","18","19","21","22","24","27","28","31","32","33","34","35","37","38","41","42","43","44","45","46","47","48","49","51","53","54","55","61","62","63","64","65","66","67","68","69","71","73","74","75","77","79","81","82","83","84","85","86","87","88","89","91","92","93","94","95","96","97","98","99"])
-
 const formatCEP = (value) => value.replace(/\D/g, "").slice(0, 8).replace(/^(\d{5})(\d)/, "$1-$2")
 const formatPhone = (value) => {
   const digits = value.replace(/\D/g, "").slice(0, 11)
@@ -70,20 +68,12 @@ const hasMinLetters = (value, count) => (value.match(/[a-zA-ZÀ-ÿ]/g) || []).le
 const normalizeText = (value) => value.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").toLowerCase()
 const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()) && !value.includes("..")
 const isValidCPF = (digits) => {
-  if (!/^\d{11}$/.test(digits) || /^(\d)\1+$/.test(digits)) return false
-  const digit = (base, factor) => { const sum = base.split("").reduce((total, number) => total + Number(number) * factor--, 0); const remainder = (sum * 10) % 11; return remainder === 10 ? 0 : remainder }
-  return digit(digits.slice(0, 9), 10) === Number(digits[9]) && digit(digits.slice(0, 10), 11) === Number(digits[10])
+  return /^\d{11}$/.test(digits)
 }
 const isValidCNPJ = (digits) => {
-  if (!/^\d{14}$/.test(digits) || /^(\d)\1+$/.test(digits)) return false
-  const digit = (base, weights) => { const sum = base.split("").reduce((total, number, index) => total + Number(number) * weights[index], 0); const remainder = sum % 11; return remainder < 2 ? 0 : 11 - remainder }
-  return digit(digits.slice(0, 12), [5,4,3,2,9,8,7,6,5,4,3,2]) === Number(digits[12]) && digit(digits.slice(0, 13), [6,5,4,3,2,9,8,7,6,5,4,3,2]) === Number(digits[13])
+  return /^\d{14}$/.test(digits)
 }
-const isValidPhone = (digits) => {
-  if (!/^\d{10,11}$/.test(digits) || /^(\d)\1+$/.test(digits) || !VALID_DDDS.has(digits.slice(0, 2))) return false
-  const number = digits.slice(2)
-  return digits.length === 11 ? number.startsWith("9") && !/^9(\d)\1{7}$/.test(number) : /^[2-5]/.test(number) && !/^(\d)\1{7}$/.test(number)
-}
+const isValidPhone = (digits) => /^\d{10,11}$/.test(digits)
 const getPasswordError = (password) => {
   const isValid = password.length >= 8
     && /[A-Z]/.test(password)
@@ -105,13 +95,14 @@ export default function CadastroCompleto() {
   const [userId, setUserId] = useState(null)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [demoDocumentAcknowledgements, setDemoDocumentAcknowledgements] = useState({ personal: false, phone: false, farm: false })
 
   const [userData, setUserData] = useState({
-    name: "", age: "", type: "", document: "", email: "", password: "", confirmPassword: "", plan: "agro-vision"
+    name: "", age: "", type: "", document: "", phone: "", email: "", password: "", confirmPassword: "", plan: "agro-vision"
   })
   const [farmData, setFarmData] = useState({
     name: "", tipo_proprietario: "PJ", documento_proprietario: "", data_aquisicao: "", cep: "",
-    bairro: "", municipio: "", uf: "", area_total: "", telefone: "", plantacao: "Soja"
+    bairro: "", municipio: "", uf: "", area_total: "", plantacao: "Soja"
   })
 
   const buscarCEP = async (cep) => {
@@ -138,8 +129,15 @@ export default function CadastroCompleto() {
     if (name === "name") formatted = value.replace(/[^a-zA-ZÀ-ÿ\s'-]/g, "").replace(/\s+/g, " ").slice(0, 80)
     if (name === "age") formatted = value.replace(/\D/g, "").slice(0, 3)
     if (name === "email") formatted = value.trim().toLowerCase().slice(0, 120)
+    if (name === "phone") formatted = formatPhone(value)
     if (name === "password" || name === "confirmPassword") formatted = value.slice(0, 64)
     setUserData({ ...userData, [name]: formatted, ...(name === "type" ? { document: "" } : {}) })
+    if (name === "type" || name === "document") {
+      setDemoDocumentAcknowledgements((current) => ({ ...current, personal: false }))
+    }
+    if (name === "phone") {
+      setDemoDocumentAcknowledgements((current) => ({ ...current, phone: false }))
+    }
     setAlertMessage({ type: "", text: "" })
   }
   const handleFarmChange = (e) => {
@@ -147,17 +145,19 @@ export default function CadastroCompleto() {
     let formatted = value
     if (name === "name") formatted = value.replace(/\s+/g, " ").slice(0, 80)
     if (name === "cep") { formatted = formatCEP(value); setCepData(null) }
-    if (name === "telefone") formatted = formatPhone(value)
     if (name === "uf") formatted = value.replace(/[^a-zA-Z]/g, "").toUpperCase().slice(0, 2)
     if (name === "bairro" || name === "municipio") formatted = value.replace(/[^a-zA-ZÀ-ÿ\s'-]/g, "").replace(/\s+/g, " ").slice(0, 80)
     if (name === "area_total") formatted = sanitizeHectaresInput(value)
     if (name === "documento_proprietario") formatted = formatDocument(value, "PJ")
     setFarmData({ ...farmData, [name]: formatted })
+    if (name === "documento_proprietario") {
+      setDemoDocumentAcknowledgements((current) => ({ ...current, farm: false }))
+    }
     setAlertMessage({ type: "", text: "" })
   }
 
   const validateUserData = () => {
-    if (!userData.name || !userData.age || !userData.type || !userData.document || !userData.email || !userData.password || !userData.confirmPassword || !userData.plan) {
+    if (!userData.name || !userData.age || !userData.type || !userData.document || !userData.phone || !userData.email || !userData.password || !userData.confirmPassword || !userData.plan) {
       setAlertMessage({ type: "error", text: "Preencha todos os dados obrigatórios." })
       return false
     }
@@ -172,15 +172,19 @@ export default function CadastroCompleto() {
     }
     const documentDigits = userData.document.replace(/\D/g, "")
     if (userData.type === "CPF" && !isValidCPF(documentDigits)) {
-      setAlertMessage({ type: "error", text: "Informe um CPF válido." })
+      setAlertMessage({ type: "error", text: "Informe um CPF fictício com 11 dígitos." })
       return false
     }
     if (userData.type === "PJ" && !isValidCNPJ(documentDigits)) {
-      setAlertMessage({ type: "error", text: "Informe um CNPJ válido." })
+      setAlertMessage({ type: "error", text: "Informe um CNPJ fictício com 14 dígitos." })
       return false
     }
     if (!isValidEmail(userData.email)) {
       setAlertMessage({ type: "error", text: "Informe um email válido." })
+      return false
+    }
+    if (!isValidPhone(userData.phone.replace(/\D/g, ""))) {
+      setAlertMessage({ type: "error", text: "Informe um telefone fictício válido com DDD." })
       return false
     }
     const passwordError = getPasswordError(userData.password)
@@ -192,17 +196,26 @@ export default function CadastroCompleto() {
       setAlertMessage({ type: "error", text: "As senhas não coincidem. Confira e tente novamente." })
       return false
     }
+    if (!demoDocumentAcknowledgements.personal) {
+      setAlertMessage({ type: "error", text: "Use um CPF ou CNPJ fictício e confirme a opção de demonstração." })
+      return false
+    }
+    if (!demoDocumentAcknowledgements.phone) {
+      setAlertMessage({ type: "error", text: "Use um telefone fictício e confirme a opção de demonstração." })
+      return false
+    }
     return true
   }
   const validateFarmData = async () => {
     const f = farmData
-    if (!f.name || !f.tipo_proprietario || !f.documento_proprietario || !f.data_aquisicao || !f.cep || !f.bairro || !f.municipio || !f.uf || !f.area_total || !f.telefone || !f.plantacao) {
+    if (!f.name || !f.tipo_proprietario || !f.documento_proprietario || !f.data_aquisicao || !f.cep || !f.bairro || !f.municipio || !f.uf || !f.area_total || !f.plantacao) {
       setAlertMessage({ type: "error", text: "Preencha todos os dados da fazenda." })
       return false
     }
     if (!isValidHectares(f.area_total)) { setAlertMessage({ type: "error", text: "Informe uma área total maior que zero." }); return false }
     const ownerDocument = f.documento_proprietario.replace(/\D/g, "")
-    if (!isValidCNPJ(ownerDocument)) { setAlertMessage({ type: "error", text: "Informe um CNPJ rural válido." }); return false }
+    if (!isValidCNPJ(ownerDocument)) { setAlertMessage({ type: "error", text: "Informe um CNPJ rural fictício com 14 dígitos." }); return false }
+    if (!demoDocumentAcknowledgements.farm) { setAlertMessage({ type: "error", text: "Use um CNPJ rural fictício e confirme a opção de demonstração." }); return false }
     if (!hasMinLetters(f.name, 3)) { setAlertMessage({ type: "error", text: "Informe um nome de fazenda válido." }); return false }
     const cepDigits = f.cep.replace(/\D/g, "")
     if (cepDigits.length !== 8) { setAlertMessage({ type: "error", text: "Informe um CEP válido com 8 dígitos." }); return false }
@@ -214,7 +227,6 @@ export default function CadastroCompleto() {
     if (!BRAZIL_STATE_SET.has(f.uf) || (validCEP.uf && f.uf !== validCEP.uf)) { setAlertMessage({ type: "error", text: validCEP.uf ? `A UF correspondente a esse CEP é ${validCEP.uf}.` : "Informe uma UF válida." }); return false }
     if (!hasMinLetters(f.bairro, 2) || (validCEP.bairro && normalizeText(f.bairro) !== normalizeText(validCEP.bairro))) { setAlertMessage({ type: "error", text: validCEP.bairro ? `O bairro correspondente a esse CEP é ${validCEP.bairro}.` : "Informe um bairro válido." }); return false }
     if (!hasMinLetters(f.municipio, 2) || (validCEP.localidade && normalizeText(f.municipio) !== normalizeText(validCEP.localidade))) { setAlertMessage({ type: "error", text: validCEP.localidade ? `O município correspondente a esse CEP é ${validCEP.localidade}.` : "Informe um município válido." }); return false }
-    if (!isValidPhone(f.telefone.replace(/\D/g, ""))) { setAlertMessage({ type: "error", text: "Informe um telefone brasileiro válido com DDD." }); return false }
     return true
   }
 
@@ -231,6 +243,7 @@ export default function CadastroCompleto() {
         age: parseInt(userData.age),
         type: userData.type,
         document: userData.document.replace(/\D/g, ""),
+        phone: userData.phone.replace(/\D/g, ""),
         email: userData.email,
         role: ACCOUNT_ROLES.ADMIN,
         plan: selectedPlan.id,
@@ -260,11 +273,6 @@ export default function CadastroCompleto() {
     if (!(await validateFarmData())) return
     setLoading(true)
     try {
-      await attachUniquePhoneToProfile({
-        userId,
-        phone: farmData.telefone,
-        updates: { updatedAt: new Date().toISOString() }
-      })
       await addDoc(collection(db, "farms"), {
         name: farmData.name,
         tipo_proprietario: farmData.tipo_proprietario,
@@ -274,7 +282,6 @@ export default function CadastroCompleto() {
         bairro: farmData.bairro,
         municipio: farmData.municipio,
         uf: farmData.uf,
-        telefone_mascarado: maskAccountPhone(farmData.telefone),
         plantacao: farmData.plantacao,
         area_total: parseHectaresInput(farmData.area_total),
         ownerId: userId,
@@ -380,7 +387,7 @@ export default function CadastroCompleto() {
 
                 {userData.type && (
                   <div className="cc-field">
-                    <label>{userData.type === "CPF" ? "CPF" : "CNPJ"}</label>
+                    <label>{userData.type === "CPF" ? "CPF fictício" : "CNPJ fictício"}</label>
                     <input
                       type="text" name="document" value={userData.document}
                       onChange={(e) => handleUserChange({ target: { name: "document", value: formatDocument(e.target.value, userData.type) } })}
@@ -388,8 +395,17 @@ export default function CadastroCompleto() {
                       inputMode="numeric"
                       maxLength={userData.type === "CPF" ? 14 : 18}
                     />
+                    <small className="cc-field-help">Digite somente números; a pontuação é automática. Não use um documento real. Exemplo: {userData.type === "CPF" ? "123.456.789-09" : "12.345.678/0001-95"}</small>
+                    <label className="cc-demo-check"><input type="checkbox" checked={demoDocumentAcknowledgements.personal} onChange={(event) => setDemoDocumentAcknowledgements((current) => ({ ...current, personal: event.target.checked }))} /><span>Confirmo que este documento é fictício e será usado apenas na demonstração.</span></label>
                   </div>
                 )}
+
+                <div className="cc-field">
+                  <label>Telefone fictício</label>
+                  <input type="tel" name="phone" value={userData.phone} onChange={handleUserChange} placeholder="(00) 00000-0000" inputMode="numeric" maxLength={15}/>
+                  <small className="cc-field-help">Digite somente números; a pontuação é automática. Não use um telefone real. Exemplo: (11) 98765-4321.</small>
+                  <label className="cc-demo-check"><input type="checkbox" checked={demoDocumentAcknowledgements.phone} onChange={(event) => setDemoDocumentAcknowledgements((current) => ({ ...current, phone: event.target.checked }))} /><span>Confirmo que este telefone é fictício e será usado apenas na demonstração.</span></label>
+                </div>
 
                 <div className="cc-field">
                   <label>Email</label>
@@ -477,7 +493,8 @@ export default function CadastroCompleto() {
                 <div className="cc-field">
                   <label>CNPJ rural</label>
                   <input type="text" name="documento_proprietario" value={farmData.documento_proprietario} onChange={handleFarmChange} inputMode="numeric" maxLength={18} placeholder="00.000.000/0000-00"/>
-                  <small className="cc-field-help">Inscrição do produtor rural associada ao CNPJ da fazenda.</small>
+                  <small className="cc-field-help">Digite somente números; a pontuação é automática. Use um CNPJ rural fictício. Exemplo: 12.345.678/0001-95.</small>
+                  <label className="cc-demo-check"><input type="checkbox" checked={demoDocumentAcknowledgements.farm} onChange={(event) => setDemoDocumentAcknowledgements((current) => ({ ...current, farm: event.target.checked }))} /><span>Confirmo que este CNPJ é fictício e será usado apenas na demonstração.</span></label>
                 </div>
 
                 <div className="cc-row">
@@ -510,20 +527,14 @@ export default function CadastroCompleto() {
                   </div>
                 </div>
 
-                <div className="cc-row">
-                  <div className="cc-field">
-                    <label>Área total</label>
-                    <HectareInput
-                      name="area_total"
-                      value={farmData.area_total}
-                      onChange={handleFarmChange}
-                      placeholder="Ex.: 125,5"
-                    />
-                  </div>
-                  <div className="cc-field">
-                    <label>Telefone</label>
-                    <input type="tel" inputMode="numeric" maxLength={15} name="telefone" value={farmData.telefone} onChange={handleFarmChange} placeholder="(00) 00000-0000"/>
-                  </div>
+                <div className="cc-field">
+                  <label>Área total</label>
+                  <HectareInput
+                    name="area_total"
+                    value={farmData.area_total}
+                    onChange={handleFarmChange}
+                    placeholder="Ex.: 125,5"
+                  />
                 </div>
 
                 {alertMessage.text && etapa === 2 && (
