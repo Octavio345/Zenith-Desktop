@@ -152,6 +152,8 @@ const PLAN_OPTIONS = [
   },
 ]
 
+const PLAN_NOTICE = "Valores simbólicos para demonstração acadêmica. Nenhuma cobrança real é realizada."
+
 const getPlanByValue = (value) => {
   const raw = String(value || "").trim().toLowerCase()
   return (
@@ -1179,6 +1181,7 @@ export default function Profile() {
                     <p>Plano atual: <strong>{currentPlan.name}</strong></p>
                   </div>
                 </div>
+                <p className="pf-plan-notice"><span className="material-symbols-outlined" aria-hidden="true">school</span>{PLAN_NOTICE}</p>
 
                 <div className="pf-plan-grid">
                   {PLAN_OPTIONS.map((plan) => {

@@ -853,6 +853,26 @@ body:has(.pf-page) .header .nav-item.active {
   color: var(--pf-green);
 }
 
+.pf-plan-notice {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 16px 0 18px;
+  padding: 10px 12px;
+  border: 1px solid rgba(22, 242, 154, 0.2);
+  border-radius: 12px;
+  background: rgba(22, 242, 154, 0.07);
+  color: rgba(226, 239, 231, 0.76);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.pf-plan-notice .material-symbols-outlined {
+  flex-shrink: 0;
+  color: var(--pf-green);
+  font-size: 18px;
+}
+
 .pf-plan-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

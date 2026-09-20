@@ -111,6 +111,20 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg-0);color:var(--t
   color:var(--text-3);
   font-size:12px;
 }
+.cc-plan-notice{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:0;
+  padding:9px 11px;
+  border:1px solid rgba(19,236,128,.16);
+  border-radius:10px;
+  background:rgba(19,236,128,.055);
+  color:rgba(232,245,239,.72);
+  font-size:11px;
+  line-height:1.4;
+}
+.cc-plan-notice .material-symbols-outlined{color:var(--primary);font-size:17px;flex-shrink:0}
 .cc-plan-grid{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
