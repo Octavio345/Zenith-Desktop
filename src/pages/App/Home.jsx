@@ -8,6 +8,7 @@ import { getUserAccessProfile, isOperationalRole } from "../../services/accessCo
 import { getWeatherByCity } from "../../services/weatherService"
 import { isConfirmedWorkItemExpired } from "../../services/workItemLifecycle"
 import { removeFieldOccurrence } from "../../services/fieldOperations"
+import { getAppLanguage } from "../../constants/appLanguages"
 import AppHeader from "../../components/App/Global/AppHeader"
 import MenuBar from "../../components/App/Global/MenuBar"
 import AppFooter from "../../components/App/Global/AppFooter"
@@ -101,6 +102,13 @@ export default function Home() {
   const firstName = userData?.name?.split(" ")[0] || "Agricultor"
   const isEmployee = isOperationalRole(userData?.role)
   const hasFarm = Boolean(farmData)
+  const appLanguage = getAppLanguage()
+  const cropLabel = (() => {
+    const crop = farmData?.plantacao || "Soja"
+    if (String(crop).toLowerCase() !== "soja") return crop
+    if (appLanguage === "en-US") return "Soybean"
+    return "Soja"
+  })()
   const temperature = hasFarm && weather?.temperature !== undefined ? Math.round(weather.temperature) : "--"
   const visibleActivities = useMemo(
     () => activities.filter((activity) => !isConfirmedWorkItemExpired(activity, lifecycleNow)),
@@ -201,10 +209,10 @@ export default function Home() {
         <section className="zenith-home__greeting">
           <div>
             <span className="zenith-kicker"><span className="material-symbols-outlined">wb_sunny</span> Visão geral da propriedade</span>
-            <h1>Olá, <strong>{firstName}</strong><span className="material-symbols-outlined">eco</span></h1>
+            <h1>Olá, <strong className="notranslate" translate="no">{firstName}</strong><span className="material-symbols-outlined">eco</span></h1>
             <button type="button" onClick={() => navigate("/cadastrar-fazenda")}>
               <span className="material-symbols-outlined">location_on</span>
-              {farmData?.name || "Cadastre sua fazenda"}
+              {farmData?.name ? <span className="notranslate" translate="no">{farmData.name}</span> : "Cadastre sua fazenda"}
             </button>
           </div>
           <div className="zenith-home__date">
@@ -218,15 +226,15 @@ export default function Home() {
           <article className="weather-hero-card">
             <div className="weather-hero-card__copy">
               <span className="card-label"><span className="material-symbols-outlined">partly_cloudy_day</span> Clima atual</span>
-              <div className="weather-temperature"><strong>{temperature}</strong><sup>{temperature !== "--" ? "°" : ""}</sup></div>
+              <div className="weather-temperature notranslate" translate="no"><strong>{temperature}</strong><sup>{temperature !== "--" ? "°" : ""}</sup></div>
               <h2>{weather?.conditionDescription || "Dados climáticos"}</h2>
-              <p>{farmData?.municipio ? `${farmData.municipio}${farmData.uf ? `, ${farmData.uf}` : ""}` : "Cadastre a localização para acompanhar o clima."}</p>
+              <p className={farmData?.municipio ? "notranslate" : undefined} translate={farmData?.municipio ? "no" : undefined}>{farmData?.municipio ? `${farmData.municipio}${farmData.uf ? `, ${farmData.uf}` : ""}` : "Cadastre a localização para acompanhar o clima."}</p>
             </div>
             <img src="/assets/image/soja-hero-cutout.webp" alt="Vagens e folhas de soja" />
             <div className="weather-metrics">
-              <div><span className="material-symbols-outlined">humidity_percentage</span><small>Umidade</small><strong>{weather?.humidity !== undefined ? `${weather.humidity}%` : "--"}</strong></div>
-              <div><span className="material-symbols-outlined">air</span><small>Vento</small><strong>{weather?.windSpeed !== undefined ? `${weather.windSpeed} km/h` : "--"}</strong></div>
-              <div><span className="material-symbols-outlined">rainy</span><small>Precipitação</small><strong>{weather?.rain !== undefined ? `${weather.rain} mm` : "--"}</strong></div>
+              <div><span className="material-symbols-outlined">humidity_percentage</span><small>Umidade</small><strong className="notranslate" translate="no">{weather?.humidity !== undefined ? `${weather.humidity}%` : "--"}</strong></div>
+              <div><span className="material-symbols-outlined">air</span><small>Vento</small><strong className="notranslate" translate="no">{weather?.windSpeed !== undefined ? `${weather.windSpeed} km/h` : "--"}</strong></div>
+              <div><span className="material-symbols-outlined">rainy</span><small>Precipitação</small><strong className="notranslate" translate="no">{weather?.rain !== undefined ? `${weather.rain} mm` : "--"}</strong></div>
             </div>
           </article>
 
@@ -238,8 +246,8 @@ export default function Home() {
               <span><span className="material-symbols-outlined">agriculture</span> Minha fazenda</span>
             </div>
             <div className="farm-showcase-card__bottom">
-              <span><small>Cultura principal</small><strong>{farmData?.plantacao || "Soja"}</strong></span>
-              <span><small>Área total</small><strong>{farmData?.area_total ? `${farmData.area_total} ha` : "--"}</strong></span>
+              <span><small>Cultura principal</small><strong className="notranslate" translate="no">{cropLabel}</strong></span>
+              <span><small>Área total</small><strong className="notranslate" translate="no">{farmData?.area_total ? `${farmData.area_total} ha` : "--"}</strong></span>
               <button type="button" onClick={() => navigate(hasFarm ? "/profile" : "/cadastrar-fazenda")}>{hasFarm ? "Ver propriedade" : "Cadastrar agora"}<span className="material-symbols-outlined">arrow_forward</span></button>
             </div>
           </article>

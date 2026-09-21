@@ -157,6 +157,7 @@ function AppShell() {
   const [quickLoading, setQuickLoading] = useState(false)
   const [translationPending, setTranslationPending] = useState(() => getAppLanguage() !== DEFAULT_APP_LANGUAGE)
   const firstRoute = useRef(true)
+  const translatedRouteKey = useRef(location.key)
   const systemCopy = getAppSystemCopy(appLanguage)
 
   useEffect(() => {
@@ -200,7 +201,6 @@ function AppShell() {
     let retryTimer = null
     let resumeTimer = null
     let brandTimer = null
-    let languageSwitchTimer = null
     let isApplying = false
     let observer = null
 
@@ -258,11 +258,11 @@ function AppShell() {
       observer.observe(document.body, { childList: true, subtree: true })
     }
 
-    const forceTranslation = (hardRefresh = false) => {
+    const forceTranslation = () => {
       const selector = document.querySelector(".goog-te-combo")
       if (!selector) {
         window.clearTimeout(retryTimer)
-        retryTimer = window.setTimeout(() => forceTranslation(hardRefresh), 250)
+        retryTimer = window.setTimeout(forceTranslation, 250)
         return false
       }
 
@@ -270,42 +270,28 @@ function AppShell() {
       observer?.disconnect()
       window.clearTimeout(resumeTimer)
       window.clearTimeout(brandTimer)
-      window.clearTimeout(languageSwitchTimer)
-
-      const applyTargetLanguage = () => {
-        selector.value = googleLanguage
-        selector.dispatchEvent(new Event("change", { bubbles: true }))
-        resumeTimer = window.setTimeout(() => {
-          protectBrandAndIcons()
-          restoreBrandName()
-          isApplying = false
-          setTranslationPending(false)
-          observeDocument()
-        }, 1750)
-        brandTimer = window.setTimeout(restoreBrandName, 2900)
-      }
-
-      if (hardRefresh && selector.value === googleLanguage) {
-        // O widget ignora uma seleção repetida. Usamos o outro idioma como
-        // ponte, coberto pelo loader, e então reaplicamos o idioma escolhido.
-        selector.value = googleLanguage === "en" ? "es" : "en"
-        selector.dispatchEvent(new Event("change", { bubbles: true }))
-        languageSwitchTimer = window.setTimeout(applyTargetLanguage, 520)
-      } else {
-        applyTargetLanguage()
-      }
+      selector.value = googleLanguage
+      selector.dispatchEvent(new Event("change", { bubbles: true }))
+      resumeTimer = window.setTimeout(() => {
+        protectBrandAndIcons()
+        restoreBrandName()
+        isApplying = false
+        setTranslationPending(false)
+        observeDocument()
+      }, 1750)
+      brandTimer = window.setTimeout(restoreBrandName, 2900)
       return true
     }
 
-    const scheduleTranslation = (force = false, hardRefresh = false) => {
+    const scheduleTranslation = (force = false) => {
       window.clearTimeout(applyTimer)
       applyTimer = window.setTimeout(() => {
         const selector = document.querySelector(".goog-te-combo")
         if (!selector) {
-          forceTranslation(hardRefresh)
+          forceTranslation()
           return
         }
-        if (force || selector.value !== googleLanguage) forceTranslation(hardRefresh)
+        if (force || selector.value !== googleLanguage) forceTranslation()
       }, force ? 180 : 420)
     }
 
@@ -337,11 +323,11 @@ function AppShell() {
         }, mountId)
         mount.dataset.initialized = "true"
       }
-      scheduleTranslation(true, true)
+      scheduleTranslation(true)
     }
 
     window.googleTranslateElementInit = initializeGoogleTranslate
-    window.__zenithForceTranslation = (hardRefresh = false) => scheduleTranslation(true, hardRefresh)
+    window.__zenithForceTranslation = () => scheduleTranslation(true)
     const handleTranslatedNavigation = () => setTranslationPending(true)
     window.addEventListener("zenith:navigate", handleTranslatedNavigation)
     const existingScript = document.getElementById("google-translate-script")
@@ -359,7 +345,6 @@ function AppShell() {
       window.clearTimeout(retryTimer)
       window.clearTimeout(resumeTimer)
       window.clearTimeout(brandTimer)
-      window.clearTimeout(languageSwitchTimer)
       observer?.disconnect()
       window.removeEventListener("zenith:navigate", handleTranslatedNavigation)
       delete window.__zenithForceTranslation
@@ -376,8 +361,14 @@ function AppShell() {
   useEffect(() => {
     if (getAppLanguage() === DEFAULT_APP_LANGUAGE) return undefined
     setTranslationPending(true)
-    const timer = window.setTimeout(() => window.__zenithForceTranslation?.(true), 260)
-    return () => window.clearTimeout(timer)
+    const routeChanged = translatedRouteKey.current !== location.key
+    translatedRouteKey.current = location.key
+    if (routeChanged) {
+      const reloadTimer = window.setTimeout(() => window.location.reload(), 80)
+      return () => window.clearTimeout(reloadTimer)
+    }
+    const translationTimer = window.setTimeout(() => window.__zenithForceTranslation?.(), 260)
+    return () => window.clearTimeout(translationTimer)
   }, [location.key])
 
   useLayoutEffect(() => {
