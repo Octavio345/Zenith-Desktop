@@ -4,9 +4,11 @@ import { auth, db } from "../../services/firebase"
 import { createUserWithEmailAndPassword, deleteUser } from "firebase/auth"
 import { doc, setDoc, addDoc, collection } from "firebase/firestore"
 import { ACCOUNT_ROLES } from "../../services/accessControl"
-import { accountIdentifierMessage, createProfileWithUniqueIdentifiers, maskAccountDocument } from "../../services/accountIdentity"
+import { createProfileWithUniqueIdentifiers, maskAccountDocument } from "../../services/accountIdentity"
+import { activateAppLanguage, getAppLanguage, persistAppLanguage } from "../../constants/appLanguages"
 import CustomSelect from "../../components/App/Global/CustomSelect"
 import HectareInput from "../../components/App/Global/HectareInput"
+import LanguagePicker from "../../components/App/Global/LanguagePicker"
 import { BRAZIL_STATE_OPTIONS, BRAZIL_STATE_SET } from "../../constants/brazilStates"
 import { isValidHectares, parseHectaresInput, sanitizeHectaresInput } from "../../utils/hectares"
 import "../../styles/App/CadastroCompleto.css"
@@ -57,6 +59,118 @@ const PLAN_OPTIONS = [
 
 const PLAN_NOTICE = "Valores simbólicos para demonstração acadêmica. Nenhuma cobrança real é realizada."
 
+const REGISTRATION_MESSAGES = {
+  "pt-BR": {
+    required: "Preencha todos os dados obrigatórios.",
+    invalidName: "Informe um nome completo válido.",
+    invalidAge: "Informe uma idade válida entre 18 e 120 anos.",
+    invalidCpf: "Informe um CPF fictício com 11 dígitos.",
+    invalidCnpj: "Informe um CNPJ fictício com 14 dígitos.",
+    invalidEmail: "Informe um email válido.",
+    invalidPhone: "Informe um telefone fictício válido com DDD.",
+    passwordRules: "A senha precisa ter pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula, um número e um caractere especial, sem espaços.",
+    passwordMismatch: "As senhas não coincidem. Confira e tente novamente.",
+    confirmDocument: "Use um CPF ou CNPJ fictício e confirme a opção de demonstração.",
+    confirmPhone: "Use um telefone fictício e confirme a opção de demonstração.",
+    farmRequired: "Preencha todos os dados da fazenda.",
+    invalidArea: "Informe uma área total maior que zero.",
+    invalidRuralCnpj: "Informe um CNPJ rural fictício com 14 dígitos.",
+    confirmFarmDocument: "Use um CNPJ rural fictício e confirme a opção de demonstração.",
+    invalidFarmName: "Informe um nome de fazenda válido.",
+    invalidCep: "Informe um CEP válido com 8 dígitos.",
+    cepNotFound: "CEP não encontrado. Confira o número informado.",
+    invalidState: "Informe uma UF válida.",
+    invalidDistrict: "Informe um bairro válido.",
+    invalidCity: "Informe um município válido.",
+    stateForCep: (value) => `A UF correspondente a esse CEP é ${value}.`,
+    districtForCep: (value) => `O bairro correspondente a esse CEP é ${value}.`,
+    cityForCep: (value) => `O município correspondente a esse CEP é ${value}.`,
+    accountCreated: "Conta criada com sucesso. Agora cadastre sua fazenda.",
+    signupError: "Erro no cadastro. Tente novamente.",
+    farmError: "Erro ao cadastrar fazenda.",
+    duplicateDocument: "Este CPF ou CNPJ já está cadastrado em outra conta.",
+    duplicatePhone: "Este número de telefone já está cadastrado em outra conta.",
+    duplicateEmail: "Este email já está cadastrado em outra conta.",
+    validationUnavailable: "Não foi possível validar os dados. Atualize a página e tente novamente.",
+  },
+  "en-US": {
+    required: "Complete all required fields.",
+    invalidName: "Enter a valid full name.",
+    invalidAge: "Enter a valid age between 18 and 120.",
+    invalidCpf: "Enter a fictitious CPF containing 11 digits.",
+    invalidCnpj: "Enter a fictitious CNPJ containing 14 digits.",
+    invalidEmail: "Enter a valid email address.",
+    invalidPhone: "Enter a valid fictitious phone number with area code.",
+    passwordRules: "The password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character, with no spaces.",
+    passwordMismatch: "The passwords do not match. Check them and try again.",
+    confirmDocument: "Use a fictitious CPF or CNPJ and confirm the demonstration option.",
+    confirmPhone: "Use a fictitious phone number and confirm the demonstration option.",
+    farmRequired: "Complete all farm information.",
+    invalidArea: "Enter a total area greater than zero.",
+    invalidRuralCnpj: "Enter a fictitious rural CNPJ containing 14 digits.",
+    confirmFarmDocument: "Use a fictitious rural CNPJ and confirm the demonstration option.",
+    invalidFarmName: "Enter a valid farm name.",
+    invalidCep: "Enter a valid 8-digit Brazilian postal code (CEP).",
+    cepNotFound: "Postal code not found. Check the number entered.",
+    invalidState: "Enter a valid Brazilian state code.",
+    invalidDistrict: "Enter a valid district.",
+    invalidCity: "Enter a valid city.",
+    stateForCep: (value) => `The state code associated with this postal code is ${value}.`,
+    districtForCep: (value) => `The district associated with this postal code is ${value}.`,
+    cityForCep: (value) => `The city associated with this postal code is ${value}.`,
+    accountCreated: "Account created successfully. Now register your farm.",
+    signupError: "Registration failed. Please try again.",
+    farmError: "The farm could not be registered.",
+    duplicateDocument: "This CPF or CNPJ is already registered to another account.",
+    duplicatePhone: "This phone number is already registered to another account.",
+    duplicateEmail: "This email is already registered to another account.",
+    validationUnavailable: "The information could not be validated. Refresh the page and try again.",
+  },
+  "es-ES": {
+    required: "Completa todos los campos obligatorios.",
+    invalidName: "Introduce un nombre completo válido.",
+    invalidAge: "Introduce una edad válida entre 18 y 120 años.",
+    invalidCpf: "Introduce un CPF ficticio de 11 dígitos.",
+    invalidCnpj: "Introduce un CNPJ ficticio de 14 dígitos.",
+    invalidEmail: "Introduce una dirección de correo electrónico válida.",
+    invalidPhone: "Introduce un teléfono ficticio válido con código de área.",
+    passwordRules: "La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial, sin espacios.",
+    passwordMismatch: "Las contraseñas no coinciden. Revísalas e inténtalo de nuevo.",
+    confirmDocument: "Usa un CPF o CNPJ ficticio y confirma la opción de demostración.",
+    confirmPhone: "Usa un teléfono ficticio y confirma la opción de demostración.",
+    farmRequired: "Completa todos los datos de la finca.",
+    invalidArea: "Introduce un área total mayor que cero.",
+    invalidRuralCnpj: "Introduce un CNPJ rural ficticio de 14 dígitos.",
+    confirmFarmDocument: "Usa un CNPJ rural ficticio y confirma la opción de demostración.",
+    invalidFarmName: "Introduce un nombre de finca válido.",
+    invalidCep: "Introduce un código postal brasileño (CEP) válido de 8 dígitos.",
+    cepNotFound: "No se encontró el código postal. Revisa el número introducido.",
+    invalidState: "Introduce un código de estado brasileño válido.",
+    invalidDistrict: "Introduce un barrio válido.",
+    invalidCity: "Introduce un municipio válido.",
+    stateForCep: (value) => `El estado correspondiente a este código postal es ${value}.`,
+    districtForCep: (value) => `El barrio correspondiente a este código postal es ${value}.`,
+    cityForCep: (value) => `El municipio correspondiente a este código postal es ${value}.`,
+    accountCreated: "La cuenta se creó correctamente. Ahora registra tu finca.",
+    signupError: "Error durante el registro. Inténtalo de nuevo.",
+    farmError: "No se pudo registrar la finca.",
+    duplicateDocument: "Este CPF o CNPJ ya está registrado en otra cuenta.",
+    duplicatePhone: "Este número de teléfono ya está registrado en otra cuenta.",
+    duplicateEmail: "Este correo electrónico ya está registrado en otra cuenta.",
+    validationUnavailable: "No se pudieron validar los datos. Actualiza la página e inténtalo de nuevo.",
+  },
+}
+
+const getRegistrationMessages = (language) => REGISTRATION_MESSAGES[language] || REGISTRATION_MESSAGES["pt-BR"]
+
+const getAccountErrorMessage = (error, messages) => {
+  if (error?.code === "account/document-already-in-use") return messages.duplicateDocument
+  if (error?.code === "account/phone-already-in-use") return messages.duplicatePhone
+  if (error?.code === "auth/email-already-in-use") return messages.duplicateEmail
+  if (error?.code === "permission-denied" || error?.code === "firestore/permission-denied") return messages.validationUnavailable
+  return ""
+}
+
 const formatCEP = (value) => value.replace(/\D/g, "").slice(0, 8).replace(/^(\d{5})(\d)/, "$1-$2")
 const formatPhone = (value) => {
   const digits = value.replace(/\D/g, "").slice(0, 11)
@@ -74,7 +188,7 @@ const isValidCNPJ = (digits) => {
   return /^\d{14}$/.test(digits)
 }
 const isValidPhone = (digits) => /^\d{10,11}$/.test(digits)
-const getPasswordError = (password) => {
+const getPasswordError = (password, messages) => {
   const isValid = password.length >= 8
     && /[A-Z]/.test(password)
     && /[a-z]/.test(password)
@@ -83,7 +197,7 @@ const getPasswordError = (password) => {
     && !/\s/.test(password)
   return isValid
     ? ""
-    : "A senha precisa ter pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula, um número e um caractere especial, sem espaços."
+    : messages.passwordRules
 }
 
 export default function CadastroCompleto() {
@@ -96,10 +210,12 @@ export default function CadastroCompleto() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [demoDocumentAcknowledgements, setDemoDocumentAcknowledgements] = useState({ personal: false, phone: false, farm: false })
+  const initialLanguage = getAppLanguage()
 
   const [userData, setUserData] = useState({
-    name: "", age: "", type: "", document: "", phone: "", email: "", password: "", confirmPassword: "", plan: "agro-vision"
+    name: "", age: "", type: "", document: "", phone: "", email: "", password: "", confirmPassword: "", plan: "agro-vision", language: initialLanguage
   })
+  const messages = getRegistrationMessages(userData.language)
   const [farmData, setFarmData] = useState({
     name: "", tipo_proprietario: "PJ", documento_proprietario: "", data_aquisicao: "", cep: "",
     bairro: "", municipio: "", uf: "", area_total: "", plantacao: "Soja"
@@ -158,50 +274,50 @@ export default function CadastroCompleto() {
 
   const validateUserData = () => {
     if (!userData.name || !userData.age || !userData.type || !userData.document || !userData.phone || !userData.email || !userData.password || !userData.confirmPassword || !userData.plan) {
-      setAlertMessage({ type: "error", text: "Preencha todos os dados obrigatórios." })
+      setAlertMessage({ type: "error", text: messages.required })
       return false
     }
     if (!hasMinLetters(userData.name, 3)) {
-      setAlertMessage({ type: "error", text: "Informe um nome completo válido." })
+      setAlertMessage({ type: "error", text: messages.invalidName })
       return false
     }
     const age = Number(userData.age)
     if (!Number.isInteger(age) || age < 18 || age > 120) {
-      setAlertMessage({ type: "error", text: "Informe uma idade válida entre 18 e 120 anos." })
+      setAlertMessage({ type: "error", text: messages.invalidAge })
       return false
     }
     const documentDigits = userData.document.replace(/\D/g, "")
     if (userData.type === "CPF" && !isValidCPF(documentDigits)) {
-      setAlertMessage({ type: "error", text: "Informe um CPF fictício com 11 dígitos." })
+      setAlertMessage({ type: "error", text: messages.invalidCpf })
       return false
     }
     if (userData.type === "PJ" && !isValidCNPJ(documentDigits)) {
-      setAlertMessage({ type: "error", text: "Informe um CNPJ fictício com 14 dígitos." })
+      setAlertMessage({ type: "error", text: messages.invalidCnpj })
       return false
     }
     if (!isValidEmail(userData.email)) {
-      setAlertMessage({ type: "error", text: "Informe um email válido." })
+      setAlertMessage({ type: "error", text: messages.invalidEmail })
       return false
     }
     if (!isValidPhone(userData.phone.replace(/\D/g, ""))) {
-      setAlertMessage({ type: "error", text: "Informe um telefone fictício válido com DDD." })
+      setAlertMessage({ type: "error", text: messages.invalidPhone })
       return false
     }
-    const passwordError = getPasswordError(userData.password)
+    const passwordError = getPasswordError(userData.password, messages)
     if (passwordError) {
       setAlertMessage({ type: "error", text: passwordError })
       return false
     }
     if (userData.password !== userData.confirmPassword) {
-      setAlertMessage({ type: "error", text: "As senhas não coincidem. Confira e tente novamente." })
+      setAlertMessage({ type: "error", text: messages.passwordMismatch })
       return false
     }
     if (!demoDocumentAcknowledgements.personal) {
-      setAlertMessage({ type: "error", text: "Use um CPF ou CNPJ fictício e confirme a opção de demonstração." })
+      setAlertMessage({ type: "error", text: messages.confirmDocument })
       return false
     }
     if (!demoDocumentAcknowledgements.phone) {
-      setAlertMessage({ type: "error", text: "Use um telefone fictício e confirme a opção de demonstração." })
+      setAlertMessage({ type: "error", text: messages.confirmPhone })
       return false
     }
     return true
@@ -209,24 +325,24 @@ export default function CadastroCompleto() {
   const validateFarmData = async () => {
     const f = farmData
     if (!f.name || !f.tipo_proprietario || !f.documento_proprietario || !f.data_aquisicao || !f.cep || !f.bairro || !f.municipio || !f.uf || !f.area_total || !f.plantacao) {
-      setAlertMessage({ type: "error", text: "Preencha todos os dados da fazenda." })
+      setAlertMessage({ type: "error", text: messages.farmRequired })
       return false
     }
-    if (!isValidHectares(f.area_total)) { setAlertMessage({ type: "error", text: "Informe uma área total maior que zero." }); return false }
+    if (!isValidHectares(f.area_total)) { setAlertMessage({ type: "error", text: messages.invalidArea }); return false }
     const ownerDocument = f.documento_proprietario.replace(/\D/g, "")
-    if (!isValidCNPJ(ownerDocument)) { setAlertMessage({ type: "error", text: "Informe um CNPJ rural fictício com 14 dígitos." }); return false }
-    if (!demoDocumentAcknowledgements.farm) { setAlertMessage({ type: "error", text: "Use um CNPJ rural fictício e confirme a opção de demonstração." }); return false }
-    if (!hasMinLetters(f.name, 3)) { setAlertMessage({ type: "error", text: "Informe um nome de fazenda válido." }); return false }
+    if (!isValidCNPJ(ownerDocument)) { setAlertMessage({ type: "error", text: messages.invalidRuralCnpj }); return false }
+    if (!demoDocumentAcknowledgements.farm) { setAlertMessage({ type: "error", text: messages.confirmFarmDocument }); return false }
+    if (!hasMinLetters(f.name, 3)) { setAlertMessage({ type: "error", text: messages.invalidFarmName }); return false }
     const cepDigits = f.cep.replace(/\D/g, "")
-    if (cepDigits.length !== 8) { setAlertMessage({ type: "error", text: "Informe um CEP válido com 8 dígitos." }); return false }
+    if (cepDigits.length !== 8) { setAlertMessage({ type: "error", text: messages.invalidCep }); return false }
     let validCEP = cepData
     if (!validCEP || validCEP.cep?.replace(/\D/g, "") !== cepDigits) {
       try { const response = await fetch(`https://viacep.com.br/ws/${cepDigits}/json/`); const data = await response.json(); validCEP = response.ok && !data.erro ? data : null; if (validCEP) setCepData(validCEP) } catch { validCEP = null }
     }
-    if (!validCEP) { setAlertMessage({ type: "error", text: "CEP não encontrado. Confira o número informado." }); return false }
-    if (!BRAZIL_STATE_SET.has(f.uf) || (validCEP.uf && f.uf !== validCEP.uf)) { setAlertMessage({ type: "error", text: validCEP.uf ? `A UF correspondente a esse CEP é ${validCEP.uf}.` : "Informe uma UF válida." }); return false }
-    if (!hasMinLetters(f.bairro, 2) || (validCEP.bairro && normalizeText(f.bairro) !== normalizeText(validCEP.bairro))) { setAlertMessage({ type: "error", text: validCEP.bairro ? `O bairro correspondente a esse CEP é ${validCEP.bairro}.` : "Informe um bairro válido." }); return false }
-    if (!hasMinLetters(f.municipio, 2) || (validCEP.localidade && normalizeText(f.municipio) !== normalizeText(validCEP.localidade))) { setAlertMessage({ type: "error", text: validCEP.localidade ? `O município correspondente a esse CEP é ${validCEP.localidade}.` : "Informe um município válido." }); return false }
+    if (!validCEP) { setAlertMessage({ type: "error", text: messages.cepNotFound }); return false }
+    if (!BRAZIL_STATE_SET.has(f.uf) || (validCEP.uf && f.uf !== validCEP.uf)) { setAlertMessage({ type: "error", text: validCEP.uf ? messages.stateForCep(validCEP.uf) : messages.invalidState }); return false }
+    if (!hasMinLetters(f.bairro, 2) || (validCEP.bairro && normalizeText(f.bairro) !== normalizeText(validCEP.bairro))) { setAlertMessage({ type: "error", text: validCEP.bairro ? messages.districtForCep(validCEP.bairro) : messages.invalidDistrict }); return false }
+    if (!hasMinLetters(f.municipio, 2) || (validCEP.localidade && normalizeText(f.municipio) !== normalizeText(validCEP.localidade))) { setAlertMessage({ type: "error", text: validCEP.localidade ? messages.cityForCep(validCEP.localidade) : messages.invalidCity }); return false }
     return true
   }
 
@@ -244,6 +360,7 @@ export default function CadastroCompleto() {
         type: userData.type,
         document: userData.document.replace(/\D/g, ""),
         phone: userData.phone.replace(/\D/g, ""),
+        language: userData.language,
         email: userData.email,
         role: ACCOUNT_ROLES.ADMIN,
         plan: selectedPlan.id,
@@ -258,13 +375,13 @@ export default function CadastroCompleto() {
       setEtapa(2)
       setAlertMessage({
         type: "success",
-        text: "Conta criada com sucesso. Agora cadastre sua fazenda.",
+        text: messages.accountCreated,
       })
     } catch (error) {
       if (createdUser && auth.currentUser?.uid === createdUser.uid) {
         try { await deleteUser(createdUser) } catch {   }
       }
-      let msg = accountIdentifierMessage(error) || "Erro no cadastro. Tente novamente."
+      let msg = getAccountErrorMessage(error, messages) || messages.signupError
       setAlertMessage({ type: "error", text: msg })
     } finally { setLoading(false) }
   }
@@ -289,10 +406,11 @@ export default function CadastroCompleto() {
         createdAt: new Date()
       })
       await setDoc(doc(db, "owners", userId), { hectares: parseHectaresInput(farmData.area_total) }, { merge: true })
-      navigate("/home", { replace: true })
+      persistAppLanguage(userData.language)
+      window.location.assign("/home")
     } catch (error) {
       console.error(error)
-      setAlertMessage({ type: "error", text: accountIdentifierMessage(error) || "Erro ao cadastrar fazenda." })
+      setAlertMessage({ type: "error", text: getAccountErrorMessage(error, messages) || messages.farmError })
     } finally { setLoading(false) }
   }
 
@@ -429,12 +547,20 @@ export default function CadastroCompleto() {
                   </div>
                 </div>
 
+                <LanguagePicker
+                  value={userData.language}
+                  onChange={(language) => {
+                    handleUserChange({ target: { name: "language", value: language } })
+                    activateAppLanguage(language)
+                  }}
+                />
+
                 <div className="cc-plan-picker">
                   <div className="cc-plan-title">
                     <span>Escolha seu plano</span>
                     <small>Voce pode alterar depois no perfil.</small>
                   </div>
-                  <p className="cc-plan-notice"><span className="material-symbols-outlined" aria-hidden="true">school</span>{PLAN_NOTICE}</p>
+                  <p className="cc-plan-notice"><span className="material-symbols-outlined notranslate" translate="no" data-icon="school" aria-hidden="true">school</span>{PLAN_NOTICE}</p>
 
                   <div className="cc-plan-grid">
                     {PLAN_OPTIONS.map((plan) => (
@@ -458,7 +584,7 @@ export default function CadastroCompleto() {
                 </div>
 
                 {alertMessage.text && etapa === 1 && (
-                  <div className={`cc-alert ${alertMessage.type}`}>{alertMessage.text}</div>
+                  <div className={`cc-alert ${alertMessage.type} notranslate`} translate="no">{alertMessage.text}</div>
                 )}
 
                 <button className="cc-btn primary" onClick={handleCreateUser} disabled={loading}>
@@ -538,7 +664,7 @@ export default function CadastroCompleto() {
                 </div>
 
                 {alertMessage.text && etapa === 2 && (
-                  <div className={`cc-alert ${alertMessage.type}`}>{alertMessage.text}</div>
+                  <div className={`cc-alert ${alertMessage.type} notranslate`} translate="no">{alertMessage.text}</div>
                 )}
 
                 <div className="cc-actions">

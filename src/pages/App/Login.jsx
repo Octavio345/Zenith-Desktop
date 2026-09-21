@@ -6,6 +6,8 @@ import { doc, setDoc } from "firebase/firestore"
 import { FaEye, FaEyeSlash, FaGoogle } from "react-icons/fa"
 import { ACCOUNT_ROLES, getUserAccessProfile, isAccountBlocked, isOperationalRole, normalizeRole } from "../../services/accessControl"
 import { protectCurrentIdentityData } from "../../services/accountIdentity"
+import { activateAppLanguage, getAppLanguage } from "../../constants/appLanguages"
+import LanguagePicker from "../../components/App/Global/LanguagePicker"
 import "../../styles/App/Login.css"
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -19,6 +21,12 @@ export default function Login() {
   const [rememberMe, setRememberMe] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [accessType, setAccessType] = useState(() => localStorage.getItem("zenithAccessType") || "owner")
+  const [language, setLanguage] = useState(() => getAppLanguage())
+
+  const handleLanguageChange = (nextLanguage) => {
+    setLanguage(nextLanguage)
+    activateAppLanguage(nextLanguage)
+  }
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -174,7 +182,7 @@ export default function Login() {
         <div className="auth-brand">
           <div className="auth-brand-mark">
             <img src="/assets/image/Logo-redonda.webp" alt="" />
-            <span><strong>Zenith</strong><small>Sua precisão agrícola no ponto mais alto</small></span>
+            <span><strong translate="no" className="notranslate">Zenith</strong><small>Sua precisão agrícola no ponto mais alto</small></span>
           </div>
         </div>
 
@@ -198,7 +206,10 @@ export default function Login() {
       <main className="auth-main">
         <div className="auth-card">
           <div className="auth-card-head">
-            <div className="auth-card-logo"><img src="/assets/image/Logo-redonda.webp" alt="" /><span>ZENITH</span></div>
+            <div className="auth-card-head__top">
+              <div className="auth-card-logo"><img src="/assets/image/Logo-redonda.webp" alt="" /><span translate="no" className="notranslate">ZENITH</span></div>
+              <LanguagePicker compact value={language} onChange={handleLanguageChange} />
+            </div>
             <h2>Acessar painel</h2>
             <p>Entre com suas credenciais para continuar.</p>
           </div>
@@ -206,11 +217,11 @@ export default function Login() {
           <div className="auth-form">
             <div className="auth-access-switch" aria-label="Tipo de acesso">
               <button type="button" className={accessType === "owner" ? "active" : ""} onClick={() => setAccessType("owner")}>
-                <span className="material-symbols-outlined">admin_panel_settings</span>
+                <span className="material-symbols-outlined notranslate" translate="no" aria-hidden="true">admin_panel_settings</span>
                 <span><strong>Proprietário / gestor</strong><small>Administração completa</small></span>
               </button>
               <button type="button" className={accessType === "employee" ? "active" : ""} onClick={() => setAccessType("employee")}>
-                <span className="material-symbols-outlined">badge</span>
+                <span className="material-symbols-outlined notranslate" translate="no" aria-hidden="true">badge</span>
                 <span><strong>Funcionário</strong><small>Acesso operacional</small></span>
               </button>
             </div>

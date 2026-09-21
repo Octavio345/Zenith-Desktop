@@ -18,6 +18,7 @@ import { auth, db } from "./services/firebase"
 import { getUserAccessProfile, isAccountBlocked, isOperationalRole } from "./services/accessControl"
 import { hasFullFeatureAccess } from "./services/featureAccess"
 import { InstallAppProvider } from "./contexts/InstallAppContext"
+import { DEFAULT_APP_LANGUAGE, getAppLanguage, getAppSystemCopy, hasStoredAppLanguage, persistAppLanguage } from "./constants/appLanguages"
 
 
 import InstallPrompt from "./components/App/Global/InstallPrompt"
@@ -35,6 +36,7 @@ const STANDALONE_TITLE = ""
 
 function AccountRoute({ children }) {
   const [access, setAccess] = useState("loading")
+  const systemCopy = getAppSystemCopy()
 
   useEffect(() => {
     let stopProfileListener = null
@@ -67,6 +69,12 @@ function AccountRoute({ children }) {
           try { await signOut(auth) } catch {   }
           return
         }
+        const profileLanguage = profile?.language || DEFAULT_APP_LANGUAGE
+        if (!hasStoredAppLanguage() && profileLanguage !== getAppLanguage()) {
+          persistAppLanguage(profileLanguage)
+          window.location.reload()
+          return
+        }
         setAccess("allowed")
       }, async () => {
         sessionStorage.setItem("zenithAccessMessage", "Não foi possível validar as permissões desta conta.")
@@ -85,7 +93,7 @@ function AccountRoute({ children }) {
     return (
       <div className="access-loader" role="status">
         <img src="/assets/image/Logo-redonda.webp" alt="" />
-        <div><strong>Verificando acesso</strong><span>Preparando sua área de trabalho</span></div>
+        <div translate="no" className="notranslate"><strong>{systemCopy.verifyingAccess}</strong><span>{systemCopy.preparingWorkspace}</span></div>
         <i aria-hidden="true" />
       </div>
     )
@@ -96,6 +104,7 @@ function AccountRoute({ children }) {
 
 function TeamRoute() {
   const [access, setAccess] = useState("loading")
+  const systemCopy = getAppSystemCopy()
 
   useEffect(() => onAuthStateChanged(auth, async (user) => {
     if (!user) {
@@ -114,7 +123,7 @@ function TeamRoute() {
     return (
       <div className="access-loader" role="status">
         <img src="/assets/image/Logo-redonda.webp" alt="" />
-        <div><strong>Verificando acesso</strong><span>Preparando sua área de trabalho</span></div>
+        <div translate="no" className="notranslate"><strong>{systemCopy.verifyingAccess}</strong><span>{systemCopy.preparingWorkspace}</span></div>
         <i aria-hidden="true" />
       </div>
     )
@@ -135,6 +144,7 @@ const resetPageScroll = () => {
 
 function AppShell() {
   const location = useLocation()
+  const [appLanguage, setAppLanguage] = useState(() => getAppLanguage())
   const noticePreview = import.meta.env.DEV
     ? new URLSearchParams(location.search).get("notice")
     : null
@@ -145,7 +155,19 @@ function AppShell() {
   const [isIOS, setIsIOS] = useState(false)
   const [isAndroid, setIsAndroid] = useState(false)
   const [quickLoading, setQuickLoading] = useState(false)
+  const [translationPending, setTranslationPending] = useState(() => getAppLanguage() !== DEFAULT_APP_LANGUAGE)
   const firstRoute = useRef(true)
+  const systemCopy = getAppSystemCopy(appLanguage)
+
+  useEffect(() => {
+    const handleLanguageChange = (event) => {
+      const nextLanguage = event.detail?.language || getAppLanguage()
+      setTranslationPending(nextLanguage !== DEFAULT_APP_LANGUAGE)
+      setAppLanguage(nextLanguage)
+    }
+    window.addEventListener("zenith:language-change", handleLanguageChange)
+    return () => window.removeEventListener("zenith:language-change", handleLanguageChange)
+  }, [])
 
   useEffect(() => {
     let timeout
@@ -153,7 +175,10 @@ function AppShell() {
       resetPageScroll()
       setQuickLoading(true)
       window.clearTimeout(timeout)
-      timeout = window.setTimeout(() => setQuickLoading(false), 850)
+      timeout = window.setTimeout(
+        () => setQuickLoading(false),
+        getAppLanguage() === DEFAULT_APP_LANGUAGE ? 850 : 2300,
+      )
     }
     window.addEventListener("zenith:navigate", showQuickLoader)
     return () => {
@@ -161,6 +186,199 @@ function AppShell() {
       window.clearTimeout(timeout)
     }
   }, [])
+
+  useEffect(() => {
+    const language = appLanguage
+    document.documentElement.lang = language
+    document.documentElement.setAttribute("translate", "yes")
+    document.body?.setAttribute("translate", "yes")
+    if (language === "pt-BR") return undefined
+
+    const mountId = "google_translate_element"
+    const googleLanguage = language === "es-ES" ? "es" : "en"
+    let applyTimer = null
+    let retryTimer = null
+    let resumeTimer = null
+    let brandTimer = null
+    let languageSwitchTimer = null
+    let isApplying = false
+    let observer = null
+
+    const restoreBrandName = () => {
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
+      const textNodes = []
+      while (walker.nextNode()) textNodes.push(walker.currentNode)
+      textNodes.forEach((node) => {
+        const parent = node.parentElement
+        if (!parent || parent.closest("script, style, textarea")) return
+        if (/\bcenit\b/i.test(node.nodeValue || "")) {
+          node.nodeValue = node.nodeValue.replace(/\bcenit\b/gi, (match) => (
+            match === match.toUpperCase() ? "ZENITH" : "Zenith"
+          ))
+        }
+      })
+    }
+
+    const protectBrandAndIcons = () => {
+      const icons = [...document.querySelectorAll(".material-symbols-outlined")]
+      const iconsWithoutSize = icons.filter((icon) => {
+        const savedSize = Number.parseFloat(icon.style.getPropertyValue("--zenith-icon-size"))
+        return !Number.isFinite(savedSize) || savedSize <= 0
+      })
+      const currentDocumentLanguage = document.documentElement.lang
+
+      // A regra visual de inglês/espanhol zera apenas o texto interno do
+      // ligature. Medimos o tamanho no estilo-base antes de criar o fallback.
+      if (iconsWithoutSize.length) document.documentElement.lang = DEFAULT_APP_LANGUAGE
+      iconsWithoutSize.forEach((icon) => {
+        const measuredSize = window.getComputedStyle(icon).fontSize
+        icon.style.setProperty(
+          "--zenith-icon-size",
+          Number.parseFloat(measuredSize) > 0 ? measuredSize : "24px",
+        )
+      })
+      if (iconsWithoutSize.length) document.documentElement.lang = currentDocumentLanguage
+
+      icons.forEach((icon) => {
+        if (!icon.dataset.icon) icon.dataset.icon = icon.textContent.trim()
+        icon.setAttribute("translate", "no")
+        icon.classList.add("notranslate")
+        icon.setAttribute("aria-hidden", "true")
+      })
+      document.querySelectorAll("body *").forEach((element) => {
+        if (element.children.length === 0 && /^(zenith)$/i.test(element.textContent.trim())) {
+          element.setAttribute("translate", "no")
+          element.classList.add("notranslate")
+        }
+      })
+    }
+
+    const observeDocument = () => {
+      if (!observer) return
+      observer.observe(document.body, { childList: true, subtree: true })
+    }
+
+    const forceTranslation = (hardRefresh = false) => {
+      const selector = document.querySelector(".goog-te-combo")
+      if (!selector) {
+        window.clearTimeout(retryTimer)
+        retryTimer = window.setTimeout(() => forceTranslation(hardRefresh), 250)
+        return false
+      }
+
+      isApplying = true
+      observer?.disconnect()
+      window.clearTimeout(resumeTimer)
+      window.clearTimeout(brandTimer)
+      window.clearTimeout(languageSwitchTimer)
+
+      const applyTargetLanguage = () => {
+        selector.value = googleLanguage
+        selector.dispatchEvent(new Event("change", { bubbles: true }))
+        resumeTimer = window.setTimeout(() => {
+          protectBrandAndIcons()
+          restoreBrandName()
+          isApplying = false
+          setTranslationPending(false)
+          observeDocument()
+        }, 1750)
+        brandTimer = window.setTimeout(restoreBrandName, 2900)
+      }
+
+      if (hardRefresh && selector.value === googleLanguage) {
+        // O widget ignora uma seleção repetida. Usamos o outro idioma como
+        // ponte, coberto pelo loader, e então reaplicamos o idioma escolhido.
+        selector.value = googleLanguage === "en" ? "es" : "en"
+        selector.dispatchEvent(new Event("change", { bubbles: true }))
+        languageSwitchTimer = window.setTimeout(applyTargetLanguage, 520)
+      } else {
+        applyTargetLanguage()
+      }
+      return true
+    }
+
+    const scheduleTranslation = (force = false, hardRefresh = false) => {
+      window.clearTimeout(applyTimer)
+      applyTimer = window.setTimeout(() => {
+        const selector = document.querySelector(".goog-te-combo")
+        if (!selector) {
+          forceTranslation(hardRefresh)
+          return
+        }
+        if (force || selector.value !== googleLanguage) forceTranslation(hardRefresh)
+      }, force ? 180 : 420)
+    }
+
+    observer = new MutationObserver((mutations) => {
+      if (isApplying) return
+      protectBrandAndIcons()
+      restoreBrandName()
+      const relevantChange = mutations.some((mutation) => {
+        const target = mutation.target?.nodeType === 1
+          ? mutation.target
+          : mutation.target?.parentElement
+        return !target?.closest?.("#google_translate_element, .goog-te-menu-frame, .goog-te-banner-frame")
+      })
+      if (relevantChange) scheduleTranslation(true)
+    })
+    observeDocument()
+    protectBrandAndIcons()
+    restoreBrandName()
+
+    const initializeGoogleTranslate = () => {
+      const mount = document.getElementById(mountId)
+      if (!mount || !window.google?.translate?.TranslateElement) return
+      if (!mount.dataset.initialized) {
+        new window.google.translate.TranslateElement({
+          pageLanguage: "pt",
+          includedLanguages: "en,es",
+          autoDisplay: false,
+          multilanguagePage: true,
+        }, mountId)
+        mount.dataset.initialized = "true"
+      }
+      scheduleTranslation(true, true)
+    }
+
+    window.googleTranslateElementInit = initializeGoogleTranslate
+    window.__zenithForceTranslation = (hardRefresh = false) => scheduleTranslation(true, hardRefresh)
+    const handleTranslatedNavigation = () => setTranslationPending(true)
+    window.addEventListener("zenith:navigate", handleTranslatedNavigation)
+    const existingScript = document.getElementById("google-translate-script")
+    if (existingScript) {
+      window.setTimeout(initializeGoogleTranslate, 0)
+    } else {
+      const script = document.createElement("script")
+      script.id = "google-translate-script"
+      script.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+      script.async = true
+      document.body.appendChild(script)
+    }
+    return () => {
+      window.clearTimeout(applyTimer)
+      window.clearTimeout(retryTimer)
+      window.clearTimeout(resumeTimer)
+      window.clearTimeout(brandTimer)
+      window.clearTimeout(languageSwitchTimer)
+      observer?.disconnect()
+      window.removeEventListener("zenith:navigate", handleTranslatedNavigation)
+      delete window.__zenithForceTranslation
+      delete window.googleTranslateElementInit
+    }
+  }, [appLanguage])
+
+  useEffect(() => {
+    if (!translationPending) return undefined
+    const safetyTimer = window.setTimeout(() => setTranslationPending(false), 6500)
+    return () => window.clearTimeout(safetyTimer)
+  }, [translationPending, appLanguage])
+
+  useEffect(() => {
+    if (getAppLanguage() === DEFAULT_APP_LANGUAGE) return undefined
+    setTranslationPending(true)
+    const timer = window.setTimeout(() => window.__zenithForceTranslation?.(true), 260)
+    return () => window.clearTimeout(timer)
+  }, [location.key])
 
   useLayoutEffect(() => {
     const previousRestoration = window.history.scrollRestoration
@@ -180,9 +398,12 @@ function AppShell() {
       return
     }
     setQuickLoading(true)
-    const routeTimeout = window.setTimeout(() => setQuickLoading(false), 900)
+    const routeTimeout = window.setTimeout(
+      () => setQuickLoading(false),
+      appLanguage === DEFAULT_APP_LANGUAGE ? 900 : 2300,
+    )
     return () => window.clearTimeout(routeTimeout)
-  }, [location.key])
+  }, [location.key, appLanguage])
 
 
 
@@ -252,6 +473,7 @@ function AppShell() {
           <InstallAppProvider value={{ isInstalled, canInstall: Boolean(deferredPrompt), requestInstall }}>
 
             <UpdatePrompt preview={noticePreview} />
+            <div id="google_translate_element" className="google-translate-shell" aria-hidden="true" />
 
             {showInstallPrompt && !isInstalled && (
               <InstallPrompt
@@ -285,13 +507,14 @@ function AppShell() {
               <Route path="/equipe" element={<AccountRoute><TeamRoute /></AccountRoute>} />
               <Route path="/admin/team" element={<AccountRoute><TeamRoute /></AccountRoute>} />
             </Routes>
-            {quickLoading && (
-              <div className="route-quick-loader" role="status" aria-label="Abrindo página">
+            {(quickLoading || translationPending) && (
+              <div className="route-quick-loader notranslate" translate="no" role="status" aria-label={translationPending ? systemCopy.applyingLanguage : systemCopy.openingPage}>
                 <div>
-                  <span className="material-symbols-outlined">eco</span>
+                  <span className="material-symbols-outlined notranslate" translate="no" aria-hidden="true">eco</span>
                   <i aria-hidden="true" />
                 </div>
-                <strong>Zenith</strong>
+                <strong className="notranslate" translate="no">Zenith</strong>
+                <span>{translationPending ? systemCopy.applyingLanguage : systemCopy.preparingPage}</span>
               </div>
             )}
           </InstallAppProvider>

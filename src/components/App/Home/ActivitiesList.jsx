@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { getAppSystemCopy } from "../../../constants/appLanguages"
 
 function formatDiagnosisName(value) {
   if (!value) return "Diagnóstico"
@@ -49,7 +50,7 @@ export default function ActivitiesList({ hasFarm, onViewAll, onRegister }) {
     return (
       <div className="act-loading">
         <div className="act-spinner"></div>
-        <p>Carregando atividades...</p>
+        <p className="notranslate" translate="no">{getAppSystemCopy().loadingActivities}</p>
       </div>
     )
   }

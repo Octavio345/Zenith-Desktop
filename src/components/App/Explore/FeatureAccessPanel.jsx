@@ -1,4 +1,5 @@
 import "../../../styles/App/FeatureAccessPanel.css"
+import { getAppSystemCopy } from "../../../constants/appLanguages"
 
 const FEATURE_NAMES = {
   diagnosis: "Análise da soja por IA",
@@ -43,7 +44,7 @@ export default function FeatureAccessPanel({ feature, access, blocked3D = false,
   if (!access || access.fullAccess) return null
 
   if (access.loading) {
-    return <div className="feature-access feature-access--status" role="status"><span className="feature-access__spinner" /> Verificando acesso...</div>
+    return <div className="feature-access feature-access--status notranslate" translate="no" role="status"><span className="feature-access__spinner" /> {getAppSystemCopy().verifyingAccess}...</div>
   }
 
   if (access.error) {
@@ -59,7 +60,7 @@ export default function FeatureAccessPanel({ feature, access, blocked3D = false,
   if (access.remaining > 0) {
     return (
       <aside className="feature-access feature-access--quota" aria-label="Limite de uso do projeto acadêmico">
-        <span className="material-symbols-outlined">school</span>
+        <span className="material-symbols-outlined notranslate" translate="no" data-icon="school" aria-hidden="true">school</span>
         <div><strong>Acesso acadêmico</strong><p>{access.remaining} de 3 {access.remaining === 1 ? "utilização disponível" : "utilizações disponíveis"} em {FEATURE_NAMES[feature]}.</p></div>
         <div className="feature-access__dots" aria-hidden="true">{[0, 1, 2].map((index) => <i key={index} className={index < access.remaining ? "is-active" : ""} />)}</div>
       </aside>

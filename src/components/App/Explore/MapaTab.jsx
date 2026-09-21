@@ -10,6 +10,7 @@ import markerIcon from "leaflet/dist/images/marker-icon.png"
 import markerShadow from "leaflet/dist/images/marker-shadow.png"
 import "../../../styles/App/MapaTab.css"
 import { getFieldOccurrences, removeFieldOccurrencesForAreas } from "../../../services/fieldOperations"
+import { getAppSystemCopy } from "../../../constants/appLanguages"
 
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
@@ -1056,7 +1057,7 @@ export default function MapaTab() {
           </div>
           <div ref={mapContainerRef} className={`farm-map-canvas ${mapViewMode === "3d" ? "farm-map-canvas--hidden" : ""}`} />
           {mapViewMode === "3d" && (
-            <Suspense fallback={<div className="farm-map-3d__loading">Carregando visualização 3D...</div>}>
+            <Suspense fallback={<div className="farm-map-3d__loading notranslate" translate="no">{getAppSystemCopy().loading3D}</div>}>
               <FarmMap3D
                 areas={areas}
                 selectedAreaId={selectedAreaId}

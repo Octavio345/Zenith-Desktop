@@ -94,7 +94,7 @@ export default function AppFooter() {
         <div className="zenith-footer__institutional" aria-label="Origem acadêmica do projeto">
           <div className="zenith-footer__institutional-inner">
             <div className="zenith-footer__institutional-heading">
-              <span className="material-symbols-outlined" aria-hidden="true">school</span>
+              <span className="material-symbols-outlined notranslate" translate="no" data-icon="school" aria-hidden="true">school</span>
               <span>
                 <small>ORIGEM DO PROJETO</small>
                 <strong>TCC desenvolvido por estudantes da Etec Polivalente de Americana</strong>

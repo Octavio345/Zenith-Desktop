@@ -619,6 +619,12 @@ body:has(.pf-page) .header .nav-item.active {
   gap: 18px 20px;
 }
 
+.pf-language-setting {
+  margin-top: 30px;
+  padding-top: 24px;
+  border-top: 1px solid var(--pf-border);
+}
+
 .pf-field-full {
   grid-column: 1 / -1;
 }
@@ -1218,6 +1224,11 @@ body:has(.pf-page) .menu-bar {
 
   .pf-grid {
     grid-template-columns: 1fr;
+  }
+
+  .pf-language-setting {
+    margin-top: 24px;
+    padding-top: 20px;
   }
 
   .pf-card-header {

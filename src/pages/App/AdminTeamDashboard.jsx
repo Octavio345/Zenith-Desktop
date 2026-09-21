@@ -11,6 +11,7 @@ import AppFooter from "../../components/App/Global/AppFooter"
 import DroneIcon from "../../components/App/Global/DroneIcon"
 import { ACCOUNT_ROLES, isAccountBlocked } from "../../services/accessControl"
 import { accountIdentifierMessage, createProfileWithUniqueIdentifiers } from "../../services/accountIdentity"
+import { getAppSystemCopy } from "../../constants/appLanguages"
 import "../../styles/App/TeamAccess.css"
 
 const DRONE_MODELS = [
@@ -817,8 +818,8 @@ export default function AdminTeamDashboard() {
             {filteredEmployees.length === 0 && (
               <div className="team-empty-text">
                 <span className="material-symbols-outlined">group_add</span>
-                <strong>{isTeamLoading ? "Carregando equipe" : employees.length ? "Nenhum resultado" : "Sua equipe começa aqui"}</strong>
-                <p>{isTeamLoading ? "Buscando os dados operacionais..." : employees.length ? "Ajuste ou limpe os filtros para visualizar a equipe." : "Crie o primeiro login de funcionário pelo botão acima."}</p>
+                <strong className={isTeamLoading ? "notranslate" : undefined} translate={isTeamLoading ? "no" : undefined}>{isTeamLoading ? getAppSystemCopy().loadingTeam : employees.length ? "Nenhum resultado" : "Sua equipe começa aqui"}</strong>
+                <p className={isTeamLoading ? "notranslate" : undefined} translate={isTeamLoading ? "no" : undefined}>{isTeamLoading ? getAppSystemCopy().fetchingOperationalData : employees.length ? "Ajuste ou limpe os filtros para visualizar a equipe." : "Crie o primeiro login de funcionário pelo botão acima."}</p>
               </div>
             )}
           </div>

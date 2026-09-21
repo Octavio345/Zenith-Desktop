@@ -13,6 +13,7 @@ import {
 import { useLocation, useNavigate } from "react-router-dom"
 import { getUserAccessProfile, isOperationalRole } from "../../services/accessControl"
 import { BRAZIL_STATE_CODES, BRAZIL_STATE_SET } from "../../constants/brazilStates"
+import { DEFAULT_APP_LANGUAGE, activateAppLanguage, getAppLanguage, getAppSystemCopy, persistAppLanguage } from "../../constants/appLanguages"
 import { isValidHectares, parseHectaresInput, sanitizeHectaresInput } from "../../utils/hectares"
 import { maskAccountDocument } from "../../services/accountIdentity"
 
@@ -21,6 +22,7 @@ import AppHeader from "../../components/App/Global/AppHeader"
 import AppFooter from "../../components/App/Global/AppFooter"
 import SplashScreen from "../../components/App/Global/SplashScreen"
 import HectareInput from "../../components/App/Global/HectareInput"
+import LanguagePicker from "../../components/App/Global/LanguagePicker"
 
 import "../../styles/App/Profile.css"
 
@@ -190,6 +192,7 @@ export default function Profile() {
     email: "",
     profileIcon: "agriculture",
     phone: "",
+    language: DEFAULT_APP_LANGUAGE,
   })
 
   const [farmForm, setFarmForm] = useState({
@@ -241,6 +244,7 @@ export default function Profile() {
           email: data.email || "",
           profileIcon: data.profileIcon || "agriculture",
           phone: data.phoneMasked || formatPhoneInput(data.phone || ""),
+          language: data.language || getAppLanguage(),
         })
         return data
       }
@@ -333,6 +337,7 @@ export default function Profile() {
       email: user?.email || "",
       profileIcon: userData?.profileIcon || "agriculture",
       phone: userData?.phoneMasked || formatPhoneInput(userData?.phone || ""),
+      language: userData?.language || DEFAULT_APP_LANGUAGE,
     })
   }
 
@@ -370,6 +375,26 @@ export default function Profile() {
       showAlert("error", "Erro ao atualizar perfil")
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleLanguageChange = async (language) => {
+    if (!user) return
+    setFormData((current) => ({ ...current, language }))
+    setUserData((current) => ({ ...current, language }))
+    persistAppLanguage(language)
+    if (language !== DEFAULT_APP_LANGUAGE) activateAppLanguage(language)
+    try {
+      await updateDoc(doc(db, userData?.profileCollection || "owners", user.uid), {
+        language,
+        updatedAt: new Date().toISOString(),
+      })
+    } catch (error) {
+      // A preferência local já foi aplicada. Uma falha de sincronização não
+      // deve ser apresentada como falha da troca de idioma para o usuário.
+      console.warn("Não foi possível sincronizar o idioma com a conta:", error)
+    } finally {
+      if (language === DEFAULT_APP_LANGUAGE) activateAppLanguage(language)
     }
   }
 
@@ -563,7 +588,7 @@ export default function Profile() {
 
 
 
-  if (loading) return <SplashScreen message="Carregando perfil..." />
+  if (loading) return <SplashScreen message={getAppSystemCopy().loadingProfile} />
 
   return (
     <>
@@ -880,6 +905,9 @@ export default function Profile() {
                   </div>
                 </div>
               )}
+              <div className="pf-language-setting">
+                <LanguagePicker value={formData.language || DEFAULT_APP_LANGUAGE} onChange={handleLanguageChange} />
+              </div>
               </div>
           )}
 
@@ -1089,7 +1117,7 @@ export default function Profile() {
                     <p>Plano atual: <strong>{currentPlan.name}</strong></p>
                   </div>
                 </div>
-                <p className="pf-plan-notice"><span className="material-symbols-outlined" aria-hidden="true">school</span>{PLAN_NOTICE}</p>
+                <p className="pf-plan-notice"><span className="material-symbols-outlined notranslate" translate="no" data-icon="school" aria-hidden="true">school</span>{PLAN_NOTICE}</p>
 
                 <div className="pf-plan-grid">
                   {PLAN_OPTIONS.map((plan) => {

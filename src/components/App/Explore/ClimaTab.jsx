@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react"
 import { useFarm } from "./hooks/useFarm"
+import { getAppSystemCopy } from "../../../constants/appLanguages"
 import "../../../styles/App/Explore.css"
 
 const API_KEY = "d77668673cf15b7d0488f921007cbd6b"
 
 export default function ClimaTab() {
   const { farmData, loading: farmLoading } = useFarm()
+  const systemCopy = getAppSystemCopy()
 
   const [weatherData, setWeatherData] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -292,9 +294,9 @@ export default function ClimaTab() {
           <div style={styles.loadingIcon}>
             <span className="material-symbols-outlined" style={{ fontSize: '48px', color: '#2e6f46' }}>cloud</span>
           </div>
-          <h3 style={styles.loadingTitle}>Buscando clima</h3>
-          <p style={styles.loadingText}>
-            {farmData ? `Obtendo dados para ${farmData.municipio}...` : 'Carregando...'}
+          <h3 className="notranslate" translate="no" style={styles.loadingTitle}>{systemCopy.weatherLoadingTitle}</h3>
+          <p className="notranslate" translate="no" style={styles.loadingText}>
+            {farmData ? `${systemCopy.fetchingDataFor} ${farmData.municipio}...` : `${systemCopy.loading}...`}
           </p>
         </div>
       </div>
