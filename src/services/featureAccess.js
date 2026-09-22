@@ -6,7 +6,8 @@ export const FEATURE_LIMIT = 3
 export const FULL_ACCESS_EMAILS = new Set([
   "oarsilva6@gmail.com",
   "leocarrilhom@gmail.com",
-  "samuel.vieirafreitas@outlook.com"
+  "samuel.vieirafreitas@outlook.com",
+  "zenith.agroia@gmail.com"
 ])
 
 const COUNTERS = {
