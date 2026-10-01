@@ -30,6 +30,15 @@ const modules = [
     type: "monitoring"
   },
   {
+    id: "cana",
+    path: "/explore",
+    tab: "cana",
+    icon: "grass",
+    label: "Cana IA",
+    sublabel: "Falhas de estande",
+    type: "monitoring"
+  },
+  {
     id: "diario",
     path: "/explore",
     tab: "diario",
@@ -54,6 +63,15 @@ const modules = [
     icon: "inventory",
     label: "Estoque",
     sublabel: "Insumos e materiais",
+    type: "stock"
+  },
+  {
+    id: "economia",
+    path: "/explore",
+    tab: "economia",
+    icon: "payments",
+    label: "Gestão econômica",
+    sublabel: "Custos por talhão",
     type: "stock"
   },
   {

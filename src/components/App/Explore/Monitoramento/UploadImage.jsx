@@ -34,7 +34,7 @@ function UploadGlyph({ loading = false }) {
   )
 }
 
-export default function UploadImage({ onSelect, disabled }) {
+export default function UploadImage({ onSelect, disabled, validateFile = validarArquivo }) {
   const [arrastando, setArrastando] = useState(false)
   const [arquivo, setArquivo] = useState(null)
   const [erroArquivo, setErroArquivo] = useState("")
@@ -78,7 +78,7 @@ export default function UploadImage({ onSelect, disabled }) {
   const processarArquivo = (file) => {
     if (!file || disabled) return
 
-    const erro = validarArquivo(file)
+    const erro = validateFile(file)
     setErroArquivo(erro || "")
     setArquivo(erro ? null : file)
   }

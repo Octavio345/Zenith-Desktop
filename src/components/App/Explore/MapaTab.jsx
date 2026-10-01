@@ -335,6 +335,7 @@ export default function MapaTab() {
     areasRef.current = nextAreas
     setAreas(nextAreas)
     localStorage.setItem(STORAGE_KEY, JSON.stringify(nextAreas))
+    window.dispatchEvent(new Event("zenith:farm-areas-updated"))
   }
 
   const stopActiveTool = ({ revertEdit = false } = {}) => {

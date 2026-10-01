@@ -1,0 +1,226 @@
+.economia {
+  --eco-bg: #0b1711;
+  --eco-surface: #112119;
+  --eco-border: rgba(180, 216, 188, .16);
+  --eco-text: #f2f7f2;
+  --eco-muted: #a2b4a7;
+  --eco-green: #55d18b;
+  width: 100%;
+  max-width: 1220px;
+  margin: 0 auto;
+  color: var(--eco-text);
+}
+.explore-container--economia .explore-bg-image { background: #080f0c; animation: none; filter: none; }
+.explore-container--economia .explore-atmosphere::after { background: none; }
+.explore-container--economia .explore-grid-overlay,
+.explore-container--economia .explore-circuit-layer,
+.explore-container--economia .background-canvas,
+.explore-container--economia .mouse-glow { display: none; }
+.explore-container--economia .explore-tabs-modern { background: #0c1b12; }
+.explore-container--economia .explore-tab.active { background: #4ed88e; box-shadow: none; }
+.economia * { box-sizing: border-box; }
+.economia button, .economia input, .economia select { font: inherit; }
+.economia button { cursor: pointer; }
+.economia-intro {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 30px;
+  padding: 34px 36px;
+  margin-bottom: 18px;
+  border: 1px solid var(--eco-border);
+  border-radius: 22px;
+  background: #102218;
+}
+.economia-eyebrow { display: block; color: var(--eco-green); font-size: .7rem; font-weight: 800; letter-spacing: .16em; }
+.economia-intro h2 { margin: 9px 0 10px; font-size: clamp(2rem, 4vw, 3.1rem); line-height: 1.1; letter-spacing: -.035em; }
+.economia-intro p { max-width: 650px; margin: 0; color: var(--eco-muted); line-height: 1.55; }
+.economia-intro-mark { color: rgba(111, 174, 130, .44); font-size: clamp(2rem, 6vw, 4.6rem); font-weight: 800; letter-spacing: -.06em; white-space: nowrap; }
+.economia-layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 18px; align-items: start; }
+.economia-sidebar, .economia-panel, .economia-metric { border: 1px solid var(--eco-border); border-radius: 18px; background: var(--eco-bg); }
+.economia-sidebar { padding: 20px; position: sticky; top: 90px; }
+.economia-sidebar-heading, .economia-panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.economia-sidebar h3, .economia-panel h3 { margin: 5px 0 0; color: var(--eco-text); font-size: 1.25rem; letter-spacing: -.02em; }
+.economia-icon-button { display: grid; place-items: center; width: 36px; height: 36px; border: 1px solid #3f7955; border-radius: 10px; background: #193d29; color: #d8f9e1; }
+.economia-icon-button:hover { background: #265b3b; }
+.economia-saved-list { display: grid; gap: 8px; margin-top: 20px; }
+.economia-saved { width: 100%; padding: 13px; text-align: left; color: var(--eco-text); background: #102119; border: 1px solid transparent; border-radius: 10px; }
+.economia-saved:hover, .economia-saved.is-active { border-color: #477858; background: #183325; }
+.economia-saved-name, .economia-saved-meta { display: block; overflow-wrap: anywhere; }
+.economia-saved-name { font-weight: 700; }
+.economia-saved-meta { margin-top: 4px; color: var(--eco-muted); font-size: .78rem; }
+.economia-sidebar-empty { color: var(--eco-muted); font-size: .88rem; line-height: 1.5; margin: 23px 0; }
+.economia-local-note { display: flex; align-items: flex-start; gap: 7px; margin: 22px 0 0; padding-top: 15px; border-top: 1px solid var(--eco-border); color: var(--eco-muted); font-size: .75rem; line-height: 1.4; }
+.economia-local-note .material-symbols-outlined { font-size: 17px; }
+.economia-main { display: grid; gap: 16px; min-width: 0; }
+.economia-panel { padding: 25px; }
+.economia-panel-heading { margin-bottom: 22px; }
+.economia-text-button { padding: 7px 0; border: 0; border-bottom: 1px solid #669c77; background: none; color: #b1e6bf; font-size: .82rem !important; font-weight: 700 !important; }
+.economia-text-button:hover { color: #fff; }
+.economia-field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: end; }
+.economia-field { display: grid; gap: 8px; color: var(--eco-muted); font-size: .8rem; font-weight: 700; }
+.economia-field input, .economia-field select, .economia-input-wrap { min-height: 46px; border: 1px solid #34503d; border-radius: 9px; background: #13271b; color: var(--eco-text); }
+.economia-field input, .economia-field select { width: 100%; padding: 0 12px; outline: none; }
+.economia-field input[readonly] { color: #a9c6b0; background: #15231a; }
+.economia-field input:focus, .economia-field select:focus, .economia-input-wrap:focus-within { border-color: var(--eco-green); box-shadow: 0 0 0 3px rgba(85, 209, 139, .12); }
+.economia-area-help { margin: 0 0 4px; color: var(--eco-muted); font-size: .82rem; line-height: 1.45; }
+.economia-unit { color: var(--eco-muted); font-size: .76rem; font-weight: 800; letter-spacing: .08em; }
+.economia-cost-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; }
+.economia-cost-field { display: grid; grid-template-columns: 28px minmax(0, 1fr) 128px; gap: 10px; align-items: center; min-height: 66px; border-top: 1px solid var(--eco-border); color: #e3eee4; font-size: .88rem; font-weight: 600; }
+.economia-cost-index { color: #649073; font-size: .72rem; font-weight: 800; }
+.economia-input-wrap { display: flex; align-items: center; min-height: 39px; padding: 0 9px; }
+.economia-input-wrap small { color: #93aa99; font-size: .74rem; }
+.economia-input-wrap input { min-width: 0; width: 100%; height: 37px; padding: 0 0 0 5px; border: 0; outline: 0; background: transparent; color: #fff; text-align: right; font-size: .88rem; }
+.economia-input-wrap input::placeholder { color: #788c7d; }
+.economia-actions { display: flex; align-items: center; gap: 16px; margin-top: 22px; }
+.economia-save { min-height: 44px; padding: 0 20px; border: 1px solid #4eb879; border-radius: 9px; background: #1b854a; color: #fff; font-weight: 800 !important; }
+.economia-save:hover { background: #239653; }
+.economia-delete { border: 0; background: none; color: #e9a5a1; font-size: .83rem !important; font-weight: 700 !important; }
+.economia-delete:hover { color: #fff; }
+.economia-feedback { padding: 10px 13px; border-radius: 8px; font-size: .84rem; }
+.economia-feedback.is-error { color: #ffc2bb; background: #38201e; }
+.economia-feedback.is-success { color: #bdf0c9; background: #1b3b28; }
+.economia-results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.economia-metric { display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 25px; }
+.economia-metric span { color: var(--eco-muted); font-size: .72rem; font-weight: 800; letter-spacing: .12em; }
+.economia-metric strong { font-size: clamp(1.65rem, 3.3vw, 2.55rem); line-height: 1.15; letter-spacing: -.04em; overflow-wrap: anywhere; }
+.economia-metric small { color: var(--eco-muted); font-size: .8rem; }
+.economia-metric-primary { background: #173e28; border-color: #347a4d; }
+.economia-metric-primary span, .economia-metric-primary small { color: #bdddc5; }
+.economia-bars { display: grid; gap: 13px; }
+.economia-bar-row { display: grid; grid-template-columns: minmax(125px, 1fr) minmax(80px, 2fr) 150px; gap: 14px; align-items: center; font-size: .82rem; }
+.economia-bar-row span small, .economia-bar-row strong small { display: block; margin-top: 4px; color: var(--eco-muted); font-size: .72rem; font-weight: 500; }
+.economia-bar-row strong { text-align: right; font-size: .88rem; }
+.economia-bar-track { height: 8px; overflow: hidden; border-radius: 20px; background: #263c2c; }
+.economia-bar-track div { height: 100%; border-radius: 20px; background: #5ccb83; }
+.economia-disclaimer { margin: 0 0 12px; color: var(--eco-muted); font-size: .78rem; line-height: 1.5; }
+.economia-dialog-backdrop { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 20px; background: rgba(0, 0, 0, .7); }
+.economia-dialog { width: min(100%, 420px); padding: 26px; border: 1px solid #53735b; border-radius: 15px; background: #102218; box-shadow: 0 24px 60px rgba(0, 0, 0, .4); }
+.economia-dialog h3 { margin: 0 0 8px; }
+.economia-dialog p { color: var(--eco-muted); line-height: 1.5; }
+.economia-dialog > div { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+.economia-dialog button { padding: 10px 16px; border: 1px solid #526b58; border-radius: 8px; background: #213729; color: #fff; }
+.economia-dialog .economia-dialog-danger { border-color: #ad5b55; background: #9b3b37; }
+@media (max-width: 900px) { .economia-layout { grid-template-columns: 1fr; } .economia-sidebar { position: static; } .economia-saved-list { display: flex; overflow-x: auto; } .economia-saved { min-width: 180px; } }
+@media (max-width: 640px) { .economia-intro { padding: 25px; } .economia-intro-mark { display: none; } .economia-panel { padding: 20px; } .economia-field-grid, .economia-cost-grid, .economia-results { grid-template-columns: 1fr; } .economia-cost-field { grid-template-columns: 25px minmax(0, 1fr) 118px; } .economia-bar-row { grid-template-columns: 1fr 130px; gap: 5px 10px; } .economia-bar-track { grid-column: 1 / -1; grid-row: 2; } }
+
+/* Superfícies claras acompanham os painéis operacionais do site. */
+.economia {
+  --eco-bg: #fff;
+  --eco-surface: #f4f9f2;
+  --eco-border: #d7e6d6;
+  --eco-text: #173c29;
+  --eco-muted: #607568;
+  --eco-green: #287447;
+  min-width: 0;
+  overflow: clip;
+}
+.explore-container--economia .explore-tabs-modern {
+  display: flex;
+  justify-content: flex-start;
+  width: min(1220px, calc(100vw - 32px));
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #65ae7c #112319;
+  background: #102319;
+}
+.explore-container--economia > .explore-heading {
+  width: min(1220px, calc(100vw - 32px));
+  max-width: 100%;
+  min-width: 0;
+  background: #eaf4e8;
+  border: 1px solid #c8dfc8;
+  box-shadow: 0 14px 34px rgba(22, 66, 34, .1);
+  color: #173c29;
+}
+.explore-container--economia > .explore-heading p { color: #597362; }
+.explore-container--economia > .explore-heading > div > span { color: #357a49; }
+.explore-container--economia > .explore-heading aside { min-width: 0; max-width: 100%; background: #fff; border-color: #d2e4d0; }
+.explore-container--economia > .explore-heading aside small { color: #6a836f; }
+.explore-container--economia > .explore-heading aside strong { display: block; color: #214d31; overflow-wrap: anywhere; }
+.explore-container--economia .explore-tabs-modern::-webkit-scrollbar { display: block; height: 6px; }
+.explore-container--economia .explore-tabs-modern::-webkit-scrollbar-thumb { border-radius: 6px; background: #65ae7c; }
+.explore-container--economia > .explore-tabs-modern > .explore-tab { flex: 0 0 auto !important; min-width: max-content; }
+.explore-container--economia .tab-content { width: min(1220px, calc(100vw - 32px)); max-width: 100%; min-width: 0; padding-left: 0; padding-right: 0; }
+.economia-intro { background: #eef7ec; border-color: #cfe3cf; }
+.economia-intro-mark { color: #a8cdb0; }
+.economia-sidebar { position: static; background: #f6faf5; }
+.economia-sidebar-divider { height: 1px; margin: 22px 0; background: var(--eco-border); }
+.economia-saved { background: #fff; color: var(--eco-text); border-color: #e1eae0; }
+.economia-saved:hover, .economia-saved.is-active { background: #e9f4e9; border-color: #79b58a; }
+.economia-icon-button { background: #e2f2e4; border-color: #b7d9bd; color: #286d41; }
+.economia-icon-button:hover { background: #d4ebd8; }
+.economia-text-button { color: #286d41; border-color: #83b993; }
+.economia-text-button:hover { color: #154b2b; }
+.economia-field-grid, .economia-cost-grid, .economia-results, .economia-projection-grid { min-width: 0; }
+.economia-field { min-width: 0; }
+.economia-field input, .economia-field select, .economia-input-wrap { min-width: 0; max-width: 100%; background: #f8fbf7; border-color: #c9dccb; color: var(--eco-text); }
+.economia-field input[readonly] { background: #ecf4eb; color: #4a6953; }
+.economia-input-wrap input { color: var(--eco-text); }
+.economia-input-wrap small, .economia-cost-index { color: #628b6c; }
+.economia-input-wrap input::placeholder { color: #879b8b; }
+.economia-cost-field { min-width: 0; color: var(--eco-text); grid-template-columns: 24px minmax(0, 1fr) minmax(102px, 128px); }
+.economia-cost-field > span:nth-child(2) { min-width: 0; overflow-wrap: anywhere; }
+.economia-panel-description { margin: -7px 0 20px; color: var(--eco-muted); font-size: .88rem; line-height: 1.5; }
+.economia-projection-hint { margin: 13px 0 0; color: #687d6c; font-size: .8rem; }
+.economia-money-hint { margin: -8px 0 16px; color: var(--eco-muted); font-size: .78rem; line-height: 1.45; }
+.economia .economia-input-wrap { gap: 6px; padding: 0 12px; border-radius: 10px; background: #f8fbf7; transition: border-color .15s ease, background .15s ease; }
+.economia .economia-input-wrap:focus-within { border-color: #79ae87; background: #f3faf2; box-shadow: none; }
+.economia .economia-input-wrap small { flex: 0 0 auto; color: #567b60; font-size: .78rem; font-weight: 800; }
+.economia .economia-money-input,
+.economia .economia-money-input:focus,
+.economia .economia-money-input:focus-visible {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  height: 39px;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  color: var(--eco-text);
+  text-align: right;
+  font-size: .93rem;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .01em;
+}
+.economia-feedback.is-error { background: #fff0ed; color: #a84437; }
+.economia-feedback.is-success { background: #e8f5e9; color: #246638; }
+.economia-delete { color: #a64039; }
+.economia-delete:hover { color: #732b27; }
+.economia-metric-primary { background: #e8f4e8; border-color: #badcbe; }
+.economia-metric-primary span, .economia-metric-primary small { color: #53725b; }
+.economia-metric strong, .economia-projection-item strong { min-width: 0; overflow-wrap: anywhere; }
+.economia-bar-track { background: #e2ede2; }
+.economia-bar-track div { background: #55a96d; }
+.economia-projection-results { min-width: 0; padding: 25px; border: 1px solid #b9dcc0; border-radius: 18px; background: #eef7ed; }
+.economia-projection-heading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6px 18px; margin-bottom: 18px; }
+.economia-projection-heading p { margin: 0; color: var(--eco-muted); font-size: .8rem; }
+.economia-projection-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.economia-projection-item { display: flex; flex-direction: column; min-width: 0; gap: 6px; padding: 18px; border: 1px solid #d5e8d3; border-radius: 12px; background: #fff; }
+.economia-projection-item span { color: var(--eco-muted); font-size: .78rem; font-weight: 700; }
+.economia-projection-item strong { color: var(--eco-text); font-size: clamp(1.3rem, 2.5vw, 2rem); line-height: 1.2; }
+.economia-projection-item small { color: var(--eco-muted); font-size: .78rem; }
+.economia-projection-item.is-positive strong { color: #227245; }
+.economia-projection-item.is-negative strong { color: #af453c; }
+.economia-projection-results > p { margin: 18px 0 0; color: #4a6953; font-size: .83rem; line-height: 1.5; }
+.economia-projection-results > p strong { color: var(--eco-text); }
+.economia-dialog { background: #fff; border-color: #d2ded0; }
+.economia-dialog button { background: #f2f6f0; border-color: #cbd9cc; color: var(--eco-text); }
+.economia-dialog .economia-dialog-danger { color: #fff; }
+@media (max-width: 900px) {
+  .economia-layout { grid-template-columns: minmax(0, 1fr); }
+  .economia-saved-list { scrollbar-width: thin; }
+}
+@media (max-width: 700px) {
+  .economia-intro { padding: 23px; }
+  .economia-panel-heading { align-items: flex-start; flex-wrap: wrap; }
+  .economia-field-grid, .economia-cost-grid, .economia-results, .economia-projection-grid { grid-template-columns: minmax(0, 1fr); }
+  .economia-cost-field { grid-template-columns: 22px minmax(0, 1fr) minmax(95px, 120px); gap: 7px; }
+  .economia-actions { flex-wrap: wrap; }
+}

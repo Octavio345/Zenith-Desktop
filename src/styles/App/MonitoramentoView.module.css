@@ -182,6 +182,31 @@
   text-align: left;
 }
 
+.serviceBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  padding: 7px 11px;
+  border: 1px solid rgba(128, 247, 184, 0.24);
+  border-radius: 999px;
+  background: rgba(3, 21, 13, 0.54);
+  color: #b7f7d1;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  backdrop-filter: blur(10px);
+}
+
+.serviceBadge > span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--g6);
+  box-shadow: 0 0 12px rgba(19, 236, 128, 0.75);
+}
+
 .hero .titulo {
   display: block;
   margin: 0 0 14px;
@@ -880,6 +905,16 @@
 .analysisStep:nth-child(2) :global(.material-symbols-outlined) { animation-delay: 0.33s; }
 .analysisStep:nth-child(3) :global(.material-symbols-outlined) { animation-delay: 0.66s; }
 
+.analysisStepActive {
+  color: #d9f9e7;
+}
+
+.analysisStepActive :global(.material-symbols-outlined) {
+  border-color: rgba(19, 236, 128, 0.58);
+  background: rgba(19, 236, 128, 0.16);
+  box-shadow: 0 0 16px rgba(19, 236, 128, 0.18);
+}
+
 @keyframes stepGlow {
   0%, 100% { box-shadow: 0 0 0 rgba(19, 236, 128, 0); }
   50% { box-shadow: 0 0 16px rgba(19, 236, 128, 0.34); }
@@ -1120,6 +1155,36 @@
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.imagemWrapperComparacao {
+  aspect-ratio: 16 / 9;
+  background: #07150d;
+}
+
+.imagemWrapperComparacao .imagemDisplay {
+  object-fit: contain;
+}
+
+.resultadoOrigem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 16px;
+  border-top: 1px solid #d8e5d7;
+  background: #f7fbf6;
+  color: #456052;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.resultadoOrigemPonto {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #2e6f46;
+  box-shadow: 0 0 0 4px rgba(46, 111, 70, 0.12);
 }
 
 .legenda {

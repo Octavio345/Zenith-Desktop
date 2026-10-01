@@ -2928,3 +2928,18 @@ body:has(.explore-container) .header-spacer {
     margin-top: 6px;
   }
 }
+
+/* Com vários módulos, a faixa deve rolar horizontalmente sem esticar os botões. */
+.explore-container > .explore-tabs-modern {
+  justify-content: flex-start;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(92, 180, 118, .7) transparent;
+}
+.explore-container > .explore-tabs-modern > .explore-tab {
+  flex: 0 0 auto !important;
+  min-width: max-content;
+}
+.explore-container > .explore-tabs-modern::-webkit-scrollbar { display: block; height: 6px; }
+.explore-container > .explore-tabs-modern::-webkit-scrollbar-thumb { border-radius: 6px; background: rgba(92, 180, 118, .7); }

@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useLocation } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
 import AppHeader from "../../components/App/Global/AppHeader"
@@ -11,8 +11,10 @@ import ClimaTab from "../../components/App/Explore/ClimaTab"
 import DiarioTab from "../../components/App/Explore/DiarioTab"
 import MapaTab from "../../components/App/Explore/MapaTab"
 import EstoqueTab from "../../components/App/Explore/EstoqueTab"
+import GestaoEconomicaTab from "../../components/App/Explore/GestaoEconomicaTab"
 import AtividadesTab from "../../components/App/Explore/AtividadesTab"
 import MonitoramentoView from "../../components/App/Explore/Monitoramento/MonitoramentoView"
+import CanaAnalysisView from "../../components/App/Explore/Cana/CanaAnalysisView"
 import LegislacaoDronesTab from "../../components/App/Explore/LegislacaoDronesTab"
 import ParticleBackground from "../../components/App/Home/ParticleBackground"
 import MouseGlow from "../../components/App/Home/MouseGlow"
@@ -22,10 +24,12 @@ const tabs = [
   { id: "diagnostico", label: "Análise IA", icon: "eco" },
   { id: "multiespectral", label: "Multiespectral", icon: "satellite_alt" },
   { id: "monitoramento", label: "Monitoramento", icon: "psychiatry" },
+  { id: "cana", label: "Cana IA", icon: "grass" },
   { id: "mapa", label: "Mapa", icon: "map" },
   { id: "clima", label: "Clima", icon: "cloud" },
   { id: "diario", label: "Diário", icon: "menu_book" },
   { id: "estoque", label: "Estoque", icon: "inventory" },
+  { id: "economia", label: "Gestão econômica", icon: "payments" },
   { id: "atividades", label: "Atividades", icon: "assignment" },
   { id: "legislacao", label: "Legislação", icon: "gavel" }
 ]
@@ -34,16 +38,19 @@ const tabContext = {
   diagnostico: ["Análise da soja por IA", "Use fotos para identificar possíveis problemas na soja. Confirme o resultado em campo."],
   multiespectral: ["Análise multiespectral", "Analise bandas de drone e priorize áreas para inspeção em campo."],
   monitoramento: ["Análise estrutural do plantio", "Monitore a lavoura de soja por imagens e visão computacional."],
+  cana: ["Integridade do estande de cana", "Localize possíveis falhas nas linhas e vegetação nas entrelinhas para priorizar vistorias."],
   clima: ["Clima da fazenda", "Condições atuais e previsão para apoiar decisões no campo."],
   diario: ["Diário de campo", "Registre ocorrências, observações e aprendizados da operação."],
   mapa: ["Mapa da propriedade", "Visualize áreas, talhões e pontos importantes da fazenda."],
   estoque: ["Estoque e insumos", "Controle entradas, saídas e níveis críticos com clareza."],
+  economia: ["Gestão econômica", "Estime os custos por hectare e o investimento de cada talhão."],
   atividades: ["Atividades", "Planeje tarefas e acompanhe a execução da equipe."],
   legislacao: ["Legislação de drones", "Consulte orientações para operar drones agrícolas com responsabilidade."],
 }
 
 export default function Explore() {
   const location = useLocation()
+  const tabsRef = useRef(null)
   const [activeTab, setActiveTab] = useState(() => {
     const savedTab = localStorage.getItem("activeExploreTab")
     return savedTab || "diagnostico"
@@ -69,6 +76,13 @@ export default function Explore() {
     localStorage.setItem("activeExploreTab", activeTab)
   }, [activeTab])
 
+  useEffect(() => {
+    const nav = tabsRef.current
+    const selected = Array.from(nav?.children || []).find((button) => button.getAttribute("aria-current") === "page")
+    if (!nav || !selected) return
+    nav.scrollTo({ left: selected.offsetLeft - (nav.clientWidth - selected.clientWidth) / 2, behavior: "smooth" })
+  }, [activeTab])
+
   const selectTab = (tabId) => {
     localStorage.setItem("activeExploreTab", tabId)
     setActiveTab(tabId)
@@ -85,6 +99,8 @@ export default function Explore() {
         return <MultispectralAnalysis />
       case "monitoramento":
         return <MonitoramentoView />
+      case "cana":
+        return <CanaAnalysisView />
       case "clima":
         return <ClimaTab />
       case "diario":
@@ -93,6 +109,8 @@ export default function Explore() {
         return <MapaTab />
       case "estoque":
         return <EstoqueTab />
+      case "economia":
+        return <GestaoEconomicaTab />
       case "atividades":
         return <AtividadesTab />
       case "legislacao":
@@ -135,7 +153,7 @@ export default function Explore() {
         </aside>
       </section>
 
-      <nav className="explore-tabs-modern" aria-label="Módulos do Explore">
+      <nav ref={tabsRef} className="explore-tabs-modern" aria-label="Módulos do Explore">
         {tabs.map((tab) => (
           <button
             key={tab.id}

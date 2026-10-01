@@ -34,11 +34,16 @@ async function loadImage(src, maxSize = 1800) {
 }
 
 export async function createAnalysisReport({ kind, result, images = [], context = {}, logoSrc = "/assets/image/Logo-redonda.webp" }) {
-  const monitor = kind === "monitoramento"
+  const caneAnalysis = kind === "cana"
+  const monitor = kind === "monitoramento" || caneAnalysis
   const doc = new jsPDF({ unit: "mm", format: "a4", compress: true })
   const generated = new Date()
   const logo = await loadImage(logoSrc)
-  const title = monitor ? "Relatório de Monitoramento da Plantação" : "Relatório de Triagem Fitossanitária"
+  const title = caneAnalysis
+    ? "Relatório de Análise da Cana-de-Açúcar"
+    : monitor
+      ? "Relatório de Monitoramento da Plantação"
+      : "Relatório de Triagem Fitossanitária"
   doc.setProperties({ title, author: context.userName || "Zenith", subject: "Análise computacional e confirmação em campo" })
   let y = 46
   function header() {
@@ -207,7 +212,7 @@ export async function createAnalysisReport({ kind, result, images = [], context 
       y = top + 23
     })
   }
-  header(); text(monitor ? "Monitoramento da plantação" : "Análise da saúde da soja", 23, true)
+  header(); text(caneAnalysis ? "Análise da cana-de-açúcar" : monitor ? "Monitoramento da plantação" : "Análise da saúde da soja", 23, true)
   text(monitor ? "RELATÓRIO DE ANÁLISE | ZENITH" : "RELATÓRIO DE TRIAGEM FITOSSANITÁRIA | ZENITH", 8, true)
   field("Gerado em", generated.toLocaleString("pt-BR"))
   field("Data da análise", context.analyzedAt)
@@ -217,8 +222,14 @@ export async function createAnalysisReport({ kind, result, images = [], context 
     field("Propriedade", context.farmName); field("Talhão", context.fieldAreaName); field("Emitido por", context.userName); field(context.documentLabel || "Documento", context.userDocument)
   }
   if (monitor) {
-    section("Comparação visual")
-    if (images[0]?.preview && result.overlay_image) {
+    const isCanaResult = result._apiVersion?.startsWith("zenith-cana-hf-")
+    section(caneAnalysis ? "Registro visual da análise da cana" : "Comparação visual")
+    if (isCanaResult && result.analysisSrc) {
+      await picture(images[0]?.preview, "Imagem original submetida à análise.")
+      await picture(result.analysisSrc, result.analysis_profile === "dossel_fechado"
+        ? "Mapa de vistoria: setores com cobertura abaixo da referência local do dossel."
+        : "Mapa de vistoria: zonas consolidadas para conferência no talhão.")
+    } else if (images[0]?.preview && result.overlay_image) {
       const comparison = await Promise.all([loadImage(images[0].preview), loadImage(`data:image/jpeg;base64,${result.overlay_image}`)])
       reserve(83)
       comparison.forEach((img, index) => {
@@ -236,10 +247,53 @@ export async function createAnalysisReport({ kind, result, images = [], context 
         reserve(8); doc.setFillColor(...color); doc.rect(16, y - 3, 3, 3, "F"); doc.setFontSize(9); doc.text(label, 22, y); y += 7
       }
     }
-    text("As regiões destacadas correspondem à análise visual da imagem e não representam, nesta versão, delimitação georreferenciada da área.", 9)
+    if (isCanaResult) {
+      section("Legenda do resultado")
+      const caneLegend = result.analysis_profile === "dossel_fechado"
+        ? [[[245,158,11],"Setores com cobertura abaixo da referência local"]]
+        : [[[255,66,66],"Zonas com possíveis descontinuidades próximas"]]
+      for (const [color, label] of caneLegend) {
+        reserve(8); doc.setFillColor(...color); doc.rect(16, y - 3, 3, 3, "F"); doc.setFontSize(9); doc.text(label, 22, y); y += 7
+      }
+      text("Os destaques são sinais visuais para orientar a vistoria. Não identificam espécies, causas ou necessidade de intervenção.", 9)
+    } else {
+      text("As regiões destacadas correspondem à análise visual da imagem e não representam, nesta versão, delimitação georreferenciada da área.", 9)
+    }
     reserve(106); section("Síntese da análise")
     // The legacy adapter supplies synthetic defaults. Do not export those as API measurements.
-    if (result._apiVersion !== "v1") {
+    if (isCanaResult) {
+      const closedCanopy = result.analysis_profile === "dossel_fechado"
+      field("Perfil da leitura", closedCanopy ? "Dossel fechado - uniformidade relativa" : "Fileiras visíveis - falhas do estande")
+      field("Qualidade da leitura", closedCanopy ? "Triagem relativa" : result.analysis_reliable ? "Validada" : result.analysis_usable ? "Assistida" : "Inconclusiva")
+      field("Cobertura vegetal aparente", percent(result.coverage, 100))
+      if (closedCanopy) {
+        field("Uniformidade relativa do dossel", percent(result.canopy_uniformity, 100))
+        field("Setores para conferência", result.inspection_region_count)
+        text("Com o dossel fechado, a imagem RGB não permite medir falhas por fileira. Os setores destacados destoam da referência da própria imagem e não determinam causa agronômica.", 9)
+      } else {
+        field("Zonas priorizadas para vistoria", result.analysis_usable ? result.inspection_region_count : null)
+        field("Participação das falhas na extensão analisada", result.analysis_usable ? percent(result.possible_gap_share, 100) : null)
+        field("Extensão acumulada das possíveis falhas", result.analysis_usable && numeric(result.possible_gap_length_meters) ? `${result.possible_gap_length_meters} m` : null)
+        field("Linhas com possível falha", result.analysis_usable ? result.rows_with_possible_gaps : null)
+        field("Fileiras identificadas", typeof result.rows?.detected === "boolean" ? result.rows.detected ? "Sim" : "Não" : null)
+        field("Quantidade estimada de fileiras", result.analysis_usable ? result.rows?.row_count : null)
+        field("Espaçamento mediano entre linhas", result.analysis_usable && numeric(result.median_row_spacing_meters) ? `${result.median_row_spacing_meters} m` : null)
+        field("Orientação dominante", result.analysis_usable && numeric(result.rows?.orientation_deg) ? `${result.rows.orientation_deg} graus` : null)
+        text("Possíveis falhas são descontinuidades visuais ao longo das linhas. Confirme tudo em campo.", 9)
+      }
+      if (Array.isArray(result.attention_regions) && result.attention_regions.length) {
+        section("Roteiro priorizado de vistoria")
+        result.attention_regions.forEach((region, index) => {
+          const number = region.inspection_id || index + 1
+          const location = region.region_type === "inspection_zone"
+            ? `Zona ${number} - ${region.affected_row_count || 1} ${(region.affected_row_count || 1) === 1 ? "fileira" : "fileiras"}`
+            : region.location_label || `Fileira ${Number(region.row_id || 0) + 1}`
+          const evidence = Math.round(region.visual_evidence_score || 0)
+          const impact = Math.round(region.impact_score || 0)
+          field(`Ponto ${String(number).padStart(2, "0")} - ${location}`, `evidência ${evidence}/100 | impacto ${impact}/100 | prioridade ${readable(region.visual_inspection_priority || "moderada")}`)
+        })
+      }
+    } else if (result._apiVersion !== "v1") {
       field("Cobertura vegetal", percent(result.coverage, 100)); field("Uniformidade", percent(result.uniformity, 100))
       field("Índice de baixa densidade", percent(result.failure_score, 100))
       field("Nível de atenção", present(result.failure_level) ? ({ ALTO: "Alta", MEDIO: "Moderada", BAIXO: "Baixa" }[result.failure_level] || readable(result.failure_level)) : null)
@@ -279,5 +333,6 @@ export async function createAnalysisReport({ kind, result, images = [], context 
   }
   const pad = n => String(n).padStart(2, "0")
   const stamp = `${generated.getFullYear()}-${pad(generated.getMonth()+1)}-${pad(generated.getDate())}_${pad(generated.getHours())}${pad(generated.getMinutes())}`
-  return { doc, filename: `Zenith_${monitor ? "Monitoramento_Plantacao" : "Triagem_Fitossanitaria"}_${stamp}.pdf` }
+  const reportName = caneAnalysis ? "Analise_Cana" : monitor ? "Monitoramento_Plantacao" : "Triagem_Fitossanitaria"
+  return { doc, filename: `Zenith_${reportName}_${stamp}.pdf` }
 }
