@@ -25,6 +25,7 @@ export default function CanaOverlayResult({ originalSrc, result }) {
   const [playing, setPlaying] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const [zoom, setZoom] = useState(1)
+  const [stageAspects, setStageAspects] = useState({})
   const analysisSrc = result?.analysisSrc || result?.analysisUrl || null
   const closedCanopy = result?.analysis_profile === "dossel_fechado"
 
@@ -38,19 +39,29 @@ export default function CanaOverlayResult({ originalSrc, result }) {
 
   const activeIndex = Math.max(0, stages.findIndex((stage) => stage.id === activeStageId))
   const activeStage = stages[activeIndex] || stages.at(-1)
-  const imageAspect = result?.source_dimensions?.width && result?.source_dimensions?.height
+  const reportedAspect = result?.source_dimensions?.width && result?.source_dimensions?.height
     ? `${result.source_dimensions.width} / ${result.source_dimensions.height}`
     : "4 / 3"
+  const imageAspect = stageAspects[activeStage?.id] || reportedAspect
   const detectedRows = Number(result?.rows?.row_count || 0)
   const recoveredRows = Number(result?.row_detection_summary?.periodic_recovered_rows || 0)
   const pipelineReady = ["mask", "rows", "intersections"].every((id) => stages.some((stage) => stage.id === id))
   const technicalStage = ["mask", "rows", "intersections"].includes(activeStage?.id)
 
   useEffect(() => {
-    const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
-    setActiveStageId(reduceMotion ? "result" : stages[0]?.id || "result")
-    setPlaying(!reduceMotion && stages.length > 1)
+    const finalStage = stages.find((stage) => stage.id === "result") || stages.at(-1)
+    setActiveStageId(finalStage?.id || "result")
+    setPlaying(false)
   }, [result, stages])
+
+  useEffect(() => {
+    const preloaders = stages.map((stage) => {
+      const image = new Image()
+      image.src = stage.src
+      return image
+    })
+    return () => preloaders.forEach((image) => { image.src = "" })
+  }, [stages])
 
   useEffect(() => {
     if (!playing || !stages.length) return undefined
@@ -89,6 +100,14 @@ export default function CanaOverlayResult({ originalSrc, result }) {
     setZoom(1)
     setExpanded(true)
   }
+  const rememberStageAspect = (event) => {
+    const { naturalWidth, naturalHeight } = event.currentTarget
+    if (!naturalWidth || !naturalHeight) return
+    const measuredAspect = `${naturalWidth} / ${naturalHeight}`
+    setStageAspects((current) => current[activeStage.id] === measuredAspect
+      ? current
+      : { ...current, [activeStage.id]: measuredAspect })
+  }
 
   return <>
     <section className={canaStyles.auditViewer} aria-label="Etapas da análise visual da cana">
@@ -108,7 +127,7 @@ export default function CanaOverlayResult({ originalSrc, result }) {
       </header>
 
       <div className={`${canaStyles.auditViewport} ${technicalStage ? canaStyles.auditViewportTechnical : ""}`} style={{ aspectRatio: imageAspect }}>
-        <img key={activeStage.id} src={activeStage.src} alt={activeStage.title} className={canaStyles.auditImage} loading="lazy" />
+        <img key={activeStage.id} src={activeStage.src} alt={activeStage.title} className={canaStyles.auditImage} onLoad={rememberStageAspect} />
         <div className={canaStyles.stageBadge}><span>{activeStage.index}</span><i className="material-symbols-outlined" aria-hidden="true">{activeStage.icon}</i>{activeStage.label}</div>
         <button type="button" className={canaStyles.expandImageButton} onClick={openExpanded} aria-label="Abrir etapa em resolução integral">
           <span className="material-symbols-outlined" aria-hidden="true">zoom_out_map</span><span>Resolução integral</span>

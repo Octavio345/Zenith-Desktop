@@ -34,8 +34,8 @@ const modules = [
     path: "/explore",
     tab: "cana",
     icon: "grass",
-    label: "Cana IA",
-    sublabel: "Falhas de estande",
+    label: "Canavial",
+    sublabel: "Fileiras e falhas de estande",
     type: "monitoring"
   },
   {

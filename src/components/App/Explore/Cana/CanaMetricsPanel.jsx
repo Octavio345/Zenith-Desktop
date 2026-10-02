@@ -16,7 +16,7 @@ function formatLength(region) {
   return "setor relativo"
 }
 
-function CanaMetricsPanel({ result }) {
+function CanaMetricsPanel({ result, hideMetrics = false }) {
   if (!result) return null
 
   const closedCanopy = result.analysis_profile === "dossel_fechado"
@@ -62,7 +62,7 @@ function CanaMetricsPanel({ result }) {
         </div>
       </header>
 
-      <div className={styles.metricGrid}>
+      {!hideMetrics && <div className={styles.metricGrid}>
         {closedCanopy ? <>
           <Metric icon="grass" label="Cobertura aparente" value={result.coverage == null ? "—" : `${Math.round(result.coverage * 100)}%`} detail="vegetação RGB detectada" />
           <Metric icon="donut_large" label="Uniformidade relativa" value={result.canopy_uniformity == null ? "—" : `${Math.round(result.canopy_uniformity * 100)}%`} detail="comparação dentro da imagem" />
@@ -72,7 +72,7 @@ function CanaMetricsPanel({ result }) {
           <Metric icon="location_searching" label="Zonas sinalizadas" value={usable ? regionCount : "—"} detail={usable && regionCount > 0 ? "sinais próximos agrupados" : usable ? "nenhum candidato" : "sem conclusão"} />
           <Metric icon="straighten" label="Extensão sinalizada" value={usable ? gapLength : "—"} detail={usable && !hasMeters ? "informe o GSD para obter metros" : usable ? "soma dos candidatos" : "sem escala confiável"} />
         </>}
-      </div>
+      </div>}
 
       {closedCanopy && <div className={styles.maturityBox}>
         <span className="material-symbols-outlined" aria-hidden="true">info</span>

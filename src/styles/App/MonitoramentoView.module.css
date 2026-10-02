@@ -689,6 +689,62 @@
   opacity: 0.68;
 }
 
+.containerUpload .uploadArea.uploadAreaCana {
+  gap: 10px;
+  margin: 0;
+  margin-bottom: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.containerUpload .uploadArea.uploadAreaCana:hover,
+.containerUpload .uploadArea.uploadAreaCana:focus-visible,
+.containerUpload .uploadArea.uploadAreaCana.uploadArea_arrastando {
+  border: 0;
+  transform: none;
+  box-shadow: none;
+}
+
+.uploadAreaCana .uploadDropZone {
+  min-height: 340px;
+  gap: 11px;
+  padding: 34px 24px;
+  border-color: #c3d5c6;
+  border-radius: 16px;
+  background: #f8faf7;
+}
+
+.uploadAreaCana .uploadDropZone:hover,
+.uploadAreaCana.uploadArea_arrastando .uploadDropZone {
+  border-color: #578b66;
+  background: #f1f6f0;
+}
+
+.uploadAreaCana .uploadDropZone .uploadVisual {
+  width: 78px;
+  height: 78px;
+  margin: 7px 0 9px;
+  border: 1px solid #bad1bf;
+  background: #e5f0e7;
+  box-shadow: none;
+}
+
+.uploadAreaCana .uploadDropZone .uploadVisual::before {
+  display: none;
+}
+
+.uploadAreaCana .uploadGlyph { width: 34px; height: 34px; }
+.uploadAreaCana .uploadDropZone .uploadTexto { font-size: .98rem; }
+.uploadAreaCana .uploadDropTitle { font-size: .78rem; }
+.uploadAreaCana .uploadDropZone .uploadDica { max-width: 42ch; font-size: .67rem; }
+.containerUpload .uploadAreaCana .uploadAcoes { grid-template-columns: auto auto; justify-content: end; gap: 8px; }
+.uploadAreaCana .uploadCancelar,
+.containerUpload .uploadAreaCana .uploadAcao { width: auto; min-width: 132px; min-height: 43px; border-radius: 11px; }
+.uploadAreaCana .uploadFileCard { border-radius: 15px; box-shadow: none; }
+
 @media (max-width: 860px) {
   .containerUpload {
     padding-inline: 16px;

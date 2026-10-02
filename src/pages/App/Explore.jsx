@@ -24,7 +24,7 @@ const tabs = [
   { id: "diagnostico", label: "Análise IA", icon: "eco" },
   { id: "multiespectral", label: "Multiespectral", icon: "satellite_alt" },
   { id: "monitoramento", label: "Monitoramento", icon: "psychiatry" },
-  { id: "cana", label: "Cana IA", icon: "grass" },
+  { id: "cana", label: "Canavial", icon: "grass" },
   { id: "mapa", label: "Mapa", icon: "map" },
   { id: "clima", label: "Clima", icon: "cloud" },
   { id: "diario", label: "Diário", icon: "menu_book" },

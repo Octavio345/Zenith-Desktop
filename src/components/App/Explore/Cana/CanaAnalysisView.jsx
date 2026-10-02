@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import ReportButton from "../ReportButton"
 import { useCanaAnalysis } from "../hooks/useCanaAnalysis"
@@ -32,6 +32,41 @@ export default function CanaAnalysisView() {
     : status === "queued"
       ? 1
       : 2
+  const loadingRef = useRef(null)
+  const resultRef = useRef(null)
+  const showEntry = !showResults && !loading
+  const dashboardStats = useMemo(() => {
+    if (!result) return []
+    const closedCanopy = result.analysis_profile === "dossel_fechado"
+    const regionCount = Array.isArray(result.attention_regions)
+      ? result.attention_regions.length
+      : Number(result.inspection_region_count || 0)
+    const rows = Number(result.rows?.row_count || 0)
+    const usable = result.analysis_usable === true
+    const reliable = result.analysis_reliable === true
+    const length = result.possible_gap_length_meters != null
+      ? `${result.possible_gap_length_meters} m`
+      : result.possible_gap_length_pixels
+        ? `${Math.round(result.possible_gap_length_pixels)} px`
+        : "—"
+    return [
+      { icon: reliable || closedCanopy ? "verified" : usable ? "manage_search" : "warning", label: "Qualidade da leitura", value: reliable || closedCanopy ? "Validada" : usable ? "Assistida" : "Inconclusiva", detail: reliable || closedCanopy ? "controles visuais aprovados" : usable ? "confirmar em campo" : "sem evidência suficiente" },
+      { icon: closedCanopy ? "grass" : "view_week", label: closedCanopy ? "Cobertura aparente" : "Fileiras reconhecidas", value: closedCanopy && result.coverage != null ? `${Math.round(result.coverage * 100)}%` : usable ? rows : "—", detail: closedCanopy ? "vegetação RGB detectada" : "estrutura reconstruída" },
+      { icon: "location_searching", label: "Zonas de vistoria", value: usable || closedCanopy ? regionCount : "—", detail: regionCount ? "priorizadas por evidência" : "nenhuma zona consolidada" },
+      { icon: "straighten", label: "Extensão sinalizada", value: usable ? length : "—", detail: result.possible_gap_length_meters != null ? "escala convertida em metros" : "medida visual na imagem" },
+    ]
+  }, [result])
+
+  useEffect(() => {
+    const target = loading ? loadingRef.current : showResults ? resultRef.current : null
+    if (!target) return undefined
+    const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    const frame = window.requestAnimationFrame(() => target.scrollIntoView({
+      behavior: reduceMotion ? "auto" : "smooth",
+      block: "start",
+    }))
+    return () => window.cancelAnimationFrame(frame)
+  }, [loading, showResults])
 
   const createFieldInspection = () => {
     const occurrence = createOccurrenceFromAnalysis({ result, source: "cana_ia" })
@@ -47,55 +82,58 @@ export default function CanaAnalysisView() {
   }
 
   return (
-    <div className={`${styles.container} ${!showResults ? styles.containerUpload : ""}`}>
-      {!showResults ? (
-        <section className={styles.hero} aria-labelledby="cana-analysis-title">
-          <div className={styles.cabecalho}>
-            <span className={styles.serviceBadge}>
-              <span aria-hidden="true" />
-              Visão computacional · Zenith Cana
-            </span>
-            <h2 id="cana-analysis-title" className={styles.titulo}>Análise da Cana-de-Açúcar</h2>
-            <p className={styles.subtitulo}>
-              Audite fileiras em cana jovem e localize manchas de cobertura quando o dossel já estiver fechado
-            </p>
+    <div className={`${styles.container} ${showEntry ? styles.containerUpload : ""} ${canaStyles.canaFlow}`}>
+      {showEntry && (
+        <section className={canaStyles.entryShell} aria-labelledby="cana-analysis-title">
+          <div className={canaStyles.entryIntro}>
+            <span className={canaStyles.entryBadge}><i aria-hidden="true" />ZENITH CANA · VISÃO DE CAMPO</span>
+            <h2 id="cana-analysis-title">Análise estrutural do canavial</h2>
+            <p>Transforme uma imagem aérea em um roteiro visual de conferência das fileiras e possíveis interrupções do estande.</p>
+            <div className={canaStyles.entryCapabilities} aria-label="Etapas da análise">
+              <div><span className="material-symbols-outlined" aria-hidden="true">contrast</span><strong>Separação visual</strong><small>Vegetação e solo</small></div>
+              <div><span className="material-symbols-outlined" aria-hidden="true">view_week</span><strong>Leitura das fileiras</strong><small>Direção e continuidade</small></div>
+              <div><span className="material-symbols-outlined" aria-hidden="true">location_searching</span><strong>Mapa de vistoria</strong><small>Pontos para conferir</small></div>
+            </div>
+            <div className={canaStyles.captureNote}>
+              <span className="material-symbols-outlined" aria-hidden="true">photo_camera</span>
+              <p><strong>Para uma leitura melhor</strong><small>Use imagem aérea apontada para baixo, com boa nitidez e fileiras visíveis.</small></p>
+            </div>
+          </div>
+          <div className={canaStyles.entryUpload}>
+            <header><span>NOVA ANÁLISE</span><strong>Imagem aérea do talhão</strong><small>O arquivo só será enviado quando você confirmar a análise.</small></header>
+            <UploadImage onSelect={analyze} disabled={loading} validateFile={validateCanaImage} variant="cana" />
           </div>
         </section>
-      ) : (
-        <div className={styles.cabecalho}>
-          <h2 className={styles.titulo}>Resultado da análise da cana</h2>
-          <p className={styles.subtitulo}>Percorra cada etapa da leitura e confira como o mapa de campo foi construído.</p>
-        </div>
-      )}
-
-      {!showResults && (
-        <UploadImage onSelect={analyze} disabled={loading} validateFile={validateCanaImage} />
       )}
 
       {loading && (
-        <div className={canaStyles.loadingShell} aria-live="polite">
-          <div className={canaStyles.loadingVisual} aria-hidden="true">
-            <div className={canaStyles.fieldRows}>
-              <span /><span /><span /><span /><span /><span />
+        <section ref={loadingRef} className={canaStyles.loadingShell} aria-live="polite" tabIndex="-1">
+          <header className={canaStyles.loadingHeader}>
+            <span className={canaStyles.loadingStatusIcon} aria-hidden="true"><span className="material-symbols-outlined">progress_activity</span></span>
+            <div><span className={canaStyles.loadingEyebrow}>PROCESSAMENTO EM ANDAMENTO</span><h2>{statusCopy[0]}</h2><p>{statusCopy[1]}</p></div>
+          </header>
+          <div className={canaStyles.loadingBody}>
+            <div className={canaStyles.loadingPreview} aria-hidden="true">
+              <div className={canaStyles.loadingPreviewHeader}><span>Imagem recebida</span><small>pré-visualização</small></div>
+              <div className={canaStyles.loadingPreviewCanvas}>
+                {preview && <img src={preview} alt="" />}
+              </div>
+              <div className={canaStyles.loadingPreviewFooter}><i /><span>Arquivo recebido e preservado na resolução original</span></div>
             </div>
-            <div className={canaStyles.drone}><span className="material-symbols-outlined">flight</span></div>
-            <div className={canaStyles.scanBeam} />
-          </div>
-          <div className={canaStyles.loadingCopy}>
-            <span className={canaStyles.loadingEyebrow}>ZENITH CANA · TRIAGEM DE ESTANDE</span>
-            <h3>{statusCopy[0]}</h3>
-            <p>{statusCopy[1]}</p>
+            <div className={canaStyles.loadingCopy}>
+              <span className={canaStyles.loadingStepLabel}>ETAPAS DA ANÁLISE</span>
             <div className={canaStyles.loadingSteps}>
-              {["Receber imagem", "Reconstruir fileiras", "Montar vistoria"].map((label, index) => (
+              {["Preparar imagem", "Reconstruir fileiras", "Montar mapa de vistoria"].map((label, index) => (
                 <div key={label} className={`${canaStyles.loadingStep} ${statusStage >= index ? canaStyles.loadingStepActive : ""}`}>
-                  <span>{statusStage > index ? "check" : index + 1}</span>{label}
+                  <span className="material-symbols-outlined">{statusStage > index ? "check" : statusStage === index ? "progress_activity" : "schedule"}</span><strong>{label}</strong><small>{statusStage > index ? "Concluída" : statusStage === index ? "Em andamento" : "Aguardando"}</small>
                 </div>
               ))}
             </div>
-            <div className={canaStyles.loadingProgress} aria-hidden="true"><span /></div>
-            <small>O sistema pode recusar a medição quando a imagem não mostrar fileiras com clareza.</small>
+            <div className={canaStyles.loadingActivity}><i aria-hidden="true" /><span>{statusCopy[1]}</span></div>
+              <p className={canaStyles.loadingNote}><span className="material-symbols-outlined" aria-hidden="true">info</span>Se a imagem não tiver evidência visual suficiente, o sistema retornará uma leitura inconclusiva em vez de inventar fileiras.</p>
+            </div>
           </div>
-        </div>
+        </section>
       )}
 
       {error && !loading && (
@@ -110,24 +148,36 @@ export default function CanaAnalysisView() {
       )}
 
       {showResults && (
-        <div className={styles.resultados}>
-          <AlertBanner alerta={interpretation.alertaPrincipal} />
-          <div className={styles.resultadosGrid}>
-            <div className={styles.colunaImagem}><CanaOverlayResult originalSrc={preview} result={result} /></div>
-            <div className={styles.colunaMetricas}><CanaMetricsPanel result={result} insights={interpretation.insights} /></div>
-          </div>
-          <div className={`${styles.acoesResultado} ${(!result.analysis_usable || result.inspection_region_count <= 0) ? canaStyles.twoActions : ""}`} aria-label="Ações do resultado">
-            <button type="button" className={`${styles.botaoResultado} ${styles.botaoResultadoPrimario}`} onClick={reset}>
-              <span className="material-symbols-outlined" aria-hidden="true">refresh</span>Analisar nova imagem
-            </button>
-            <div className={styles.acaoRelatorio}>
-              <ReportButton kind="cana" result={result} images={[{ preview }]} className={`${styles.botaoResultado} ${styles.botaoResultadoSecundario}`} />
+        <div ref={resultRef} className={`${styles.resultados} ${canaStyles.resultSection}`} tabIndex="-1">
+          <header className={canaStyles.resultHeader}>
+            <div><span>ANÁLISE CONCLUÍDA</span><h2>Dashboard de leitura do canavial</h2><p>Visão operacional, evidências visuais e roteiro de vistoria em uma única tela.</p></div>
+            <div className={canaStyles.resultHeaderControls}>
+              <span className={canaStyles.resultStatus}><i aria-hidden="true" />Processamento finalizado</span>
+              <div className={`${styles.acoesResultado} ${canaStyles.resultActions}`} aria-label="Ações do resultado">
+                <button type="button" className={`${styles.botaoResultado} ${styles.botaoResultadoPrimario} ${canaStyles.resultActionButton}`} onClick={reset}>
+                  <span className="material-symbols-outlined" aria-hidden="true">refresh</span>Nova análise
+                </button>
+                <div className={`${styles.acaoRelatorio} ${canaStyles.resultReport}`}>
+                  <ReportButton kind="cana" result={result} images={[{ preview }]} className={`${styles.botaoResultado} ${styles.botaoResultadoSecundario} ${canaStyles.resultActionButton}`} />
+                </div>
+                {result.analysis_usable && result.inspection_region_count > 0 && (
+                  <button type="button" className={`${styles.botaoResultado} ${styles.botaoResultadoVistoria} ${canaStyles.resultActionButton}`} onClick={createFieldInspection}>
+                    <span className="material-symbols-outlined" aria-hidden="true">assignment_add</span>Criar vistoria
+                  </button>
+                )}
+              </div>
             </div>
-            {result.analysis_usable && result.inspection_region_count > 0 && (
-              <button type="button" className={`${styles.botaoResultado} ${styles.botaoResultadoVistoria}`} onClick={createFieldInspection}>
-                <span className="material-symbols-outlined" aria-hidden="true">assignment_add</span>Criar tarefa de vistoria
-              </button>
-            )}
+          </header>
+          <AlertBanner alerta={interpretation.alertaPrincipal} />
+          <section className={canaStyles.dashboardKpis} aria-label="Resumo da análise">
+            {dashboardStats.map((stat) => <article key={stat.label}>
+              <span className="material-symbols-outlined" aria-hidden="true">{stat.icon}</span>
+              <div><small>{stat.label}</small><strong>{stat.value}</strong><p>{stat.detail}</p></div>
+            </article>)}
+          </section>
+          <div className={canaStyles.dashboardGrid}>
+            <div className={styles.colunaImagem}><CanaOverlayResult originalSrc={preview} result={result} /></div>
+            <div className={styles.colunaMetricas}><CanaMetricsPanel result={result} insights={interpretation.insights} hideMetrics /></div>
           </div>
         </div>
       )}

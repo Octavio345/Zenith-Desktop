@@ -1162,6 +1162,93 @@ html,body,button,input,select,textarea,h1,h2,h3,h4,h5,h6,p,a,label,strong,small,
   }
 }
 
+/* Navegação do Explore: distribuição equilibrada sem cortar nomes longos. */
+@media (min-width: 1280px) {
+  .explore-container > .explore-tabs-modern {
+    display: grid !important;
+    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+    padding: 8px !important;
+    overflow: visible !important;
+  }
+
+  .explore-container > .explore-tabs-modern > .explore-tab {
+    grid-column: span 2;
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 46px !important;
+    height: 46px !important;
+    padding-inline: 12px !important;
+  }
+
+  .explore-container > .explore-tabs-modern > .explore-tab:nth-child(7) {
+    grid-column: 2 / span 2;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1279px) {
+  .explore-container > .explore-tabs-modern {
+    display: grid !important;
+    grid-template-columns: repeat(8, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+    padding: 8px !important;
+    overflow: visible !important;
+  }
+
+  .explore-container > .explore-tabs-modern > .explore-tab {
+    grid-column: span 2;
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 46px !important;
+    height: 46px !important;
+    padding-inline: 10px !important;
+  }
+
+  .explore-container > .explore-tabs-modern > .explore-tab:nth-child(9) {
+    grid-column: 2 / span 2;
+  }
+}
+
+@media (max-width: 760px) {
+  .explore-container > .explore-tabs-modern {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    gap: 7px !important;
+    padding: 8px 14px 10px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+
+  .explore-container > .explore-tabs-modern::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .explore-container > .explore-tabs-modern > .explore-tab {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: 126px !important;
+    min-height: 44px !important;
+    height: 44px !important;
+    padding-inline: 13px !important;
+    scroll-snap-align: center;
+  }
+
+  .explore-container > .explore-tabs-modern .explore-tab-icon {
+    display: inline-flex !important;
+    font-size: 16px !important;
+  }
+
+  .explore-container > .explore-tabs-modern .explore-tab-label {
+    overflow: hidden;
+    font-size: .72rem !important;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
 /* Academic origin: the logos remain protected in individual light cards while
    the section continues the footer's green visual language. */
 .zenith-footer__institutional {

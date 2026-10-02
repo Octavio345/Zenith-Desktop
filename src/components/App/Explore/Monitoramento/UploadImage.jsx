@@ -34,7 +34,7 @@ function UploadGlyph({ loading = false }) {
   )
 }
 
-export default function UploadImage({ onSelect, disabled, validateFile = validarArquivo }) {
+export default function UploadImage({ onSelect, disabled, validateFile = validarArquivo, variant = "default" }) {
   const [arrastando, setArrastando] = useState(false)
   const [arquivo, setArquivo] = useState(null)
   const [erroArquivo, setErroArquivo] = useState("")
@@ -107,6 +107,7 @@ export default function UploadImage({ onSelect, disabled, validateFile = validar
     <section
       className={[
         styles.uploadArea,
+        variant === "cana" ? styles.uploadAreaCana : "",
         arrastando ? styles.uploadArea_arrastando : "",
         disabled ? styles.uploadArea_desabilitado : "",
       ].filter(Boolean).join(" ")}
@@ -115,22 +116,24 @@ export default function UploadImage({ onSelect, disabled, validateFile = validar
       onDrop={handleDrop}
       aria-busy={disabled}
     >
-      <label
-        className={styles.uploadDropZone}
-        htmlFor={inputId}
-        onClick={(event) => disabled && event.preventDefault()}
-      >
-        <span className={styles.uploadTexto}>Envie a imagem das fileiras</span>
-        <span className={styles.uploadVisual} aria-hidden="true">
-          <UploadGlyph loading={disabled} />
-        </span>
-        <span className={styles.uploadDropTitle}>
-          {arrastando ? "Solte a imagem aqui" : "Arraste ou selecione uma imagem"}
-        </span>
-        <span className={styles.uploadDica}>
-          JPG, PNG ou WebP, até 50 MB. Prefira fotos aéreas em alta resolução.
-        </span>
-      </label>
+      {(!arquivo || variant !== "cana") && (
+        <label
+          className={styles.uploadDropZone}
+          htmlFor={inputId}
+          onClick={(event) => disabled && event.preventDefault()}
+        >
+          <span className={styles.uploadTexto}>Envie a imagem das fileiras</span>
+          <span className={styles.uploadVisual} aria-hidden="true">
+            <UploadGlyph loading={disabled} />
+          </span>
+          <span className={styles.uploadDropTitle}>
+            {arrastando ? "Solte a imagem aqui" : "Arraste ou selecione uma imagem"}
+          </span>
+          <span className={styles.uploadDica}>
+            JPG, PNG ou WebP, até 50 MB. Prefira fotos aéreas em alta resolução.
+          </span>
+        </label>
+      )}
 
       <input
         id={inputId}
