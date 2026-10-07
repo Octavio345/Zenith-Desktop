@@ -1181,9 +1181,6 @@ html,body,button,input,select,textarea,h1,h2,h3,h4,h5,h6,p,a,label,strong,small,
     padding-inline: 12px !important;
   }
 
-  .explore-container > .explore-tabs-modern > .explore-tab:nth-child(7) {
-    grid-column: 2 / span 2;
-  }
 }
 
 @media (min-width: 761px) and (max-width: 1279px) {
@@ -1204,9 +1201,6 @@ html,body,button,input,select,textarea,h1,h2,h3,h4,h5,h6,p,a,label,strong,small,
     padding-inline: 10px !important;
   }
 
-  .explore-container > .explore-tabs-modern > .explore-tab:nth-child(9) {
-    grid-column: 2 / span 2;
-  }
 }
 
 @media (max-width: 760px) {

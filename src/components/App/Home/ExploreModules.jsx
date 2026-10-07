@@ -75,6 +75,15 @@ const modules = [
     type: "stock"
   },
   {
+    id: "produtividade",
+    path: "/explore",
+    tab: "produtividade",
+    icon: "monitoring",
+    label: "Estimativa de Produtividade",
+    sublabel: "Soja e trigo por talhão",
+    type: "monitoring"
+  },
+  {
     id: "atividades",
     path: "/explore",
     tab: "atividades",

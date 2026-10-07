@@ -12,6 +12,7 @@ import DiarioTab from "../../components/App/Explore/DiarioTab"
 import MapaTab from "../../components/App/Explore/MapaTab"
 import EstoqueTab from "../../components/App/Explore/EstoqueTab"
 import GestaoEconomicaTab from "../../components/App/Explore/GestaoEconomicaTab"
+import ProdutividadeTab from "../../components/App/Explore/ProdutividadeTab"
 import AtividadesTab from "../../components/App/Explore/AtividadesTab"
 import MonitoramentoView from "../../components/App/Explore/Monitoramento/MonitoramentoView"
 import CanaAnalysisView from "../../components/App/Explore/Cana/CanaAnalysisView"
@@ -30,6 +31,7 @@ const tabs = [
   { id: "diario", label: "Diário", icon: "menu_book" },
   { id: "estoque", label: "Estoque", icon: "inventory" },
   { id: "economia", label: "Gestão econômica", icon: "payments" },
+  { id: "produtividade", label: "Estimativa de Produtividade", icon: "monitoring" },
   { id: "atividades", label: "Atividades", icon: "assignment" },
   { id: "legislacao", label: "Legislação", icon: "gavel" }
 ]
@@ -44,6 +46,7 @@ const tabContext = {
   mapa: ["Mapa da propriedade", "Visualize áreas, talhões e pontos importantes da fazenda."],
   estoque: ["Estoque e insumos", "Controle entradas, saídas e níveis críticos com clareza."],
   economia: ["Gestão econômica", "Estime os custos por hectare e o investimento de cada talhão."],
+  produtividade: ["Estimativa de Produtividade", "Estime soja e trigo a partir de dados coletados no talhão."],
   atividades: ["Atividades", "Planeje tarefas e acompanhe a execução da equipe."],
   legislacao: ["Legislação de drones", "Consulte orientações para operar drones agrícolas com responsabilidade."],
 }
@@ -53,19 +56,19 @@ export default function Explore() {
   const tabsRef = useRef(null)
   const [activeTab, setActiveTab] = useState(() => {
     const savedTab = localStorage.getItem("activeExploreTab")
-    return savedTab || "diagnostico"
+    return tabs.some((tab) => tab.id === savedTab) ? savedTab : "diagnostico"
   })
 
 
   useEffect(() => {
 
-    if (location.state?.activeTab) {
+    if (tabs.some((tab) => tab.id === location.state?.activeTab)) {
       setActiveTab(location.state.activeTab)
       localStorage.setItem("activeExploreTab", location.state.activeTab)
     } else {
 
       const savedTab = localStorage.getItem("activeExploreTab")
-      if (savedTab && savedTab !== activeTab) {
+      if (tabs.some((tab) => tab.id === savedTab) && savedTab !== activeTab) {
         setActiveTab(savedTab)
       }
     }
@@ -111,6 +114,8 @@ export default function Explore() {
         return <EstoqueTab />
       case "economia":
         return <GestaoEconomicaTab />
+      case "produtividade":
+        return <ProdutividadeTab onOpenMap={() => selectTab("mapa")} />
       case "atividades":
         return <AtividadesTab />
       case "legislacao":

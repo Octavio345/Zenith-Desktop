@@ -1,0 +1,95 @@
+.explore-container--produtividade .explore-bg-image { background: #080f0c; animation: none; filter: none; }
+.explore-container--produtividade .explore-atmosphere::after { background: none; }
+.explore-container--produtividade .explore-grid-overlay,
+.explore-container--produtividade .explore-circuit-layer,
+.explore-container--produtividade .background-canvas,
+.explore-container--produtividade .mouse-glow { display: none; }
+.explore-container--produtividade > .explore-heading {
+  width: min(1220px, calc(100vw - 32px)); max-width: 100%; min-width: 0;
+  background: #eaf4e8; border: 1px solid #c8dfc8;
+  box-shadow: 0 14px 34px rgba(22, 66, 34, .1); color: #173c29;
+}
+.explore-container--produtividade > .explore-heading p { color: #597362; }
+.explore-container--produtividade > .explore-heading > div > span { color: #357a49; }
+.explore-container--produtividade > .explore-heading aside { min-width: 0; max-width: 100%; background: #fff; border-color: #d2e4d0; }
+.explore-container--produtividade > .explore-heading aside small { color: #6a836f; }
+.explore-container--produtividade > .explore-heading aside strong { display: block; color: #214d31; overflow-wrap: anywhere; }
+.explore-container--produtividade .explore-tabs-modern { width: min(1220px, calc(100vw - 32px)); max-width: 100%; background: #102319; }
+.explore-container--produtividade .explore-tab.active { background: #4ed88e; box-shadow: none; }
+.explore-container--produtividade .tab-content { width: min(1220px, calc(100vw - 32px)); max-width: 100%; min-width: 0; padding-left: 0; padding-right: 0; }
+.produtividade { width: 100%; }
+.produtividade-layout { display: grid; grid-template-columns: minmax(0, 1fr) 270px; gap: 18px; align-items: start; }
+.produtividade-main { display: grid; gap: 16px; min-width: 0; }
+.produtividade .economia-intro { background: #eef7ec; border-color: #cfe3cf; }
+.produtividade .economia-intro-mark { color: #a8cdb0; }
+.produtividade .economia-panel, .produtividade .economia-sidebar { background: #fff; }
+.produtividade .economia-panel { min-width: 0; }
+.produtividade .economia-field input, .produtividade .economia-field select { background: #f8fbf7; border-color: #c9dccb; color: #173c29; }
+.produtividade .economia-metric-primary { background: #e8f4e8; border-color: #badcbe; }
+.produtividade .economia-metric-primary span, .produtividade .economia-metric-primary small { color: #53725b; }
+.produtividade .economia-feedback.is-error { background: #fff0ed; color: #a84437; }
+.produtividade .economia-feedback.is-success { background: #e8f5e9; color: #246638; }
+.produtividade .economia-save:disabled { opacity: .48; cursor: not-allowed; }
+.produtividade-state { color: var(--eco-muted); }
+.produtividade-empty { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; color: var(--eco-text); }
+.produtividade-empty > .material-symbols-outlined { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 12px; background: #e8f4e8; color: #287447; }
+.produtividade-empty > div { flex: 1; min-width: 180px; }
+.produtividade-empty p { margin: 4px 0 0; color: var(--eco-muted); font-size: .85rem; }
+.produtividade-plot-meta { display: flex; flex-wrap: wrap; gap: 12px 25px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--eco-border); }
+.produtividade-plot-meta span { display: grid; gap: 3px; min-width: 110px; }
+.produtividade-plot-meta small { color: var(--eco-muted); font-size: .73rem; }
+.produtividade-plot-meta strong { color: var(--eco-text); font-size: .9rem; overflow-wrap: anywhere; }
+.produtividade-crops { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.produtividade-crop { display: flex; align-items: center; gap: 11px; min-height: 68px; padding: 13px 16px; text-align: left; border: 1px solid #d7e6d6; border-radius: 12px; background: #f8fbf7; color: #173c29; cursor: pointer; font: inherit; }
+.produtividade-crop:hover, .produtividade-crop.is-active { border-color: #79b58a; background: #e9f4e9; }
+.produtividade-crop.is-active { box-shadow: inset 0 0 0 1px #79b58a; }
+.produtividade-crop .material-symbols-outlined { color: #287447; }
+.produtividade-crop strong { font-size: .95rem; }
+.produtividade-mode { display: flex; flex-wrap: wrap; gap: 8px; margin: -3px 0 18px; }
+.produtividade-mode button, .produtividade-secondary { min-height: 39px; padding: 8px 13px; border: 1px solid #c9dccb; border-radius: 9px; background: #f8fbf7; color: #286d41; font: inherit; font-size: .82rem; font-weight: 700; cursor: pointer; }
+.produtividade-mode button:hover, .produtividade-mode button.is-active, .produtividade-secondary:hover { background: #e9f4e9; border-color: #79b58a; }
+.produtividade-number-hint { margin: -4px 0 15px; color: var(--eco-muted); font-size: .77rem; line-height: 1.4; }
+.produtividade-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 16px; }
+.produtividade-field { min-width: 0; }
+.produtividade-field-heading { display: flex; align-items: center; gap: 6px; min-height: 26px; margin-bottom: 7px; color: var(--eco-muted); font-size: .8rem; font-weight: 700; }
+.produtividade-field-heading label { cursor: pointer; }
+.produtividade-info { position: relative; }
+.produtividade-info summary { display: flex; color: #628b6c; cursor: pointer; list-style: none; }
+.produtividade-info summary::-webkit-details-marker { display: none; }
+.produtividade-info .material-symbols-outlined { font-size: 16px; }
+.produtividade-info p { position: absolute; z-index: 5; top: 24px; left: -60px; width: min(245px, 70vw); padding: 10px 12px; border: 1px solid #c9dccb; border-radius: 9px; background: #fff; box-shadow: 0 8px 22px rgba(22, 66, 34, .13); color: #3d6048; font-size: .76rem; font-weight: 500; line-height: 1.4; }
+.produtividade-input-wrap { display: flex; align-items: center; min-height: 46px; border: 1px solid #c9dccb; border-radius: 9px; background: #f8fbf7; }
+.produtividade-input-wrap:focus-within { border-color: #79ae87; box-shadow: 0 0 0 3px rgba(85, 209, 139, .12); }
+.produtividade-input-wrap input { flex: 1; width: 100%; min-width: 0; height: 44px; padding: 0 12px; border: 0; outline: 0; background: transparent; color: #173c29; font: inherit; font-size: .92rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.produtividade-input-wrap span { flex: 0 0 auto; padding-right: 12px; color: #628b6c; font-size: .77rem; font-weight: 700; }
+.produtividade-sampling { margin-top: 20px; border-top: 1px solid var(--eco-border); padding-top: 15px; color: #286d41; font-size: .83rem; }
+.produtividade-sampling summary { width: fit-content; cursor: pointer; font-weight: 700; }
+.produtividade-sampling ol { display: grid; gap: 5px; margin: 12px 0 0 20px; color: var(--eco-muted); line-height: 1.45; }
+.produtividade .economia-feedback { margin-top: 15px; }
+.produtividade-result { display: grid; gap: 16px; }
+.produtividade-result .economia-panel-heading { margin-bottom: 0; }
+.produtividade-status { color: #287447; font-size: .75rem; font-weight: 700; }
+.produtividade-result-hero { padding: 24px; border: 1px solid #badcbe; border-radius: 14px; background: #e8f4e8; }
+.produtividade-result-hero > span { color: #53725b; font-size: .76rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.produtividade-result-hero strong { display: block; margin: 5px 0; color: #173c29; font-size: clamp(2.2rem, 5vw, 3.8rem); letter-spacing: -.05em; line-height: 1.12; overflow-wrap: anywhere; }
+.produtividade-result-hero strong small { font-size: .42em; letter-spacing: 0; }
+.produtividade-result-hero p { color: #53725b; font-size: 1rem; font-weight: 700; }
+.produtividade .economia-results { gap: 12px; }
+.produtividade .economia-metric { padding: 19px; }
+.produtividade .economia-metric strong { font-size: clamp(1.25rem, 2.2vw, 1.8rem); }
+.produtividade-breakdown { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding-top: 15px; border-top: 1px solid var(--eco-border); }
+.produtividade-breakdown > div { display: grid; gap: 4px; min-width: 0; }
+.produtividade-breakdown span, .produtividade-breakdown small { color: var(--eco-muted); font-size: .75rem; }
+.produtividade-breakdown strong { color: var(--eco-text); font-size: 1rem; overflow-wrap: anywhere; }
+.produtividade-method { color: var(--eco-muted); font-size: .77rem; line-height: 1.5; }
+.produtividade-history { background: #f6faf5 !important; }
+.produtividade-history h3 { margin-bottom: 15px; }
+.produtividade-history ol { list-style: none; display: grid; gap: 8px; }
+.produtividade-history li { display: grid; gap: 3px; padding: 12px; border: 1px solid #e1eae0; border-radius: 10px; background: #fff; }
+.produtividade-history li span { color: var(--eco-muted); font-size: .73rem; }
+.produtividade-history li strong { color: var(--eco-text); font-size: .83rem; }
+.produtividade-history li b { color: #287447; font-size: 1rem; }
+.produtividade :focus-visible { outline: 2px solid #287447; outline-offset: 2px; }
+.produtividade .produtividade-input-wrap input:focus-visible { outline: 0; box-shadow: none; }
+@media (max-width: 900px) { .produtividade-layout { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 640px) { .produtividade .economia-intro { padding: 23px; } .produtividade .economia-intro-mark { display: none; } .produtividade .economia-panel { padding: 20px; } .produtividade-fields, .produtividade .economia-results, .produtividade-breakdown { grid-template-columns: minmax(0, 1fr); } .produtividade-result-hero { padding: 18px; } }
