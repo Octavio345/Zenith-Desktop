@@ -1138,3 +1138,278 @@
 .result-disease {
   color: #3f7f56 !important;
 }
+
+.diagnostic-container .option-card:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.diagnostic-container .option-card:disabled:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: var(--border-muted);
+}
+
+.diagnosis-loading {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 0 30px;
+  align-items: center;
+  width: min(790px, calc(100% - 32px));
+  margin: 34px auto 70px;
+  padding: clamp(24px, 4vw, 38px);
+  border: 1px solid #d9e6d6;
+  border-radius: 28px;
+  color: #173326;
+  background: #f7faf5;
+  box-shadow: 0 20px 50px rgba(39, 78, 48, 0.10);
+}
+
+.diagnosis-loading__scene {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 210px;
+  height: 210px;
+}
+
+.diagnosis-loading__rings,
+.diagnosis-loading__rings i {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(46, 111, 70, 0.20);
+  border-radius: 50%;
+}
+
+.diagnosis-loading__rings i:nth-child(2) { inset: 18px; }
+.diagnosis-loading__rings i:nth-child(3) { inset: 36px; }
+
+.diagnosis-loading__crop {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 146px;
+  height: 146px;
+  overflow: hidden;
+  border: 7px solid #fff;
+  border-radius: 50%;
+  background: #dfeedd;
+  box-shadow: 0 14px 32px rgba(32, 83, 47, 0.14);
+}
+
+.diagnosis-loading__crop img {
+  width: 125%;
+  height: 125%;
+  margin: -8% 0 0 -12%;
+  object-fit: contain;
+}
+
+.diagnosis-loading__crop--wheat {
+  background: #e5f0de;
+}
+
+.diagnosis-loading__crop--wheat > .material-symbols-outlined {
+  color: #3f7f56;
+  font-size: 82px;
+  font-variation-settings: "FILL" 1;
+}
+
+.diagnosis-loading__scan {
+  position: absolute;
+  top: 18px;
+  right: 8px;
+  left: 8px;
+  height: 2px;
+  background: #4b9964;
+  box-shadow: 0 0 10px rgba(75, 153, 100, 0.45);
+  animation: diagnosisScan 2.4s ease-in-out infinite alternate;
+}
+
+.diagnosis-loading__orbit {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #cfe2cb;
+  border-radius: 11px;
+  color: #397c51;
+  background: #fff;
+  font-size: 19px;
+}
+
+.diagnosis-loading__orbit--one { top: 14px; right: 13px; }
+.diagnosis-loading__orbit--two { bottom: 20px; left: 6px; }
+
+.diagnosis-loading__eyebrow {
+  color: #3e8258;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+}
+
+.diagnosis-loading h2 {
+  margin: 8px 0 10px;
+  color: #173d2b;
+  font: 800 clamp(1.8rem, 3.5vw, 2.55rem)/1.1 Georgia, "Times New Roman", serif;
+}
+
+.diagnosis-loading p {
+  margin: 0;
+  color: #63776a;
+  line-height: 1.55;
+}
+
+.diagnosis-loading__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.diagnosis-loading__meta > span {
+  display: grid;
+  gap: 3px;
+  min-width: 105px;
+  padding: 9px 11px;
+  border: 1px solid #dce8d9;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.diagnosis-loading__meta strong {
+  color: #77897b;
+  font-size: 0.66rem;
+  font-weight: 600;
+}
+
+.diagnosis-loading__steps,
+.diagnosis-loading__footer {
+  grid-column: 1 / -1;
+}
+
+.diagnosis-loading__steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 28px 0 18px;
+}
+
+.diagnosis-loading__steps > div {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 58px;
+  padding: 10px 12px;
+  border: 1px solid #e0e9de;
+  border-radius: 13px;
+  color: #829087;
+  background: #fff;
+}
+
+.diagnosis-loading__steps .material-symbols-outlined { font-size: 21px; }
+.diagnosis-loading__steps strong { font-size: 0.73rem; }
+.diagnosis-loading__steps .is-done { color: #2e6f46; }
+.diagnosis-loading__steps .is-active {
+  border-color: #a9cbaa;
+  color: #286c47;
+  background: #eaf5e7;
+}
+
+.diagnosis-loading__progress {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: #dfe9dc;
+}
+
+.diagnosis-loading__progress span {
+  display: block;
+  width: 35%;
+  height: 100%;
+  border-radius: inherit;
+  background: #3f7f56;
+  animation: diagnosisProgress 1.9s ease-in-out infinite alternate;
+}
+
+.diagnosis-loading__footer small {
+  display: block;
+  margin-top: 11px;
+  color: #75867a;
+  font-size: 0.72rem;
+}
+
+@keyframes diagnosisScan {
+  to { transform: translateY(105px); }
+}
+
+@keyframes diagnosisProgress {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(285%); }
+}
+
+@media (max-width: 700px) {
+  .diagnosis-loading {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .diagnosis-loading__scene { width: 180px; height: 180px; margin-bottom: 20px; }
+  .diagnosis-loading__crop { width: 126px; height: 126px; }
+  .diagnosis-loading__meta { justify-content: center; }
+  .diagnosis-loading__steps { grid-template-columns: 1fr; width: 100%; }
+  .diagnosis-loading__footer { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diagnosis-loading__scan,
+  .diagnosis-loading__progress span { animation: none; }
+}
+
+.diagnostic-container {
+  animation: none;
+}
+
+.diagnostic-container > .diagnostic-hero {
+  background: #0d2618 url("/assets/image/imagem-fundo-diagnostico.png") center 58% / cover no-repeat;
+}
+
+.diagnostic-container > .diagnostic-hero::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  content: "";
+  background: rgba(5, 27, 15, 0.72);
+  pointer-events: none;
+}
+
+.diagnostic-container > .diagnostic-hero::after,
+.diagnostic-container .card-glow {
+  display: none;
+}
+
+.diagnostic-container > .diagnostic-hero .diagnostic-header {
+  z-index: 1;
+}
+
+.diagnostic-container .option-card.drag-active {
+  background: var(--bg-card);
+}
+
+.diagnostic-container .option-card:hover,
+.diagnostic-container .history-card:hover {
+  transform: none;
+}
+
+.diagnostic-container .confidence-fill {
+  background: #286c47;
+}
+
+@media (max-width: 820px) {
+  .diagnostic-container > .diagnostic-hero .diagnostic-header {
+    background: rgba(5, 27, 15, 0.45);
+  }
+}

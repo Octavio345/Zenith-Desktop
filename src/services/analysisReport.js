@@ -2,7 +2,7 @@ import { jsPDF } from "jspdf"
 
 const GREEN = [38, 99, 65]
 const DISCLAIMER = "Os resultados apresentados constituem apoio tecnológico à inspeção agrícola e devem ser interpretados em conjunto com avaliação de campo."
-const names = { soja_saudavel: "Soja saudável", doenca_de_ferrugem_soja: "Ferrugem da soja", doenca_ferrugem_soja: "Ferrugem da soja", ataque_de_largata_soja: "Ataque de lagarta", ataque_de_lagarta_soja: "Ataque de lagarta", cercospora: "Cercóspora" }
+const names = { soja_saudavel: "Soja saudável", doenca_de_ferrugem_soja: "Ferrugem da soja", doenca_ferrugem_soja: "Ferrugem da soja", ataque_de_largata_soja: "Ataque de lagarta na soja", ataque_de_lagarta_soja: "Ataque de lagarta na soja", cercospora: "Cercosporiose da soja", healthy: "Trigo saudável", septoria: "Septoriose do trigo", stripe_rust: "Ferrugem amarela do trigo" }
 const statuses = { ok: "Análise concluída", baixa_confianca: "Baixa confiança", baixa_qualidade: "Qualidade insuficiente", fora_do_dominio: "Imagem fora do padrão esperado", classes_proximas: "Classes próximas - resultado inconclusivo", consenso_insuficiente: "Consenso insuficiente", sem_imagens_analisaveis: "Sem imagens analisáveis", heterogeneo: "Conjunto com diferentes condições", imagem_invalida: "Imagem inválida", erro_api: "Erro no serviço de análise", erro_conexao: "Erro de conexão", erro_processamento: "Erro de processamento" }
 const readable = (v) => names[v] || String(v ?? "").replace(/_/g, " ")
 const present = (v) => v !== undefined && v !== null && v !== ""
@@ -36,6 +36,8 @@ async function loadImage(src, maxSize = 1800) {
 export async function createAnalysisReport({ kind, result, images = [], context = {}, logoSrc = "/assets/image/Logo-redonda.webp" }) {
   const caneAnalysis = kind === "cana"
   const monitor = kind === "monitoramento" || caneAnalysis
+  const cultura = result?.cultura || result?.resultado_geral?.cultura || context.cultura || "soja"
+  const cultureLabel = cultura === "trigo" ? "Trigo" : "Soja"
   const doc = new jsPDF({ unit: "mm", format: "a4", compress: true })
   const generated = new Date()
   const logo = await loadImage(logoSrc)
@@ -161,7 +163,7 @@ export async function createAnalysisReport({ kind, result, images = [], context 
       field(batch ? "Confiança média do modelo" : "Confiança do modelo", percent(data.confianca_media ?? data.confianca ?? data.confidence))
       y = Math.max(y, cardTop + cardHeight + 2)
       text(/saud[aá]vel/i.test(classification)
-        ? "As características visuais foram classificadas como soja saudável. Isso não garante ausência de problemas; mantenha o acompanhamento e a avaliação de campo."
+        ? `As características visuais foram classificadas como ${cultureLabel.toLowerCase()} saudável. Isso não garante ausência de problemas; mantenha o acompanhamento e a avaliação de campo.`
         : "A análise computacional identificou características visuais compatíveis com a classe apresentada. O resultado apoia a inspeção e não constitui diagnóstico agronômico definitivo.")
     } else if (status === "heterogeneo") {
       reserve(34)
@@ -212,9 +214,10 @@ export async function createAnalysisReport({ kind, result, images = [], context 
       y = top + 23
     })
   }
-  header(); text(caneAnalysis ? "Análise da cana-de-açúcar" : monitor ? "Monitoramento da plantação" : "Análise da saúde da soja", 23, true)
+  header(); text(caneAnalysis ? "Análise da cana-de-açúcar" : monitor ? "Monitoramento da plantação" : `Análise da saúde ${cultura === "trigo" ? "do trigo" : "da soja"}`, 23, true)
   text(monitor ? "RELATÓRIO DE ANÁLISE | ZENITH" : "RELATÓRIO DE TRIAGEM FITOSSANITÁRIA | ZENITH", 8, true)
   field("Gerado em", generated.toLocaleString("pt-BR"))
+  if (!monitor) field("Cultura analisada", cultureLabel)
   field("Data da análise", context.analyzedAt)
   field("Identificador", context.id)
   if (context.farmName || context.fieldAreaName || context.userName || context.userDocument) {
@@ -333,6 +336,6 @@ export async function createAnalysisReport({ kind, result, images = [], context 
   }
   const pad = n => String(n).padStart(2, "0")
   const stamp = `${generated.getFullYear()}-${pad(generated.getMonth()+1)}-${pad(generated.getDate())}_${pad(generated.getHours())}${pad(generated.getMinutes())}`
-  const reportName = caneAnalysis ? "Analise_Cana" : monitor ? "Monitoramento_Plantacao" : "Triagem_Fitossanitaria"
+  const reportName = caneAnalysis ? "Analise_Cana" : monitor ? "Monitoramento_Plantacao" : `Triagem_Fitossanitaria_${cultureLabel}`
   return { doc, filename: `Zenith_${reportName}_${stamp}.pdf` }
 }

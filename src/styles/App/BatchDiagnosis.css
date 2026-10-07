@@ -1506,3 +1506,127 @@
 .field-area-picker__menu { position: absolute; top: calc(100% + 7px); right: 0; left: 0; overflow: hidden; padding: 7px; border: 1px solid #d5e3d4; border-radius: 14px; background: rgba(255,255,255,.99); box-shadow: 0 16px 34px rgba(35,78,45,.14); backdrop-filter: blur(14px); }
 .field-area-picker__hint { display: block; padding: 5px 9px 7px; color: #849188; font-size: .62rem; font-weight: 800; letter-spacing: .055em; text-transform: uppercase; }.field-area-picker__menu > button { width: 100%; display: flex; align-items: center; gap: 9px; min-height: 40px; padding: 8px 9px; border: 0; border-radius: 10px; color: var(--zenith-ink, #1d2b21); background: transparent; font: 700 .78rem Inter, sans-serif; text-align: left; cursor: pointer; }.field-area-picker__menu > button:hover { color: var(--zenith-green, #286c47); background: #eaf5e9; }.field-area-picker__menu > button > .material-symbols-outlined { color: var(--zenith-green, #286c47); font-size: 18px; }.field-area-picker__check { margin-left: auto; }.field-area-picker__empty { margin: 5px 9px 9px; color: #829087; font-size: .75rem; line-height: 1.35; }.field-area-picker__manual { border-top: 1px solid #e5eee4 !important; color: var(--zenith-green, #286c47) !important; }.field-area-picker__skip { margin-top: 2px; border-top: 1px solid #e5eee4 !important; color: #718077 !important; }.field-area-picker__more { justify-content: center !important; margin: 2px 0 4px; color: var(--zenith-green, #286c47) !important; background: #f2f8f0 !important; font-weight: 800 !important; }
 @media (max-width: 680px) { .diagnostic-field-context .field-area-picker { grid-column: 1 / -1; }.diagnostic-field-context { padding: 16px; }.field-area-picker__menu { left: 0; right: 0; } }
+
+/* Triagem de soja e trigo: superfícies sólidas e movimento discreto. */
+.batch-modal-shell {
+  background: #07130c;
+  backdrop-filter: none;
+  animation: none;
+}
+
+.batch-preview-card,
+.batch-result-hero,
+.batch-panel,
+.batch-images-section,
+.batch-error-panel {
+  background: #102018;
+  animation: none;
+}
+
+.batch-preview-header {
+  background: #172a1e;
+}
+
+.batch-heading-icon,
+.batch-result-icon {
+  background: rgba(63, 127, 86, 0.12);
+}
+
+.batch-result-page {
+  animation: none;
+}
+
+.batch-result-heterogeneous {
+  background: #292318;
+}
+
+.batch-result-hero::after {
+  display: none;
+}
+
+.batch-score-ring {
+  border: 5px solid #3f7f56;
+  background: #173421;
+}
+
+.batch-button-primary,
+.batch-probability-track span,
+.batch-condition-healthy .batch-condition-bar span {
+  background: #286c47;
+}
+
+.batch-condition-bar span,
+.batch-condition-rust .batch-condition-bar span,
+.batch-condition-disease .batch-condition-bar span {
+  background: #bd6b51;
+}
+
+.batch-condition-pest .batch-condition-bar span {
+  background: #8b70b1;
+}
+
+.batch-button:hover:not(:disabled),
+.batch-image-result-card:hover {
+  transform: none;
+}
+
+.batch-crop-label {
+  display: inline-block;
+  margin: 0 0 10px;
+  padding: 5px 9px;
+  border: 1px solid rgba(151, 204, 162, 0.28);
+  border-radius: 8px;
+  color: #d5e9d9;
+  background: rgba(63, 127, 86, 0.14);
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.batch-preview-card .batch-preview-header {
+  background: #edf6e9 !important;
+}
+
+.batch-result-page .batch-result-hero {
+  background: #184b31 !important;
+}
+
+.batch-result-page .batch-result-heterogeneous {
+  background: #3a2d1c !important;
+}
+
+.batch-result-page .batch-score-ring {
+  background: #173421 !important;
+}
+
+/* Entrada curta para orientar a leitura do resultado, sem movimento contínuo. */
+.batch-result-page .batch-result-hero {
+  animation: diagnosisResultReveal 420ms ease-out both;
+}
+
+.batch-result-page .batch-metrics-grid {
+  animation: diagnosisResultReveal 420ms ease-out 80ms both;
+}
+
+.batch-result-page .batch-result-layout,
+.batch-result-page .batch-error-panel {
+  animation: diagnosisResultReveal 420ms ease-out 130ms both;
+}
+
+.batch-result-page .batch-images-section,
+.batch-result-page .batch-result-footer {
+  animation: diagnosisResultReveal 420ms ease-out 180ms both;
+}
+
+@keyframes diagnosisResultReveal {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .batch-result-page .batch-result-hero,
+  .batch-result-page .batch-metrics-grid,
+  .batch-result-page .batch-result-layout,
+  .batch-result-page .batch-error-panel,
+  .batch-result-page .batch-images-section,
+  .batch-result-page .batch-result-footer { animation: none; }
+}

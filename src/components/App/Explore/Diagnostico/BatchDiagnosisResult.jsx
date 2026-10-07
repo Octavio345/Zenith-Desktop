@@ -1,6 +1,7 @@
 import ReportButton from "../ReportButton"
 import { useMemo, useState } from "react"
 import { formatDiagnosisName } from "./diagnosisLabels"
+import { cropName } from "../../../../constants/diagnosisCrops"
 import ThreeDExperience from "./ThreeDExperience"
 import "../../../../styles/App/BatchDiagnosis.css"
 
@@ -44,8 +45,8 @@ function getConditionStyle(value) {
   const key = normalizedKey(value)
   if (isHealthy(value)) return { tone: "healthy", icon: "verified" }
   if (key.includes("lagarta") || key.includes("largata")) return { tone: "pest", icon: "pest_control" }
-  if (key.includes("ferrugem")) return { tone: "rust", icon: "coronavirus" }
-  if (key.includes("cercospora")) return { tone: "disease", icon: "microbiology" }
+  if (key.includes("ferrugem") || key.includes("stripe_rust")) return { tone: "rust", icon: "microbiology" }
+  if (key.includes("cercospora") || key.includes("septoria")) return { tone: "disease", icon: "microbiology" }
   return { tone: "disease", icon: "eco" }
 }
 
@@ -57,7 +58,7 @@ function getImageStatus(status) {
   }
 }
 
-function getOverallPresentation(general, conditions) {
+function getOverallPresentation(general, conditions, cultura) {
   const status = general?.status
 
   if (status === "heterogeneo") {
@@ -106,7 +107,7 @@ function getOverallPresentation(general, conditions) {
       icon: "verified",
       eyebrow: "CLASSE MAIS PROVÁVEL",
       title: "Lote com predominância saudável",
-      description: general?.mensagem || "As imagens confiáveis foram classificadas como soja saudável."
+      description: general?.mensagem || `As imagens confiáveis foram classificadas como ${cropName(cultura).toLowerCase()} saudável.`
     }
   }
 
@@ -162,6 +163,7 @@ function MetricCard({ icon, value, label, tone = "default" }) {
 export default function BatchDiagnosisResult({ result, selectedImages = [], onRestart, onCreateInspection, reportContext, allowThreeD = false }) {
   const [imageFilter, setImageFilter] = useState("all")
   const general = result?.resultado_geral || null
+  const cultura = result?.cultura || general?.cultura || reportContext?.cultura || "soja"
   const conditions = useMemo(() => {
     return [...(general?.ocorrencias_confiaveis || [])]
       .filter((item) => item?.classe)
@@ -181,7 +183,8 @@ export default function BatchDiagnosisResult({ result, selectedImages = [], onRe
 
   const presentation = getOverallPresentation(
     general || { status: result?.status, mensagem: result?.mensagem },
-    conditions
+    conditions,
+    cultura
   )
   const reliable = asNumber(general?.resultados_confiaveis)
   const rejected = asNumber(general?.inconclusivas_ou_rejeitadas)
@@ -203,7 +206,12 @@ export default function BatchDiagnosisResult({ result, selectedImages = [], onRe
     return reliableImages.length >= 2 ? reliableImages : selectedImages
   }, [result, selectedImages])
 
-  const nextSteps = general?.status === "heterogeneo"
+  const nextSteps = !general
+    ? [
+        "Verifique a conexão com o serviço de análise.",
+        "Mantenha as fotos selecionadas e tente novamente em alguns instantes."
+      ]
+    : general.status === "heterogeneo"
     ? [
         "Use os cartões por imagem para separar as áreas com cada condição.",
         "Refaça a coleta nas imagens marcadas como inconclusivas ou de baixa qualidade.",
@@ -213,7 +221,7 @@ export default function BatchDiagnosisResult({ result, selectedImages = [], onRe
       ? [
           "Capture fotos mais próximas, nítidas e com iluminação uniforme.",
           "Evite excesso de céu, solo ou objetos sem vegetação no enquadramento.",
-          "Envie um lote menor de teste antes de processar toda a missão."
+          "Envie um lote menor de fotos antes de processar toda a coleta."
         ]
       : [
           "Priorize a inspeção das imagens com resultado confiável.",
@@ -230,6 +238,7 @@ export default function BatchDiagnosisResult({ result, selectedImages = [], onRe
           </div>
           <div>
             <span className="batch-eyebrow">{presentation.eyebrow}</span>
+            <span className="batch-crop-label">Cultura analisada: {cropName(cultura)}</span>
             <h1>{presentation.title}</h1>
             <p>{presentation.description}</p>
           </div>
@@ -237,7 +246,7 @@ export default function BatchDiagnosisResult({ result, selectedImages = [], onRe
 
         {general && (
           <div className="batch-result-score">
-            <div className="batch-score-ring" style={{ "--progress": `${utilization * 3.6}deg` }}>
+            <div className="batch-score-ring">
               <div>
                 <strong>{utilization}%</strong>
                 <span>aproveitamento</span>
@@ -424,7 +433,7 @@ export default function BatchDiagnosisResult({ result, selectedImages = [], onRe
               </div>
             )}
           </section>
-          {detectedConditionNames.length > 0 && reconstructionImages.length > 0 && (
+          {cultura === "soja" && detectedConditionNames.length > 0 && reconstructionImages.length > 0 && (
             <ThreeDExperience images={reconstructionImages} conditionNames={detectedConditionNames} accessAllowed={allowThreeD} />
           )}
         </>
@@ -436,7 +445,7 @@ export default function BatchDiagnosisResult({ result, selectedImages = [], onRe
           <p>{result?.aviso || "Esta análise funciona como apoio à inspeção e deve ser confirmada em campo. O resultado não substitui avaliação agronômica profissional."}</p>
         </div>
         <div className="batch-result-footer-actions">
-          <ReportButton result={result} images={selectedImages} context={reportContext} className="batch-button batch-button-secondary" />
+          {general && <ReportButton result={result} images={selectedImages} context={reportContext} className="batch-button batch-button-secondary" />}
           {onCreateInspection && presentation.tone !== "danger" && (
             <button type="button" className="batch-button batch-button-secondary" onClick={onCreateInspection}>
               <span className="material-symbols-outlined">assignment_add</span>

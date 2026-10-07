@@ -105,7 +105,7 @@ export default function FarmCommandCenter({ activities = [], onOpen }) {
           <span className="material-symbols-outlined">route</span>
           <small>Próximo passo recomendado</small>
           <h3>{attentionOccurrences.length ? "Confira as vistorias pendentes" : "Comece por uma imagem"}</h3>
-          <p>{attentionOccurrences.length ? "Converta a ocorrência identificada pela análise em uma tarefa para a equipe." : "Selecione imagens da soja para analisar sinais e acompanhar a lavoura."}</p>
+          <p>{attentionOccurrences.length ? "Converta a ocorrência identificada pela análise em uma tarefa para a equipe." : "Selecione a cultura e envie imagens para analisar sinais na lavoura."}</p>
           <button type="button" onClick={() => onOpen(attentionOccurrences.length ? "atividades" : "diagnostico")}>
             {attentionOccurrences.length ? "Ver atividades" : "Fazer análise"}<span className="material-symbols-outlined">arrow_outward</span>
           </button>

@@ -2,7 +2,7 @@ import "../../../styles/App/FeatureAccessPanel.css"
 import { getAppSystemCopy } from "../../../constants/appLanguages"
 
 const FEATURE_NAMES = {
-  diagnosis: "Análise da soja por IA",
+  diagnosis: "Análise de soja e trigo por IA",
   monitoring: "Monitoramento da plantação"
 }
 

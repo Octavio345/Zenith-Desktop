@@ -35,7 +35,7 @@ const tabs = [
 ]
 
 const tabContext = {
-  diagnostico: ["Análise da soja por IA", "Use fotos para identificar possíveis problemas na soja. Confirme o resultado em campo."],
+  diagnostico: ["Análise de soja e trigo por IA", "Escolha a cultura, envie fotos do mesmo lote e confirme os sinais em campo."],
   multiespectral: ["Análise multiespectral", "Analise bandas de drone e priorize áreas para inspeção em campo."],
   monitoramento: ["Análise estrutural do plantio", "Monitore a lavoura de soja por imagens e visão computacional."],
   cana: ["Integridade do estande de cana", "Localize possíveis falhas nas linhas e vegetação nas entrelinhas para priorizar vistorias."],

@@ -1,10 +1,13 @@
 const KNOWN_DIAGNOSIS_LABELS = {
-  ataque_de_largata_soja: "Ataque de lagarta",
-  ataque_de_lagarta_soja: "Ataque de lagarta",
-  cercospora: "Cercóspora",
-  doenca_de_ferrugem_soja: "Doença de ferrugem",
-  doenca_ferrugem_soja: "Doença de ferrugem",
-  soja_saudavel: "Soja saudável"
+  ataque_de_largata_soja: "Ataque de lagarta na soja",
+  ataque_de_lagarta_soja: "Ataque de lagarta na soja",
+  cercospora: "Cercosporiose da soja",
+  doenca_de_ferrugem_soja: "Ferrugem da soja",
+  doenca_ferrugem_soja: "Ferrugem da soja",
+  soja_saudavel: "Soja saudável",
+  healthy: "Trigo saudável",
+  septoria: "Septoriose do trigo",
+  stripe_rust: "Ferrugem amarela do trigo"
 }
 
 const WORD_REPLACEMENTS = {

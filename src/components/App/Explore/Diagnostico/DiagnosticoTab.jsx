@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import CameraView from "./CameraView"
 import BatchImagePreview from "./BatchImagePreview"
@@ -7,10 +7,12 @@ import AnalysisLoader from "./AnalysisLoader"
 import DiagnosisResult from "./DiagnosisResult"
 import AllHistory from "./AllHistory"
 import FieldAreaPicker from "./FieldAreaPicker"
+import CropSelector from "./CropSelector"
+import { cropName } from "../../../../constants/diagnosisCrops"
 import FeatureAccessPanel from "../FeatureAccessPanel"
 import { formatDiagnosisName } from "./diagnosisLabels"
 import { useFeatureAccess } from "../../../../hooks/useFeatureAccess"
-import { diagnosticarLote } from "../../../../services/sojaApi"
+import { diagnosticarLote } from "../../../../services/diagnosticoApi"
 import { createOccurrenceFromAnalysis, saveActivityDraft } from "../../../../services/fieldOperations"
 import "../../../../styles/App/Diagnostico.css"
 import "../../../../styles/App/BatchDiagnosis.css"
@@ -41,11 +43,13 @@ export default function DiagnosticoTab() {
   const fileInputRef = useRef(null)
   const selectedImagesRef = useRef([])
   const requestControllerRef = useRef(null)
+  const scrollToStartRef = useRef(false)
   const location = useLocation()
   const navigate = useNavigate()
   const diagnosisAccess = useFeatureAccess("diagnosis")
 
   const [step, setStep] = useState("start")
+  const [selectedCrop, setSelectedCrop] = useState("")
   const [selectedImages, setSelectedImages] = useState([])
   const [result, setResult] = useState(null)
   const [reportContext, setReportContext] = useState({})
@@ -61,6 +65,13 @@ export default function DiagnosticoTab() {
   useEffect(() => {
     selectedImagesRef.current = selectedImages
   }, [selectedImages])
+
+  useLayoutEffect(() => {
+    if (step !== "start" || !scrollToStartRef.current) return
+    scrollToStartRef.current = false
+    const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches
+    window.scrollTo({ top: 0, left: 0, behavior: reducedMotion ? "auto" : "smooth" })
+  }, [step])
 
   useEffect(() => {
     const handleResize = () => setIsMobile(checkIsMobile())
@@ -81,8 +92,11 @@ export default function DiagnosticoTab() {
     if (location.state?.showHistory) setShowAllHistory(true)
     if (location.state?.showResult && location.state?.diagnosticData) {
       const diagnostic = location.state.diagnosticData
-      setReportContext({ analyzedAt: diagnostic.date, id: diagnostic.id, fieldAreaName: diagnostic.fieldAreaName })
+      const cultura = diagnostic.cultura || "soja"
+      setSelectedCrop(cultura)
+      setReportContext({ analyzedAt: diagnostic.date, id: diagnostic.id, fieldAreaName: diagnostic.fieldAreaName, cultura })
       setResult({
+        cultura,
         status: diagnostic.status || "ok",
         doenca: formatDiagnosisName(diagnostic.disease),
         confianca: diagnostic.confidence,
@@ -143,6 +157,7 @@ export default function DiagnosticoTab() {
       reliableCount: Number(general.resultados_confiaveis) || 0,
       conditionCount: conditions.length,
       status: general.status,
+      cultura: data.cultura || selectedCrop,
       fieldAreaId: fieldArea?.id || "",
       fieldAreaName: fieldArea?.name || "Talhão não informado"
     })
@@ -170,6 +185,7 @@ export default function DiagnosticoTab() {
       : "Resultado inconclusivo ou sem classe única; conferir as imagens e confirmar em campo"
     const description = [
       "Análise realizada pelo Zenith.",
+      `Cultura: ${cropName(result?.cultura || selectedCrop)}.`,
       `Classe mais provável: ${condition}.`,
       confidence != null && Number.isFinite(Number(confidence)) ? `Confiança do modelo: ${Math.round(Number(confidence))}%.` : null,
       fieldArea?.name ? `Talhão relacionado: ${fieldArea.name}.` : null,
@@ -211,6 +227,10 @@ export default function DiagnosticoTab() {
   }
 
   const addSelectedFiles = (fileList) => {
+    if (!selectedCrop) {
+      setSelectionNotice({ type: "warning", text: "Selecione soja ou trigo antes de adicionar as fotos." })
+      return
+    }
     const incomingFiles = Array.from(fileList || [])
     if (incomingFiles.length === 0) return
 
@@ -291,7 +311,7 @@ export default function DiagnosticoTab() {
     canvas.toBlob((blob) => {
       if (!blob) return
       const timestamp = new Date().toISOString().replace(/[:.]/g, "-")
-      const cameraFile = new File([blob], `captura-soja-${timestamp}.jpg`, {
+      const cameraFile = new File([blob], `captura-${selectedCrop}-${timestamp}.jpg`, {
         type: "image/jpeg",
         lastModified: Date.now()
       })
@@ -300,7 +320,10 @@ export default function DiagnosticoTab() {
     }, "image/jpeg", 0.92)
   }
 
-  const openGallery = () => fileInputRef.current?.click()
+  const openGallery = () => {
+    if (!selectedCrop) return
+    fileInputRef.current?.click()
+  }
 
   const handleGalleryImages = (event) => {
     addSelectedFiles(event.target.files)
@@ -326,6 +349,13 @@ export default function DiagnosticoTab() {
     addSelectedFiles(event.dataTransfer.files)
   }
 
+  const changeCrop = (cultura) => {
+    setSelectedCrop(cultura)
+    setSelectedFieldAreaId("")
+    setCustomFieldAreaName("")
+    setSelectionNotice(null)
+  }
+
   const removeSelectedImage = (imageId) => {
     const imageToRemove = selectedImages.find((image) => image.id === imageId)
     if (imageToRemove) URL.revokeObjectURL(imageToRemove.preview)
@@ -346,6 +376,10 @@ export default function DiagnosticoTab() {
 
   const analyzeBatch = async () => {
     if (selectedImages.length === 0) return
+    if (!selectedCrop) {
+      setSelectionNotice({ type: "warning", text: "Selecione a cultura deste lote antes de analisar." })
+      return
+    }
 
     const permission = await diagnosisAccess.consume()
     if (!permission.allowed) {
@@ -358,17 +392,18 @@ export default function DiagnosticoTab() {
 
     const controller = new AbortController()
     requestControllerRef.current = controller
-    setReportContext({ fieldAreaName: getFieldAreaContext()?.name })
+    setReportContext({ fieldAreaName: getFieldAreaContext()?.name, cultura: selectedCrop })
     setStep("analysis")
 
     try {
-      const data = await diagnosticarLote(selectedImages, { signal: controller.signal })
+      const data = await diagnosticarLote(selectedImages, { signal: controller.signal, cultura: selectedCrop })
       setReportContext((current) => ({ ...current, analyzedAt: new Date().toLocaleString("pt-BR") }))
       setResult(data)
       saveBatchToHistory(data)
     } catch (error) {
       if (controller.signal.aborted) return
       setResult({
+        cultura: selectedCrop,
         status: error?.status ? "erro_api" : "erro_conexao",
         resultado: "Erro",
         mensagem: error?.message || "Não foi possível analisar o lote agora. Verifique a conexão e tente novamente."
@@ -383,6 +418,9 @@ export default function DiagnosticoTab() {
     stopCamera()
     clearSelectedImages()
     setResult(null)
+    setSelectedFieldAreaId("")
+    setCustomFieldAreaName("")
+    scrollToStartRef.current = true
     setStep("start")
   }
 
@@ -414,6 +452,8 @@ export default function DiagnosticoTab() {
       <>
         <BatchImagePreview
           images={selectedImages}
+          cultura={selectedCrop}
+          onCropChange={changeCrop}
           notice={selectionNotice}
           fieldAreas={fieldAreas}
           fieldAreaId={selectedFieldAreaId}
@@ -432,14 +472,14 @@ export default function DiagnosticoTab() {
       </>
     )
   }
-  if (step === "analysis") return <AnalysisLoader imageCount={selectedImages.length} />
+  if (step === "analysis") return <AnalysisLoader imageCount={selectedImages.length} cultura={selectedCrop} />
   if (step === "result" && result?.resultado_geral) {
     return <BatchDiagnosisResult result={result} selectedImages={selectedImages} onRestart={reset} onCreateInspection={createInspectionTask} reportContext={reportContext} allowThreeD={diagnosisAccess.fullAccess} />
   }
   if (step === "result" && selectedImages.length > 0) {
     return <BatchDiagnosisResult result={result} selectedImages={selectedImages} onRestart={reset} onCreateInspection={createInspectionTask} reportContext={reportContext} allowThreeD={diagnosisAccess.fullAccess} />
   }
-  if (step === "result") return <DiagnosisResult result={result} onRestart={reset} onCreateInspection={createInspectionTask} reportContext={reportContext} />
+  if (step === "result") return <DiagnosisResult result={result} onRestart={reset} onCreateInspection={createInspectionTask} reportContext={reportContext} cultura={selectedCrop} />
 
   return (
     <div className="diagnostic-container">
@@ -447,10 +487,10 @@ export default function DiagnosticoTab() {
         <div className="diagnostic-header">
           <div className="header-glow" />
           <span className="batch-eyebrow">INTELIGÊNCIA ARTIFICIAL NO CAMPO</span>
-          <h1 id="diagnostic-title" className="diagnostico-title">Análise da soja <span className="highlight">por IA</span></h1>
+          <h1 id="diagnostic-title" className="diagnostico-title">Análise da lavoura <span className="highlight">por IA</span></h1>
           <p>
-            Envie até <span className="highlight">100 fotos da soja</span> para identificar possíveis problemas.
-            Veja o resultado de cada foto e confirme em campo com um profissional.
+            Escolha soja ou trigo e envie até <span className="highlight">100 fotos do mesmo lote</span>.
+            Veja o resultado de cada imagem e confirme os sinais em campo.
           </p>
         </div>
       </section>
@@ -458,6 +498,8 @@ export default function DiagnosticoTab() {
       <FeatureAccessPanel feature="diagnosis" access={{ ...diagnosisAccess, refresh: diagnosisAccess.refresh }} />
 
       {(diagnosisAccess.fullAccess || diagnosisAccess.remaining > 0) && !diagnosisAccess.error && <>
+
+      <CropSelector value={selectedCrop} onChange={changeCrop} />
 
       <section className="diagnostic-field-context" aria-labelledby="diagnostic-field-context-title">
         <span className="material-symbols-outlined">location_on</span>
@@ -484,7 +526,7 @@ export default function DiagnosticoTab() {
 
       <div className="diagnostic-main-grid">
         {isMobile && (
-          <button type="button" className="option-card camera-card" onClick={startCamera}>
+          <button type="button" className="option-card camera-card" onClick={startCamera} disabled={!selectedCrop}>
             <div className="card-glow" />
             <div className="option-icon-wrapper">
               <div className="option-icon">
@@ -492,7 +534,7 @@ export default function DiagnosticoTab() {
               </div>
             </div>
             <h3>Tirar foto</h3>
-            <p>Fotografe uma folha de soja para analisar.</p>
+            <p>{selectedCrop ? `Fotografe uma folha de ${cropName(selectedCrop).toLowerCase()} para analisar.` : "Escolha a cultura acima para usar a câmera."}</p>
             <div className="card-action">
               <span>Usar câmera</span>
               <span className="material-symbols-outlined arrow" aria-hidden="true">arrow_forward</span>
@@ -504,6 +546,7 @@ export default function DiagnosticoTab() {
           type="button"
           className={`option-card gallery-card ${isDraggingImage ? "drag-active" : ""}`}
           onClick={openGallery}
+          disabled={!selectedCrop}
           onDragEnter={handleDragOverImage}
           onDragOver={handleDragOverImage}
           onDragLeave={handleDragLeaveImage}
@@ -516,7 +559,7 @@ export default function DiagnosticoTab() {
             </div>
           </div>
           <h3>Analisar fotos do drone</h3>
-          <p>Escolha as fotos no seu dispositivo ou arraste-as para cá.</p>
+          <p>{selectedCrop ? `Escolha fotos de ${cropName(selectedCrop).toLowerCase()} ou arraste-as para cá.` : "Escolha a cultura acima para selecionar as fotos."}</p>
           <div className="card-action">
             <span>Selecionar imagens</span>
             <span className="material-symbols-outlined arrow" aria-hidden="true">arrow_forward</span>
@@ -552,7 +595,7 @@ export default function DiagnosticoTab() {
                   <div className="history-info">
                     <div className="history-name">{formatDiagnosisName(item.disease)}</div>
                     <div className="history-date">
-                      {item.type === "batch" && item.imageCount ? `${item.imageCount} fotos • ` : ""}{item.date}
+                      {cropName(item.cultura || "soja")} • {item.type === "batch" && item.imageCount ? `${item.imageCount} fotos • ` : ""}{item.date}
                     </div>
                   </div>
                   <div className="history-confidence" title="Confiança média">

@@ -1,14 +1,9 @@
 import { useEffect, useState } from "react"
+import { cropName } from "../../../../constants/diagnosisCrops"
 
-const phases = [
-  { icon: "photo_library", label: "Preparando imagens" },
-  { icon: "psychology", label: "Executando a IA" },
-  { icon: "analytics", label: "Organizando resultado" },
-]
-
-export default function AnalysisLoader({ imageCount = 1 }) {
+export default function AnalysisLoader({ imageCount = 1, cultura }) {
   const [elapsed, setElapsed] = useState(0)
-  const phase = elapsed < 5 ? 0 : elapsed < 14 ? 1 : 2
+  const isWheat = cultura === "trigo"
 
   useEffect(() => {
     const timer = window.setInterval(() => setElapsed((value) => value + 1), 1000)
@@ -16,41 +11,44 @@ export default function AnalysisLoader({ imageCount = 1 }) {
   }, [])
 
   return (
-    <section className="analysis-loader" aria-live="polite">
-      <div className="analysis-loader__scene" aria-hidden="true">
-        <div className="analysis-loader__rings"><i /><i /><i /></div>
-        <div className="analysis-loader__crop">
-          <img src="/assets/image/soja-hero-cutout.webp" alt="" />
-          <span className="analysis-loader__scan" />
-          <span className="analysis-loader__focus analysis-loader__focus--one" />
-          <span className="analysis-loader__focus analysis-loader__focus--two" />
+    <section className="diagnosis-loading" role="status" aria-label="Análise das imagens em andamento">
+      <div className="diagnosis-loading__scene" aria-hidden="true">
+        <div className="diagnosis-loading__rings"><i /><i /><i /></div>
+        <div className={`diagnosis-loading__crop ${isWheat ? "diagnosis-loading__crop--wheat" : ""}`}>
+          {isWheat ? (
+            <span className="material-symbols-outlined">grass</span>
+          ) : (
+            <img src="/assets/image/soja-hero-cutout.webp" alt="" />
+          )}
+          <span className="diagnosis-loading__scan" />
         </div>
-        <span className="analysis-loader__orbit analysis-loader__orbit--one material-symbols-outlined">eco</span>
-        <span className="analysis-loader__orbit analysis-loader__orbit--two material-symbols-outlined">center_focus_strong</span>
+        <span className="material-symbols-outlined diagnosis-loading__orbit diagnosis-loading__orbit--one">eco</span>
+        <span className="material-symbols-outlined diagnosis-loading__orbit diagnosis-loading__orbit--two">center_focus_strong</span>
       </div>
 
-      <div className="analysis-loader__copy">
-        <span className="analysis-loader__eyebrow"><i /> LEITURA VISUAL DO LOTE</span>
-        <h2>{imageCount > 1 ? `Analisando ${imageCount} imagens` : "Analisando imagem"}</h2>
+      <div className="diagnosis-loading__copy">
+        <span className="diagnosis-loading__eyebrow">LEITURA VISUAL DO LOTE</span>
+        <h2>Analisando {imageCount === 1 ? "imagem" : "imagens"}</h2>
         <p>
-          {elapsed < 8
-            ? "Estamos preparando o lote e procurando padrões visuais na lavoura."
-            : "Na primeira análise, o modelo pode levar alguns instantes para iniciar. Você pode aguardar nesta tela."}
+          O modelo de {cropName(cultura).toLowerCase()} está avaliando {imageCount === 1 ? "a foto selecionada" : `as ${imageCount} fotos selecionadas`}.{" "}
+          Mantenha esta página aberta até o resultado chegar.
         </p>
+        <div className="diagnosis-loading__meta">
+          <span><strong>Cultura</strong>{cropName(cultura)}</span>
+          <span><strong>Imagens</strong>{imageCount}</span>
+          <span><strong>Tempo decorrido</strong><span aria-hidden="true">{elapsed}s</span></span>
+        </div>
       </div>
 
-      <div className="analysis-loader__phases">
-        {phases.map((item, index) => (
-          <div className={index < phase ? "done" : index === phase ? "active" : ""} key={item.label}>
-            <span className="material-symbols-outlined">{index < phase ? "check" : item.icon}</span>
-            <strong>{item.label}</strong>
-          </div>
-        ))}
+      <div className="diagnosis-loading__steps" aria-hidden="true">
+        <div className="is-done"><span className="material-symbols-outlined">check_circle</span><strong>Fotos selecionadas</strong></div>
+        <div className="is-active"><span className="material-symbols-outlined">analytics</span><strong>Análise em andamento</strong></div>
+        <div><span className="material-symbols-outlined">description</span><strong>Resultado</strong></div>
       </div>
 
-      <div className="analysis-loader__footer">
-        <div className="analysis-loader__progress" aria-hidden="true"><span /></div>
-        <small className="analysis-loader__time"><span className="material-symbols-outlined">verified_user</span> Processamento seguro · {elapsed}s</small>
+      <div className="diagnosis-loading__footer">
+        <div className="diagnosis-loading__progress" aria-hidden="true"><span /></div>
+        <small>A primeira análise pode levar mais tempo para carregar o modelo.</small>
       </div>
     </section>
   )

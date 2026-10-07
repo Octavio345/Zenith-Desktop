@@ -1,0 +1,127 @@
+.diagnosis-crop-selector {
+  width: min(1060px, calc(100% - 32px));
+  min-width: 0;
+  margin: 0 auto 24px;
+  padding: 18px 20px 20px;
+  border: 1px solid #d5e3d4;
+  border-radius: 18px;
+  color: #1d2b21;
+  background: #f5f8f4;
+}
+
+.diagnosis-crop-selector legend {
+  padding: 0 6px;
+  color: #244f35;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.diagnosis-crop-selector > p {
+  margin: 0 0 15px;
+  color: #5f7064;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.diagnosis-crop-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.diagnosis-crop-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: 76px;
+  padding: 12px 15px;
+  border: 1px solid #d6e1d5;
+  border-radius: 13px;
+  color: #25392b;
+  background: #fff;
+  cursor: pointer;
+}
+
+.diagnosis-crop-option:hover,
+.diagnosis-crop-option:focus-within {
+  border-color: #6e9d78;
+  outline: none;
+}
+
+.diagnosis-crop-option:focus-within {
+  box-shadow: 0 0 0 3px rgba(40, 108, 71, 0.14);
+}
+
+.diagnosis-crop-option.is-selected {
+  border-color: #286c47;
+  background: #e9f4e8;
+}
+
+.diagnosis-crop-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.diagnosis-crop-option > .material-symbols-outlined {
+  flex: 0 0 auto;
+  color: #286c47;
+  font-size: 22px;
+}
+
+.diagnosis-crop-option__copy {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.diagnosis-crop-option__copy strong {
+  color: #1d2b21;
+  font-size: 0.93rem;
+}
+
+.diagnosis-crop-option__copy small {
+  color: #65766a;
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.diagnosis-crop-option > .diagnosis-crop-option__check {
+  margin-left: auto;
+  color: #286c47;
+  opacity: 0;
+  font-size: 19px;
+}
+
+.diagnosis-crop-option.is-selected > .diagnosis-crop-option__check {
+  opacity: 1;
+}
+
+.diagnosis-crop-selector--compact {
+  width: auto;
+  margin: 18px clamp(24px, 3vw, 38px) 0;
+  padding: 14px 18px 17px;
+}
+
+.diagnosis-crop-selector--compact .diagnosis-crop-option {
+  min-height: 62px;
+}
+
+@media (max-width: 680px) {
+  .diagnosis-crop-selector {
+    width: calc(100% - 20px);
+    padding: 15px;
+  }
+
+  .diagnosis-crop-options {
+    grid-template-columns: 1fr;
+  }
+
+  .diagnosis-crop-selector--compact {
+    width: auto;
+    margin: 16px 18px 0;
+  }
+}

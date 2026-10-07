@@ -81,7 +81,7 @@ export default function ActivitiesList({ hasFarm, onViewAll, onRegister }) {
       icon: "history",
       title: "Diagnósticos recentes",
       description: recentDiagnostics.length > 0
-        ? recentDiagnostics.slice(0, 2).map(d => `${formatDiagnosisName(d.disease)} (${d.confidence}%)`).join(" • ")
+        ? recentDiagnostics.slice(0, 2).map(d => `${d.cultura === "trigo" ? "Trigo" : "Soja"}: ${formatDiagnosisName(d.disease)} (${d.confidence}%)`).join(" • ")
         : "Nenhum diagnóstico salvo",
       status: recentDiagnostics.length > 0 ? "concluido" : "vazio",
       action: () => navigate("/explore", { state: { activeTab: "diagnostico", showHistory: true } })

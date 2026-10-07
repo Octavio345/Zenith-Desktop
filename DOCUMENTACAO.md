@@ -18,11 +18,11 @@ O Zenith expõe três serviços visuais:
 
 | Serviço | Entrada | Resultado operacional |
 | --- | --- | --- |
-| Diagnóstico de soja | uma imagem ou lote de imagens | leitura de condição, confiança e indicadores retornados pela API |
+| Diagnóstico de soja e trigo | um lote de até 100 imagens de uma cultura | leitura de condição, confiança e indicadores retornados pela API |
 | Monitoramento de plantio | imagem de campo ou aérea | cobertura, uniformidade, alinhamento e indicadores de falhas quando disponíveis |
 | Reconstrução 3D | de 2 a 40 fotografias | criação de tarefa de processamento e link de visualização do modelo |
 
-Os serviços são integrados por `src/services/sojaApi.js`, `src/services/monitoramentoService.js` e `src/services/modelo3dApi.js`. A interface trata timeout, erro de rede e respostas não conclusivas para evitar apresentar um diagnóstico indefinido como certeza.
+Os serviços são integrados por `src/services/diagnosticoApi.js`, `src/services/monitoramentoService.js` e `src/services/modelo3dApi.js`. A interface trata timeout, erro de rede e respostas não conclusivas para evitar apresentar um diagnóstico indefinido como certeza.
 
 Os resultados devem ser usados como apoio à vistoria. A plataforma não emite laudo agronômico, não substitui avaliação presencial e não deve ser usada como única base para aplicação de defensivos ou decisão financeira.
 
@@ -34,7 +34,7 @@ O Zenith é uma aplicação cliente: React renderiza a interface no navegador, F
 | --- | --- | --- |
 | Interface | telas, rotas, formulários e experiência desktop | React 18, React Router e Vite |
 | Dados e acesso | login, perfis, equipe, tarefas e atividades em tempo real | Firebase Authentication e Firestore |
-| Visão computacional | diagnóstico de soja, plantio e geração 3D | APIs HTTP configuráveis |
+| Visão computacional | diagnóstico de soja e trigo, plantio e geração 3D | APIs HTTP configuráveis |
 | Mapa | visualização, geocodificação, desenho, cálculo e inspeção 3D de talhões | Leaflet, Leaflet Draw, ArcGIS Maps SDK, Esri e OpenStreetMap |
 | Dados locais | itens que ainda não são sincronizados entre dispositivos | `localStorage` e IndexedDB |
 | Instalação | versão instalável e cache do navegador | `vite-plugin-pwa` |
@@ -298,7 +298,7 @@ A aba inclui links externos oficiais. Como normas e procedimentos podem mudar, a
 
 | Integração | Requisição usada pelo Zenith | Finalidade | Onde está integrada |
 | --- | --- | --- | --- |
-| API de diagnóstico de soja | `POST /predict` e `POST /predict/batch`, com `FormData` | analisa uma foto ou um lote de fotos de soja | `services/sojaApi.js` |
+| API de diagnóstico de soja e trigo | `POST /culturas/{cultura}/predict/batch`, com `FormData` | analisa fotos de uma cultura por lote | `services/diagnosticoApi.js` |
 | API de monitoramento de plantio | `POST /analyze`, com `FormData` no campo `file` | devolve cobertura, uniformidade, fileiras, falhas e imagens de sobreposição quando disponíveis | `services/monitoramentoService.js` |
 | API de reconstrução 3D | `POST /webodm/tasks`, `GET /webodm/tasks/:id` e rota de visualização | cria e acompanha o processamento de 2 a 40 fotografias | `services/modelo3dApi.js` |
 | OpenWeatherMap | `GET /data/2.5/weather` e `GET /data/2.5/forecast` | clima atual e previsão por cidade e UF | `services/weatherService.js` e `ClimaTab.jsx` |
@@ -313,7 +313,7 @@ A aba inclui links externos oficiais. Como normas e procedimentos podem mudar, a
 As URLs das três APIs de visão computacional podem ser alteradas sem editar o código pelo arquivo `.env`:
 
 ```env
-VITE_SOJA_API_URL=https://seu-endpoint-de-diagnostico
+VITE_DIAGNOSTICO_API_URL=https://seu-endpoint-de-diagnostico
 VITE_MONITORAMENTO_API_URL=https://seu-endpoint-de-plantio/analyze
 VITE_MODELO_3D_API_URL=https://seu-endpoint-3d
 VITE_ARCGIS_API_KEY=sua-chave-publica-do-arcgis
@@ -359,12 +359,12 @@ Para tornar o mapa, diário, estoque e histórico de diagnóstico corporativos, 
 Endpoints configuráveis:
 
 ```env
-VITE_SOJA_API_URL=
+VITE_DIAGNOSTICO_API_URL=
 VITE_MONITORAMENTO_API_URL=
 VITE_MODELO_3D_API_URL=
 ```
 
-- `src/services/sojaApi.js` envia imagem ou lote para diagnóstico de soja. O tempo limite da requisição é de cinco minutos e a interface permite cancelar a análise.
+- `src/services/diagnosticoApi.js` envia o lote para a rota da cultura escolhida (`soja` ou `trigo`). O tempo limite da requisição é de cinco minutos e a interface permite cancelar a análise.
 - `src/services/monitoramentoService.js` aceita JPG, PNG ou WebP de até 50 MB. O tempo limite é de 40 segundos; respostas antigas e novas da API são normalizadas antes de chegar à interface.
 - `src/services/modelo3dApi.js` cria tarefas de reconstrução 3D com 2 a 40 imagens, consulta o status da tarefa e monta a URL do visualizador. O envio pode durar até 30 minutos antes de ser interrompido pelo navegador.
 
@@ -376,7 +376,7 @@ VITE_MODELO_3D_API_URL=
 4. A interface apresenta o resultado de forma legível e pode registrar uma ocorrência para vistoria.
 5. O histórico fica disponível para comparação e acompanhamento da operação.
 
-No diagnóstico de soja, respostas como baixa qualidade, baixa confiança ou imagem fora do domínio devem ser tratadas como orientação para repetir a captura ou fazer vistoria — nunca como resultado conclusivo.
+No diagnóstico de soja e trigo, respostas como baixa qualidade e baixa confiança devem ser tratadas como orientação para repetir a captura ou fazer vistoria — nunca como resultado conclusivo. O filtro adicional de domínio se aplica apenas à soja.
 
 ### Clima
 
@@ -388,10 +388,10 @@ Diário, estoque, áreas do mapa e parte do histórico de diagnóstico permanece
 
 ## Variáveis de ambiente
 
-O repositório ignora `.env` e `.env.example`. Para desenvolvimento local, crie `.env` com:
+O repositório ignora `.env`; `.env.example` é o exemplo versionado. Para desenvolvimento local, crie `.env` com:
 
 ```env
-VITE_SOJA_API_URL=
+VITE_DIAGNOSTICO_API_URL=
 VITE_MONITORAMENTO_API_URL=
 VITE_MODELO_3D_API_URL=
 VITE_ARCGIS_API_KEY=

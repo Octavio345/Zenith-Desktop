@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from "react"
 import { createPortal } from "react-dom"
 import FieldAreaPicker from "./FieldAreaPicker"
+import CropSelector from "./CropSelector"
 import "../../../../styles/App/BatchDiagnosis.css"
 
 function formatBytes(bytes) {
@@ -10,6 +11,8 @@ function formatBytes(bytes) {
 
 export default function BatchImagePreview({
   images,
+  cultura,
+  onCropChange,
   notice,
   fieldAreas = [],
   fieldAreaId,
@@ -47,9 +50,9 @@ export default function BatchImagePreview({
               <span className="material-symbols-outlined">flight_takeoff</span>
             </div>
             <div>
-              <span className="batch-eyebrow">MISSÃO DE MAPEAMENTO</span>
+              <span className="batch-eyebrow">TRIAGEM DO LOTE</span>
               <h1 id="batch-preview-title">Fotos prontas para análise</h1>
-              <p>Confira as fotos antes de iniciar a análise.</p>
+              <p>Confirme a cultura, o talhão e as fotos antes de iniciar.</p>
             </div>
           </div>
 
@@ -68,6 +71,8 @@ export default function BatchImagePreview({
             </div>
           </div>
         </header>
+
+        <CropSelector value={cultura} onChange={onCropChange} compact />
 
         {notice?.text && (
           <div className={`batch-notice batch-notice-${notice.type || "info"}`} role="status">
@@ -154,9 +159,9 @@ export default function BatchImagePreview({
               type="button"
               className="batch-button batch-button-primary"
               onClick={onAnalyze}
-              disabled={images.length === 0}
+              disabled={images.length === 0 || !cultura}
             >
-              <span className="material-symbols-outlined">auto_awesome</span>
+              <span className="material-symbols-outlined">analytics</span>
               Analisar {images.length === 1 ? "foto" : `${images.length} fotos`}
             </button>
           </div>

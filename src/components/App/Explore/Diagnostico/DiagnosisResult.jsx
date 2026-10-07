@@ -1,5 +1,6 @@
 import ReportButton from "../ReportButton"
 import { formatDiagnosisName } from "./diagnosisLabels"
+import { cropName } from "../../../../constants/diagnosisCrops"
 
 
 function formatClassName(name) {
@@ -39,15 +40,15 @@ function normalizeResult(result) {
   }
 }
 
-function getResultMode(status) {
+function getResultMode(status, cultura) {
   if (status === "fora_do_dominio") {
     return {
       icon: "warning",
       badge: "Imagem fora do padrão",
-      title: "Essa imagem não parece ser soja",
+      title: `Essa imagem não parece ser ${cropName(cultura).toLowerCase()}`,
       label: "TRIAGEM NÃO REALIZADA",
       tone: "warning",
-      message: "Por favor, selecione uma foto clara de uma folha ou lavoura de soja."
+      message: `Selecione uma foto clara de uma folha ou lavoura de ${cropName(cultura).toLowerCase()}.`
     }
   }
 
@@ -58,7 +59,7 @@ function getResultMode(status) {
       title: "Imagem sem nitidez suficiente",
       label: "ANÁLISE INCONCLUSIVA",
       tone: "warning",
-      message: "Envie uma foto mais próxima, iluminada e focada da folha de soja."
+      message: `Envie uma foto mais próxima, iluminada e focada da folha de ${cropName(cultura).toLowerCase()}.`
     }
   }
 
@@ -98,21 +99,22 @@ function getResultMode(status) {
   }
 }
 
-function getRecommendations(status) {
+function getRecommendations(status, cultura) {
   return status === "ok" ? [
     "Confirme os sinais em campo com um profissional habilitado",
     "Registre novas imagens para acompanhar a lavoura",
     "Não realize intervenções com base apenas nesta triagem"
   ] : [
-    "Envie uma imagem de soja mais próxima, nítida e bem iluminada",
+    `Envie uma imagem de ${cropName(cultura).toLowerCase()} mais próxima, nítida e bem iluminada`,
     "Confira o enquadramento e tente analisar novamente",
     "Confirme os sinais em campo antes de qualquer intervenção"
   ]
 }
 
-export default function DiagnosisResult({ result, onRestart, onCreateInspection, reportContext, images }) {
+export default function DiagnosisResult({ result, onRestart, onCreateInspection, reportContext, images, cultura: selectedCrop }) {
+  const cultura = result?.cultura || selectedCrop || "soja"
   const normalized = normalizeResult(result)
-  const mode = getResultMode(normalized.status)
+  const mode = getResultMode(normalized.status, cultura)
   const isPositiveDiagnosis = normalized.status === "ok"
   const primaryLabel = mode.label
   const primaryValue = isPositiveDiagnosis ? normalized.disease : mode.badge
@@ -123,7 +125,7 @@ export default function DiagnosisResult({ result, onRestart, onCreateInspection,
     : mode.badge
   const confidenceBarValue = normalized.confidence ?? 0
   const shouldShowConfidenceBar = isPositiveDiagnosis && normalized.confidence != null
-  const recommendations = getRecommendations(normalized.status)
+  const recommendations = getRecommendations(normalized.status, cultura)
 
   return (
     <div className={`result-container animate-fade-in result-${mode.tone}`}>
@@ -305,7 +307,6 @@ export default function DiagnosisResult({ result, onRestart, onCreateInspection,
         .premium-card:hover {
           border-color: rgba(63, 127, 86, 0.3);
           box-shadow: 0 0 0 1px rgba(63, 127, 86, 0.2), 0 0 24px rgba(63, 127, 86, 0.15), 0 8px 40px rgba(0, 0, 0, 0.5);
-          transform: translateY(-3px);
         }
 
         .col-left {
@@ -388,7 +389,7 @@ export default function DiagnosisResult({ result, onRestart, onCreateInspection,
 
         .confidence-fill {
           height: 100%;
-          background: linear-gradient(90deg, #00cc88 0%, #3f7f56 100%);
+          background: #3f7f56;
           border-radius: 999px;
           transition: width 0.6s ease;
         }
@@ -571,7 +572,6 @@ export default function DiagnosisResult({ result, onRestart, onCreateInspection,
         .restart-btn-premium:hover {
           background: #0e9c5e;
           box-shadow: 0 6px 24px rgba(13, 124, 75, 0.5);
-          transform: translateY(-3px);
         }
 
         .restart-btn-premium span {
@@ -580,16 +580,20 @@ export default function DiagnosisResult({ result, onRestart, onCreateInspection,
         }
 
         .restart-btn-premium:hover span {
-          transform: rotate(180deg);
+          transform: none;
         }
 
         .animate-fade-in {
-          animation: fadeInUp 0.5s ease forwards;
+          animation: fadeInUp 420ms ease-out both;
         }
 
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(15px); }
           to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .animate-fade-in { animation: none; }
         }
 
         @media (max-width: 1100px) {

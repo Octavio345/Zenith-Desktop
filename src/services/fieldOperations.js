@@ -61,6 +61,7 @@ export function createOccurrenceFromAnalysis({ result, fieldArea, imageCount = 0
   return saveFieldOccurrence({
     id: globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
     source,
+    cultura: result?.cultura || general.cultura || "soja",
     condition,
     confidence: Math.max(0, Math.min(100, Math.round(confidence))),
     fieldAreaId: fieldArea?.id || "",

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { formatDiagnosisName } from "./diagnosisLabels"
+import { cropName } from "../../../../constants/diagnosisCrops"
 
 export default function AllHistory({ onBack }) {
   const [history, setHistory] = useState([])
@@ -108,6 +109,7 @@ export default function AllHistory({ onBack }) {
                 ) : (
                   <h3 className="disease-name">{formatDiagnosisName(item.disease)}</h3>
                 )}
+                <div className="history-crop">Cultura: {cropName(item.cultura || "soja")}</div>
                 {item.fieldAreaName && item.fieldAreaName !== "Talhão não informado" && (
                   <div className="history-field-area">
                     <span className="material-symbols-outlined">landscape</span>
@@ -169,10 +171,7 @@ export default function AllHistory({ onBack }) {
         }
         .all-history-header h1 {
           font-size: 2.2rem;
-          background: linear-gradient(135deg, #3f7f56, #0066ff);
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
+          color: #3f7f56;
           margin-bottom: 0.5rem;
           letter-spacing: -0.02em;
         }
@@ -194,7 +193,6 @@ export default function AllHistory({ onBack }) {
         }
         .history-card-full:hover {
           border-color: #3f7f56;
-          transform: translateY(-6px);
           box-shadow: 0 0 0 1px rgba(63, 127, 86, 0.3), 0 12px 28px rgba(0,0,0,0.4);
         }
         .history-card-header {
@@ -247,6 +245,12 @@ export default function AllHistory({ onBack }) {
           color: #fff;
           margin-bottom: 0.75rem;
           word-break: break-word;
+        }
+        .history-crop {
+          margin: -0.25rem 0 0.8rem;
+          color: #9ab8a2;
+          font-size: 0.78rem;
+          font-weight: 700;
         }
         .edit-input {
           width: 100%;
