@@ -1,0 +1,104 @@
+.ms-workflow-tabs { display: flex; gap: 8px; margin: 0 0 20px; padding: 6px; border: 1px solid #dce7db; border-radius: 16px; background: #fff; box-shadow: 0 8px 25px rgba(39, 78, 48, .05); }
+.ms-workflow-tabs button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 9px 17px; border: 1px solid transparent; border-radius: 11px; background: transparent; color: #65756a; font: inherit; font-size: .82rem; font-weight: 700; cursor: pointer; transition: background .2s, color .2s, border-color .2s; }
+.ms-workflow-tabs button:hover { color: #205c39; background: #f1f7ee; }
+.ms-workflow-tabs button.is-active { border-color: #c8dfc8; background: #eaf4e7; color: #205c39; }
+.ms-workflow-tabs button:disabled { cursor: not-allowed; opacity: .55; }
+.ms-workflow-tabs .material-symbols-outlined { font-size: 20px; }
+.ms-workflow-tabs small { padding: 3px 7px; border-radius: 20px; background: #f2f5ef; color: #69816d; font-size: .65rem; }
+.ms-workflow-tabs button:focus-visible, .ms-prep-panel button:focus-visible, .ms-prep-panel a:focus-visible, .ms-prep-loader button:focus-visible { outline: 3px solid #81b587; outline-offset: 3px; }
+
+.ms-prep-panel, .ms-prep-loader { border: 1px solid #dce7db; border-radius: 22px; background: #fff; box-shadow: 0 12px 36px rgba(39, 78, 48, .075); color: #1d2b21; }
+.ms-prep-panel { padding: clamp(20px, 3.5vw, 34px); }
+.ms-prep-intro { display: flex; align-items: flex-start; justify-content: space-between; gap: 25px; }
+.ms-prep-kicker { display: block; color: #286c47; font-size: .64rem; font-weight: 800; letter-spacing: .16em; }
+.ms-prep-intro h2 { margin: 9px 0 7px; color: #153f2a; font-size: clamp(1.45rem, 2.6vw, 2rem); line-height: 1.15; }
+.ms-prep-intro p { max-width: 670px; margin: 0; color: #69776c; font-size: .84rem; line-height: 1.65; }
+.ms-prep-limit { display: grid; min-width: 105px; padding: 13px 17px; border: 1px solid #d7e6d5; border-radius: 14px; background: #f4f9f1; text-align: center; }
+.ms-prep-limit strong { color: #286c47; font-size: 1.5rem; line-height: 1; }
+.ms-prep-limit span { margin-top: 4px; color: #69776c; font-size: .65rem; }
+.ms-prep-flow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 26px 0; }
+.ms-prep-flow > div { display: grid; grid-template-columns: auto 1fr; column-gap: 11px; padding: 13px 14px; border: 1px solid #e1e9de; border-radius: 13px; background: #fafcf8; }
+.ms-prep-flow span { grid-row: span 2; align-self: center; color: #286c47; font-size: .75rem; font-weight: 800; }
+.ms-prep-flow strong { color: #243c2b; font-size: .78rem; }
+.ms-prep-flow small { margin-top: 2px; color: #79867d; font-size: .66rem; }
+.ms-prep-dropzone { display: flex; min-height: 240px; flex-direction: column; align-items: center; justify-content: center; padding: 26px; border: 1.5px dashed #aac8aa; border-radius: 16px; background: #f8fbf6; text-align: center; transition: border-color .2s, background .2s; }
+.ms-prep-dropzone.is-dragging { border-color: #286c47; background: #edf6eb; }
+.ms-prep-dropzone input { display: none; }
+.ms-prep-dropzone > .material-symbols-outlined { display: grid; width: 46px; height: 46px; place-items: center; border: 1px solid #d1e5cf; border-radius: 12px; background: #eaf5e8; color: #286c47; font-size: 25px; }
+.ms-prep-dropzone h3 { margin: 11px 0 4px; color: #153f2a; font-size: 1rem; }
+.ms-prep-dropzone p { margin: 0 0 14px; color: #69776c; font-size: .76rem; }
+.ms-prep-dropzone .ms-secondary-button { width: auto; min-height: 37px; padding: 8px 16px; }
+.ms-prep-dropzone small { max-width: 550px; margin-top: 12px; color: #7a887d; font-size: .66rem; line-height: 1.5; }
+.ms-prep-files { margin-top: 24px; }
+.ms-prep-files__heading { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 10px; font-size: .78rem; }
+.ms-prep-files__heading strong { color: #153f2a; }
+.ms-prep-files__heading span { color: #738078; }
+.ms-prep-files ul { display: grid; gap: 6px; max-height: 300px; overflow: auto; margin: 0; padding: 0; list-style: none; }
+.ms-prep-files li { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 10px 12px; border: 1px solid #e2ebe0; border-radius: 10px; background: #fafcf8; }
+.ms-prep-files li > .material-symbols-outlined { color: #4b8058; font-size: 19px; }
+.ms-prep-files li > span:nth-child(2) { overflow: hidden; flex: 1; color: #304b37; font-size: .72rem; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.ms-prep-files li small { flex: none; color: #78867d; font-size: .66rem; }
+.ms-prep-files li button { display: grid; width: 28px; height: 28px; flex: none; place-items: center; border: 0; border-radius: 7px; background: transparent; color: #647269; cursor: pointer; }
+.ms-prep-files li button:hover { background: #e9efe7; }
+.ms-prep-files li button .material-symbols-outlined { font-size: 17px; }
+.ms-prep-footer { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-top: 24px; padding-top: 20px; border-top: 1px solid #e2ebe0; }
+.ms-prep-footer p { max-width: 490px; margin: 0; color: #738078; font-size: .73rem; line-height: 1.55; }
+.ms-prep-footer .ms-primary-button { flex: none; }
+.ms-prep-panel > .ms-message { margin-top: 18px; }
+.ms-prepared-notice { display: flex; align-items: center; gap: 9px; margin-bottom: 15px; padding: 13px 16px; border: 1px solid #c8dfc8; border-radius: 12px; background: #f0f8ed; color: #205c39; font-size: .78rem; font-weight: 700; }
+.ms-prepared-notice .material-symbols-outlined { font-size: 20px; }
+
+.ms-prep-loader { display: flex; min-height: 430px; flex-direction: column; align-items: center; justify-content: center; padding: 35px 30px; text-align: center; }
+.ms-prep-loader__mark { display: grid; width: 72px; height: 72px; place-items: center; margin-bottom: 26px; border: 2px solid #d2e4d1; border-radius: 19px; background: #f6faf3; }
+.ms-prep-loader__mark span { display: block; width: 29px; height: 29px; border: 3px solid #d6e6d4; border-top-color: #286c47; border-radius: 50%; animation: ms-prep-spin 1s linear infinite; }
+.ms-prep-loader h2 { margin: 8px 0 6px; color: #153f2a; font-size: clamp(1.35rem, 2.5vw, 1.9rem); }
+.ms-prep-loader p { max-width: 455px; margin: 0; color: #69776c; font-size: .82rem; line-height: 1.6; }
+.ms-prep-loader__track { width: min(350px, 100%); height: 5px; overflow: hidden; margin-top: 26px; border-radius: 5px; background: #e4ede1; }
+.ms-prep-loader__track span { display: block; width: 35%; height: 100%; border-radius: 5px; background: #286c47; animation: ms-prep-progress 1.6s ease-in-out infinite alternate; }
+.ms-prep-loader__steps { display: flex; justify-content: space-between; gap: 10px; width: min(350px, 100%); margin: 14px 0 24px; padding: 0; list-style: none; }
+.ms-prep-loader__steps li { display: flex; align-items: center; gap: 5px; color: #96a198; font-size: .65rem; font-weight: 650; }
+.ms-prep-loader__steps li.is-active { color: #286c47; }
+.ms-prep-loader__steps span { font-size: .6rem; }
+.ms-prep-text-button { padding: 6px 10px; border: 0; background: transparent; color: #66766c; font: inherit; font-size: .74rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.ms-prep-text-button:hover { color: #205c39; }
+@keyframes ms-prep-spin { to { transform: rotate(360deg); } }
+@keyframes ms-prep-progress { from { transform: translateX(-65%); } to { transform: translateX(250%); } }
+
+.ms-prep-result { margin-top: 24px; padding: 21px; border: 1px solid #bedbbd; border-radius: 15px; background: #f7fbf4; }
+.ms-prep-result__heading { display: flex; align-items: flex-start; gap: 13px; }
+.ms-prep-result__heading > .material-symbols-outlined { color: #286c47; font-size: 31px; }
+.ms-prep-result h3 { margin: 4px 0; color: #153f2a; font-size: 1.13rem; }
+.ms-prep-result__heading p { margin: 0; color: #728076; font-size: .72rem; }
+.ms-prep-result__bands { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 19px 0; }
+.ms-prep-result__bands a { display: flex; align-items: center; justify-content: space-between; gap: 7px; padding: 11px 12px; border: 1px solid #dce9d8; border-radius: 9px; background: #fff; color: #245c3a; font-size: .74rem; font-weight: 700; text-decoration: none; }
+.ms-prep-result__bands a:hover { border-color: #9ac49b; background: #f3f8f0; }
+.ms-prep-result__bands .material-symbols-outlined { font-size: 18px; }
+.ms-prep-result__notice, .ms-prep-result__warning { margin: 10px 0 0; color: #69776c; font-size: .71rem; line-height: 1.55; }
+.ms-prep-result__warning { color: #88621f; }
+.ms-prep-result__actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+.ms-prep-result__actions a { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+.ms-prep-result__actions .ms-primary-button, .ms-prep-result__actions .ms-secondary-button { width: auto; min-height: 41px; padding: 9px 16px; }
+
+@media (max-width: 720px) {
+  .ms-workflow-tabs { display: grid; grid-template-columns: 1fr 1fr; }
+  .ms-workflow-tabs button { padding: 9px 5px; font-size: .7rem; }
+  .ms-workflow-tabs small { display: none; }
+  .ms-prep-flow { grid-template-columns: 1fr; gap: 7px; }
+  .ms-prep-flow > div { grid-template-columns: auto 1fr auto; align-items: center; }
+  .ms-prep-flow span { grid-row: auto; }
+  .ms-prep-flow small { margin: 0; }
+  .ms-prep-result__bands { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ms-prep-footer, .ms-prep-result__actions { align-items: stretch; flex-direction: column; }
+  .ms-prep-footer .ms-primary-button, .ms-prep-result__actions .ms-primary-button, .ms-prep-result__actions .ms-secondary-button { width: 100%; }
+}
+@media (max-width: 480px) {
+  .ms-prep-intro { flex-direction: column; gap: 14px; }
+  .ms-prep-limit { display: none; }
+  .ms-prep-flow small { display: none; }
+  .ms-prep-dropzone { padding: 21px 14px; }
+  .ms-prep-result__bands { grid-template-columns: 1fr; }
+  .ms-prep-files__heading { flex-direction: column; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ms-prep-loader__mark span, .ms-prep-loader__track span { animation: none; }
+}

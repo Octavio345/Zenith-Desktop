@@ -45,7 +45,9 @@ function getResultMode(status, cultura) {
     return {
       icon: "warning",
       badge: "Imagem fora do padrão",
-      title: `Essa imagem não parece ser ${cropName(cultura).toLowerCase()}`,
+      title: cultura === "trigo"
+        ? "Não foi possível confirmar uma planta na imagem"
+        : `Essa imagem não parece ser ${cropName(cultura).toLowerCase()}`,
       label: "TRIAGEM NÃO REALIZADA",
       tone: "warning",
       message: `Selecione uma foto clara de uma folha ou lavoura de ${cropName(cultura).toLowerCase()}.`
@@ -67,7 +69,9 @@ function getResultMode(status, cultura) {
     return {
       icon: "help",
       badge: "Inconclusivo",
-      title: "O modelo não teve certeza suficiente",
+      title: cultura === "trigo"
+        ? "Condição não identificada com segurança"
+        : "O modelo não teve certeza suficiente",
       label: "ANÁLISE INCONCLUSIVA",
       tone: "info",
       message: "Envie outra imagem da folha em melhor ângulo e confirme os sinais em campo."

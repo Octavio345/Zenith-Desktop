@@ -72,7 +72,7 @@ function BandCard({ band, file, disabled, onSelect, onRemove }) {
   )
 }
 
-export default function MultispectralUpload({ files, error, disabled, onSelect, onRemove, onAnalyze }) {
+export default function MultispectralUpload({ files, settings, error, disabled, onSelect, onRemove, onSettingsChange, onAnalyze }) {
   const requiredCount = BAND_DEFINITIONS.filter((band) => band.required && files[band.id]).length
 
   return (
@@ -81,7 +81,7 @@ export default function MultispectralUpload({ files, error, disabled, onSelect, 
         <div>
           <span className="ms-eyebrow">Preparação das bandas</span>
           <h2 id="ms-upload-title">Adicione as imagens do levantamento</h2>
-          <p>Use arquivos TIFF da mesma captura ou produtos já alinhados. As imagens não são processadas no navegador.</p>
+          <p>Use TIFFs ópticos calibrados e alinhados da mesma área. Capturas brutas da câmera precisam ser processadas antes.</p>
         </div>
         <div className="ms-required-progress" aria-label={`${requiredCount} de 4 bandas obrigatórias adicionadas`}>
           <strong>{requiredCount}/4</strong>
@@ -101,6 +101,34 @@ export default function MultispectralUpload({ files, error, disabled, onSelect, 
           />
         ))}
       </div>
+
+      <details className="ms-upload-settings" open>
+        <summary>Configuração dos TIFFs processados</summary>
+        <p>Informe a escala documentada pelo software que gerou os mapas. Dividir os pixels por um número não calibra capturas brutas. O padrão 255 vale para a amostra de 8 bits.</p>
+        <div className="ms-upload-settings__grid">
+          <label>Divisor da reflectância
+            <input type="number" min="0.000001" step="any" value={settings.reflectanceScale} onChange={(event) => onSettingsChange("reflectanceScale", event.target.value)} disabled={disabled} />
+          </label>
+          <label>NDVI mínimo para vegetação
+            <input type="number" min="-1" max="1" step="0.01" value={settings.vegetationNdviMin} onChange={(event) => onSettingsChange("vegetationNdviMin", Number(event.target.value))} disabled={disabled} />
+          </label>
+          <label>Agrupamento mínimo (pixels)
+            <input type="number" min="1" step="1" value={settings.minimumClusterPixels} onChange={(event) => onSettingsChange("minimumClusterPixels", Number(event.target.value))} disabled={disabled} />
+          </label>
+          <label>Unidade térmica
+            <select value={settings.thermalUnit} onChange={(event) => onSettingsChange("thermalUnit", event.target.value)} disabled={disabled}>
+              <option value="celsius">Celsius</option>
+              <option value="kelvin">Kelvin</option>
+              <option value="centikelvin">Centikelvin</option>
+            </select>
+          </label>
+          <label>Limiar térmico Z
+            <input type="number" min="0.1" step="0.1" value={settings.thermalZThreshold} onChange={(event) => onSettingsChange("thermalZThreshold", Number(event.target.value))} disabled={disabled} />
+          </label>
+          <label className="ms-upload-settings__checkbox"><input type="checkbox" checked={settings.assumeAligned} onChange={(event) => onSettingsChange("assumeAligned", event.target.checked)} disabled={disabled} /> TIFFs sem CRS já registrados pixel a pixel</label>
+        </div>
+        <p>Marque o alinhamento apenas se o registro entre bandas tiver sido conferido. Arquivos com CRS são alinhados pelo serviço.</p>
+      </details>
 
       {error && (
         <div className="ms-message ms-message--error" role="alert">

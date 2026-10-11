@@ -11,7 +11,7 @@ export const MULTISPECTRAL_DEFAULTS = Object.freeze({
   thermalUnit: "celsius",
   thermalZThreshold: 2.5,
   minimumClusterPixels: 25,
-  assumeAligned: true,
+  assumeAligned: false,
 })
 
 function parseResult(value) {
@@ -118,7 +118,23 @@ export async function analyzeMultispectral(files, options = {}) {
     throw new Error("Adicione as bandas Green, Red, Red Edge e NIR para iniciar a análise.")
   }
 
-  const { signal, onStatus = () => {} } = options
+  const { signal, onStatus = () => {}, settings: requestedSettings = {} } = options
+  const settings = { ...MULTISPECTRAL_DEFAULTS, ...requestedSettings }
+  if (!Number.isFinite(Number(settings.reflectanceScale)) || Number(settings.reflectanceScale) <= 0) {
+    throw new Error("Informe um divisor de reflectância positivo, conforme a documentação da exportação.")
+  }
+  if (!Number.isFinite(Number(settings.vegetationNdviMin)) || Number(settings.vegetationNdviMin) < -1 || Number(settings.vegetationNdviMin) > 1) {
+    throw new Error("O NDVI mínimo deve estar entre -1 e 1.")
+  }
+  if (!Number.isInteger(Number(settings.minimumClusterPixels)) || Number(settings.minimumClusterPixels) < 1) {
+    throw new Error("O agrupamento mínimo deve ser um número inteiro positivo.")
+  }
+  if (!Number.isFinite(Number(settings.thermalZThreshold)) || Number(settings.thermalZThreshold) <= 0) {
+    throw new Error("O limiar térmico deve ser maior que zero.")
+  }
+  if (!["celsius", "kelvin", "centikelvin"].includes(settings.thermalUnit)) {
+    throw new Error("Selecione uma unidade térmica válida.")
+  }
   let submission = null
   let timeoutId = null
   let abortHandler = null
@@ -148,12 +164,12 @@ export async function analyzeMultispectral(files, options = {}) {
       handle_file(files.nir),
       files.blue ? handle_file(files.blue) : null,
       files.thermal ? handle_file(files.thermal) : null,
-      MULTISPECTRAL_DEFAULTS.reflectanceScale,
-      MULTISPECTRAL_DEFAULTS.vegetationNdviMin,
-      MULTISPECTRAL_DEFAULTS.thermalUnit,
-      MULTISPECTRAL_DEFAULTS.thermalZThreshold,
-      MULTISPECTRAL_DEFAULTS.minimumClusterPixels,
-      MULTISPECTRAL_DEFAULTS.assumeAligned,
+      Number(settings.reflectanceScale),
+      Number(settings.vegetationNdviMin),
+      settings.thermalUnit,
+      Number(settings.thermalZThreshold),
+      Number(settings.minimumClusterPixels),
+      Boolean(settings.assumeAligned),
     ]
 
     submission = client.submit(ENDPOINT, payload)

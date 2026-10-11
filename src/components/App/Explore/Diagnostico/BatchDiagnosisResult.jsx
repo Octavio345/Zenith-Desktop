@@ -72,21 +72,30 @@ function getOverallPresentation(general, conditions, cultura) {
   }
 
   if (status === "consenso_insuficiente") {
+    const singleImage = asNumber(general?.total_recebidas) === 1
+    const singleImageTitle = cultura === "trigo"
+      ? "Condição não identificada com segurança"
+      : "A imagem não atingiu confiança suficiente"
     return {
       tone: "warning",
       icon: "rule",
       eyebrow: "RESULTADO INCONCLUSIVO",
-      title: "O lote não atingiu consenso suficiente",
-      description: general?.mensagem || "As imagens válidas não convergiram para um resultado seguro."
+      title: singleImage ? singleImageTitle : "O lote não atingiu consenso suficiente",
+      description: singleImage
+        ? general?.mensagem || "A foto foi analisada, mas o modelo não teve segurança para escolher uma classe. Confira as probabilidades abaixo e confirme em campo."
+        : general?.mensagem || "As imagens válidas não convergiram para um resultado seguro."
     }
   }
 
   if (status === "sem_imagens_analisaveis") {
+    const onlyOutOfDomain = cultura === "trigo" &&
+      asNumber(general?.status_das_imagens?.fora_do_dominio) === asNumber(general?.total_recebidas) &&
+      asNumber(general?.total_recebidas) > 0
     return {
       tone: "danger",
       icon: "imagesmode",
       eyebrow: "NOVA COLETA NECESSÁRIA",
-      title: "Nenhuma foto pôde ser analisada",
+      title: onlyOutOfDomain ? "Não foi encontrada planta suficiente nas fotos" : "Nenhuma foto pôde ser analisada",
       description: general?.mensagem || "Revise a qualidade e o enquadramento das imagens antes de tentar novamente."
     }
   }
@@ -188,8 +197,11 @@ export default function BatchDiagnosisResult({ result, selectedImages = [], onRe
   )
   const reliable = asNumber(general?.resultados_confiaveis)
   const rejected = asNumber(general?.inconclusivas_ou_rejeitadas)
+  const totalReceived = asNumber(general?.total_recebidas)
+  const modeled = asNumber(general?.analisadas_pelo_modelo)
   const consensus = percent(general?.consenso)
-  const utilization = percent(general?.taxa_aproveitamento)
+  const reliableRate = totalReceived > 0 ? percent((reliable / totalReceived) * 100) : 0
+  const hasMeaningfulConsensus = modeled >= 2 && reliable >= 2
   const probabilities = Object.entries(general?.probabilidades_medias || {})
     .map(([name, value]) => ({ name, value: asNumber(value) }))
     .sort((a, b) => b.value - a.value)
@@ -217,12 +229,18 @@ export default function BatchDiagnosisResult({ result, selectedImages = [], onRe
         "Refaça a coleta nas imagens marcadas como inconclusivas ou de baixa qualidade.",
         "Confirme a severidade e o manejo com um engenheiro agrônomo antes de qualquer aplicação."
       ]
-    : general?.status === "sem_imagens_analisaveis" || reliable === 0
+    : general?.status === "sem_imagens_analisaveis" || (reliable === 0 && modeled === 0)
       ? [
           "Capture fotos mais próximas, nítidas e com iluminação uniforme.",
           "Evite excesso de céu, solo ou objetos sem vegetação no enquadramento.",
           "Envie um lote menor de fotos antes de processar toda a coleta."
         ]
+      : reliable === 0
+        ? [
+            "As fotos foram analisadas, mas nenhuma classificação atendeu aos critérios de segurança.",
+            "Fotografe as folhas mais de perto e sob outros ângulos para uma nova análise.",
+            "Confirme os sinais com um profissional antes de usar a classe mais provável como diagnóstico."
+          ]
       : [
           "Priorize a inspeção das imagens com resultado confiável.",
           "Compare o padrão encontrado com outras áreas do mesmo talhão.",
@@ -246,13 +264,13 @@ export default function BatchDiagnosisResult({ result, selectedImages = [], onRe
 
         {general && (
           <div className="batch-result-score">
-            <div className="batch-score-ring">
+            <div className={`batch-score-ring${reliable === 0 ? " batch-score-ring-empty" : ""}`}>
               <div>
-                <strong>{utilization}%</strong>
-                <span>aproveitamento</span>
+                <strong>{reliableRate}%</strong>
+                <span>fotos confiáveis</span>
               </div>
             </div>
-            <p>{reliable} de {asNumber(general.total_recebidas)} fotos geraram resultado confiável.</p>
+            <p>{reliable} de {totalReceived} fotos geraram resultado confiável.</p>
           </div>
         )}
       </header>
@@ -268,11 +286,11 @@ export default function BatchDiagnosisResult({ result, selectedImages = [], onRe
       ) : (
         <>
           <section className="batch-metrics-grid" aria-label="Métricas da análise">
-            <MetricCard icon="photo_library" value={asNumber(general.total_recebidas)} label="fotos recebidas" />
-            <MetricCard icon="psychology" value={asNumber(general.analisadas_pelo_modelo)} label="analisadas pela IA" />
+            <MetricCard icon="photo_library" value={totalReceived} label="fotos recebidas" />
+            <MetricCard icon="psychology" value={modeled} label="analisadas pela IA" />
             <MetricCard icon="verified" value={reliable} label="resultados confiáveis" tone="success" />
             <MetricCard icon="warning" value={rejected} label="precisam de atenção" tone={rejected ? "warning" : "default"} />
-            <MetricCard icon="handshake" value={`${consensus}%`} label="consenso do lote" />
+            <MetricCard icon="handshake" value={hasMeaningfulConsensus ? `${consensus}%` : "—"} label="consenso do lote" />
             {result?.tempo_processamento_ms != null && <MetricCard icon="timer" value={`${asNumber(result.tempo_processamento_ms).toFixed(0)} ms`} label="tempo de processamento" />}
           </section>
 
@@ -327,7 +345,7 @@ export default function BatchDiagnosisResult({ result, selectedImages = [], onRe
               <div className="batch-panel-heading">
                 <div>
                   <span className="batch-eyebrow">VISÃO GERAL</span>
-                  <h2>Probabilidade média</h2>
+                  <h2>{modeled === 1 ? "Probabilidades da imagem" : "Probabilidade média"}</h2>
                 </div>
                 <span className="material-symbols-outlined batch-heading-symbol">donut_large</span>
               </div>

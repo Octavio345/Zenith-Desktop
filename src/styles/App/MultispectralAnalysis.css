@@ -173,6 +173,16 @@
 .ms-band-file button:hover { background: rgba(255, 107, 107, 0.16); color: #ff9b9b; }
 .ms-band-file button span { font-size: 17px; }
 
+.ms-upload-settings { margin-top: 20px; padding: 16px 18px; border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; background: rgba(3,14,8,0.38); }
+.ms-upload-settings summary { color: var(--ms-text); cursor: pointer; font-size: 0.82rem; font-weight: 700; }
+.ms-upload-settings > p { max-width: 760px; margin: 12px 0 16px; color: var(--ms-muted); font-size: 0.73rem; line-height: 1.5; }
+.ms-upload-settings__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+.ms-upload-settings__grid label { display: flex; min-width: 0; flex-direction: column; gap: 6px; color: var(--ms-muted); font-size: 0.71rem; font-weight: 600; }
+.ms-upload-settings__grid select, .ms-upload-settings__grid input[type="number"] { width: 100%; min-height: 39px; padding: 8px 10px; border: 1px solid rgba(255,255,255,0.15); border-radius: 9px; background: #102118; color: var(--ms-text); font: inherit; }
+.ms-upload-settings__grid select:focus-visible, .ms-upload-settings__grid input:focus-visible { outline: 2px solid var(--ms-primary); outline-offset: 2px; }
+.ms-upload-settings__grid .ms-upload-settings__checkbox { flex-direction: row; align-items: center; gap: 9px; }
+.ms-upload-settings__checkbox input { width: 17px; height: 17px; accent-color: #21b477; }
+
 .ms-message { margin-top: 16px; padding: 12px 14px; border-radius: 13px; }
 .ms-message p { margin: 0; font-size: 0.8rem; line-height: 1.5; }
 .ms-message--error { border: 1px solid rgba(255, 107, 107, 0.28); background: rgba(108, 28, 28, 0.22); color: #ffc0c0; }
@@ -416,6 +426,8 @@
 .ms-band-file strong { color: var(--zenith-forest, #153f2a); }
 .ms-band-file span { color: #62806c; }
 .ms-band-file button { background: #ffffff; color: #647269; box-shadow: 0 4px 12px rgba(39, 78, 48, 0.08); }
+.ms-upload-settings { border-color: #dce7db; background: #f8faf5; }
+.ms-upload-settings__grid select, .ms-upload-settings__grid input[type="number"] { border-color: #cbdccd; background: #ffffff; color: #1d2b21; }
 
 .ms-message--error { border-color: #f0c7be; background: #fff3f0; color: #a34b39; }
 .ms-upload-note { color: #738078; }

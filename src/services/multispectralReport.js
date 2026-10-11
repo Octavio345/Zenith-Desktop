@@ -148,6 +148,7 @@ export async function createMultispectralReport({
   const input = summary.input || {}
   const processing = summary.processing || {}
   const vegetation = summary.vegetation || {}
+  const quality = summary.quality || {}
   const stress = summary.stress_analysis || {}
   const thermal = summary.thermal_analysis || {}
   const indices = summary.indices || {}
@@ -297,16 +298,16 @@ export async function createMultispectralReport({
   doc.setFont("helvetica", "normal")
   doc.setFontSize(8)
   setColor("text", [220, 235, 224])
-  doc.text(doc.splitTextToSize("Percentual dos pixels considerados vegetação que apresentaram comportamento anômalo em relação ao padrão da área.", 105), 23, 111)
+  doc.text(doc.splitTextToSize("Percentual dos pixels analisados que apresentaram comportamento anômalo em relação ao padrão da área.", 105), 23, 111)
   setColor("fill", [49, 83, 62])
   doc.roundedRect(142, 81, 44, 36, 3, 3, "F")
   doc.setFontSize(6.5)
   setColor("text", [194, 224, 201])
-  doc.text("PIXELS DE VEGETAÇÃO", 148, 91)
+  doc.text("PIXELS ANALISADOS", 148, 91)
   doc.setFont("helvetica", "bold")
   doc.setFontSize(13)
   setColor("text", COLORS.white)
-  doc.text(number(vegetation.pixel_count), 148, 102)
+  doc.text(number(vegetation.analyzed_pixel_count ?? vegetation.pixel_count), 148, 102)
   doc.setFont("helvetica", "normal")
   doc.setFontSize(6.5)
   doc.text(`${percent(stress.priority_area_percentage)} prioritários`, 148, 111)
@@ -408,6 +409,33 @@ export async function createMultispectralReport({
     doc.setFont("helvetica", "bold"); doc.setFontSize(7); setColor("text", COLORS.amber); doc.text("NOTA DE CALIBRAÇÃO", 22, 248)
     paragraph(processing.radiometric_note, 22, 254, 166, { size: 7, color: [112, 89, 32] })
   }
+
+  newPage("Qualidade da entrada")
+  heading("Controle de qualidade", "Limites desta leitura", "Verificações dos dados usados para gerar os mapas e percentuais.")
+  labelValue("Pixels válidos", number(quality.valid_pixel_count), 16, 74, 55)
+  labelValue("Pixels analisados", number(vegetation.analyzed_pixel_count ?? vegetation.pixel_count), 77, 74, 55)
+  labelValue("NDVI baixo, fora da análise", number(quality.low_ndvi_unclassified_pixels), 139, 74, 55)
+  doc.setFont("helvetica", "bold")
+  doc.setFontSize(10)
+  setColor("text", COLORS.forest)
+  doc.text("Alertas de qualidade", 16, 121)
+  const qualityWarnings = Array.isArray(quality.warnings) ? quality.warnings : []
+  let warningY = 134
+  for (const warning of qualityWarnings) {
+    doc.setFont("helvetica", "normal")
+    doc.setFontSize(8)
+    if (warningY + doc.splitTextToSize(clean(warning), 174).length * 3.5 > 254) {
+      newPage("Alertas de qualidade")
+      warningY = 72
+    }
+    warningY = paragraph(`• ${warning}`, 18, warningY, 174, { size: 8, color: COLORS.ink }) + 8
+  }
+  if (!qualityWarnings.length) paragraph("Nenhum alerta adicional registrado.", 18, warningY, 174)
+  if (warningY > 246) {
+    newPage("Interpretação")
+    warningY = 72
+  }
+  paragraph("As áreas destacadas representam diferenças relativas nesta cena. Confirme em campo antes de atribuir uma causa ou comparar levantamentos.", 16, Math.max(warningY + 12, warningY > 100 ? 214 : 84), 178, { size: 8 })
 
   doc.addPage()
   pageHeader("Inspeção em campo")

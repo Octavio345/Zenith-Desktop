@@ -1598,6 +1598,11 @@
   background: #173421 !important;
 }
 
+.batch-result-page .batch-score-ring-empty {
+  border-color: #90a59a;
+  background: #284334 !important;
+}
+
 /* Entrada curta para orientar a leitura do resultado, sem movimento contínuo. */
 .batch-result-page .batch-result-hero {
   animation: diagnosisResultReveal 420ms ease-out both;

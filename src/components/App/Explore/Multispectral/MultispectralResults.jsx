@@ -77,6 +77,8 @@ export default function MultispectralResults({ result, onRestart }) {
   const thermal = summary.thermal_analysis || {}
   const input = summary.input || {}
   const processing = summary.processing || {}
+  const quality = summary.quality || {}
+  const qualityWarnings = Array.isArray(quality.warnings) ? quality.warnings : []
   const anomalyPercentage = Number(stress.spectral_anomaly_percentage) || 0
   const priorityPercentage = Number(stress.priority_area_percentage) || 0
   const availableMaps = useMemo(() => MAP_DEFINITIONS.filter((map) => files[map.id]), [files])
@@ -100,8 +102,8 @@ export default function MultispectralResults({ result, onRestart }) {
             <strong>{formatNumber(anomalyPercentage, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}<small>%</small></strong>
           </article>
           <article>
-            <span>Pixels de vegetação</span>
-            <strong>{formatNumber(vegetation.pixel_count)}</strong>
+            <span>Pixels analisados</span>
+            <strong>{formatNumber(vegetation.analyzed_pixel_count ?? vegetation.pixel_count)}</strong>
           </article>
           <article>
             <span>Status</span>
@@ -191,10 +193,15 @@ export default function MultispectralResults({ result, onRestart }) {
             <div><dt>Imagem térmica</dt><dd>{input.thermal_available ? "Fornecida" : "Não fornecida"}</dd></div>
             <div><dt>Georreferenciamento</dt><dd>{input.crs ? `Disponível (${input.crs})` : "Não disponível"}</dd></div>
             <div><dt>Dimensões</dt><dd>{input.width && input.height ? `${formatNumber(input.width)} × ${formatNumber(input.height)} px` : "—"}</dd></div>
+            {input.source_dtype && <div><dt>Tipo de pixel da banda Red</dt><dd>{input.source_dtype}</dd></div>}
+            {input.capture_id && <div><dt>Captura</dt><dd>{input.capture_id}</dd></div>}
+            <div><dt>NDVI baixo não classificado</dt><dd>{formatNumber(quality.low_ndvi_unclassified_pixels ?? 0)}</dd></div>
+            {quality.minimum_cluster_area_m2 != null && <div><dt>Área mínima do agrupamento</dt><dd>{formatNumber(quality.minimum_cluster_area_m2, { maximumFractionDigits: 3 })} m²</dd></div>}
             <div><dt>Alinhamento assumido</dt><dd>{processing.assume_aligned ? "Sim" : "Não"}</dd></div>
             <div><dt>Escala de reflectância</dt><dd>{formatNumber(input.reflectance_scale)}</dd></div>
           </dl>
           {processing.radiometric_note && <div className="ms-radiometric-note"><span className="material-symbols-outlined">warning</span><p>{processing.radiometric_note}</p></div>}
+          {qualityWarnings.map((warning) => <div className="ms-radiometric-note" key={warning}><span className="material-symbols-outlined">info</span><p>{warning}</p></div>)}
         </div>
       </details>
 

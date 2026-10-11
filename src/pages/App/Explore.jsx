@@ -51,25 +51,34 @@ const tabContext = {
   legislacao: ["Legislação de drones", "Consulte orientações para operar drones agrícolas com responsabilidade."],
 }
 
+const DEFAULT_TAB = "diagnostico"
+const resolveTab = (tabId) => (
+  typeof tabId === "string" && Object.prototype.hasOwnProperty.call(tabContext, tabId)
+    ? tabId
+    : DEFAULT_TAB
+)
+
 export default function Explore() {
   const location = useLocation()
   const tabsRef = useRef(null)
   const [activeTab, setActiveTab] = useState(() => {
     const savedTab = localStorage.getItem("activeExploreTab")
-    return tabs.some((tab) => tab.id === savedTab) ? savedTab : "diagnostico"
+    return resolveTab(savedTab)
   })
 
 
   useEffect(() => {
 
     if (tabs.some((tab) => tab.id === location.state?.activeTab)) {
-      setActiveTab(location.state.activeTab)
-      localStorage.setItem("activeExploreTab", location.state.activeTab)
+      const nextTab = resolveTab(location.state.activeTab)
+      setActiveTab(nextTab)
+      localStorage.setItem("activeExploreTab", nextTab)
     } else {
 
       const savedTab = localStorage.getItem("activeExploreTab")
-      if (tabs.some((tab) => tab.id === savedTab) && savedTab !== activeTab) {
-        setActiveTab(savedTab)
+      const nextTab = resolveTab(savedTab)
+      if (nextTab !== activeTab) {
+        setActiveTab(nextTab)
       }
     }
   }, [location])
@@ -87,8 +96,9 @@ export default function Explore() {
   }, [activeTab])
 
   const selectTab = (tabId) => {
-    localStorage.setItem("activeExploreTab", tabId)
-    setActiveTab(tabId)
+    const nextTab = resolveTab(tabId)
+    localStorage.setItem("activeExploreTab", nextTab)
+    setActiveTab(nextTab)
     window.scrollTo({ top: 0, left: 0, behavior: "auto" })
     document.documentElement.scrollTop = 0
     document.body.scrollTop = 0
@@ -150,11 +160,11 @@ export default function Explore() {
         <div>
           <span><span className="material-symbols-outlined">explore</span> Central de operações</span>
           <h1>Explore</h1>
-          <p>{tabContext[activeTab][1]}</p>
+          <p>{(tabContext[activeTab] || tabContext[DEFAULT_TAB])[1]}</p>
         </div>
         <aside>
           <span className="material-symbols-outlined">{tabs.find((tab) => tab.id === activeTab)?.icon}</span>
-          <div><small>Área atual</small><strong>{tabContext[activeTab][0]}</strong></div>
+          <div><small>Área atual</small><strong>{(tabContext[activeTab] || tabContext[DEFAULT_TAB])[0]}</strong></div>
         </aside>
       </section>
 
