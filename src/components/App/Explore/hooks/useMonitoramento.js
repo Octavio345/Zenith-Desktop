@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react"
-import { analisarImagem, validarArquivo } from "../../../../services/monitoramentoService"
+import { analisarImagem, resultadoConclusivo, validarArquivo } from "../../../../services/monitoramentoService"
 
 export function useMonitoramento() {
   const [result, setResult] = useState(null)
@@ -16,7 +16,7 @@ export function useMonitoramento() {
     }
   }, [])
 
-  const analisar = useCallback(async (file) => {
+  const analisar = useCallback(async (file, onComplete) => {
     if (!file) return
 
     const erroValidacao = validarArquivo(file)
@@ -39,6 +39,9 @@ export function useMonitoramento() {
 
     try {
       const data = await analisarImagem(file)
+      if (resultadoConclusivo(data)) {
+        await onComplete?.(data)
+      }
       setResult(data)
     } catch (err) {
       setError(err.message || "Erro desconhecido ao analisar imagem.")

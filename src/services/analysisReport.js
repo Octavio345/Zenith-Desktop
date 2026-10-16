@@ -241,12 +241,12 @@ export async function createAnalysisReport({ kind, result, images = [], context 
         doc.addImage(img.data, "JPEG", 16 + index * 93 + (85 - w) / 2, y + (66 - h) / 2, w, h)
       })
       y += 72; doc.setFontSize(8); doc.setTextColor(40, 58, 46)
-      doc.text("Imagem original", 16, y); doc.text("Análise do Zenith / overlay", 109, y); y += 9
+      doc.text("Imagem original", 16, y); doc.text("Áreas destacadas na análise", 109, y); y += 9
     } else await picture(images[0]?.preview, "Imagem original submetida à análise pelo Zenith.")
     if (result.overlay_image) {
-      if (!images[0]?.preview) await picture(`data:image/jpeg;base64,${result.overlay_image}`, "Overlay gerado pela análise de Visão Computacional.")
-      section("Legenda do overlay")
-      for (const [color, label] of [[[86,168,112],"Vegetação detectada"],[[245,158,11],"Baixa densidade - atenção moderada"],[[239,68,68],"Baixa densidade - atenção alta"],[[59,130,246],"Caminho identificado"]]) {
+      if (!images[0]?.preview) await picture(`data:image/jpeg;base64,${result.overlay_image}`, "Áreas destacadas pela análise visual.")
+      section("Legenda da imagem analisada")
+      for (const [color, label] of [[[86,168,112],"Vegetação detectada"],[[245,158,11],"Menor cobertura - atenção moderada"],[[239,68,68],"Menor cobertura - atenção alta"],[[59,130,246],"Caminho fora da análise"]]) {
         reserve(8); doc.setFillColor(...color); doc.rect(16, y - 3, 3, 3, "F"); doc.setFontSize(9); doc.text(label, 22, y); y += 7
       }
     }
@@ -297,8 +297,8 @@ export async function createAnalysisReport({ kind, result, images = [], context 
         })
       }
     } else if (result._apiVersion !== "v1") {
-      field("Cobertura vegetal", percent(result.coverage, 100)); field("Uniformidade", percent(result.uniformity, 100))
-      field("Índice de baixa densidade", percent(result.failure_score, 100))
+      field("Cobertura vegetal da área analisada", percent(result.coverage, 100)); field("Uniformidade visual", percent(result.uniformity, 100))
+      field("Área com menor cobertura", percent(result.failure_score, 100))
       field("Nível de atenção", present(result.failure_level) ? ({ ALTO: "Alta", MEDIO: "Moderada", BAIXO: "Baixa" }[result.failure_level] || readable(result.failure_level)) : null)
       field("Caminhos identificados na imagem", percent(result.path_coverage, 100))
       field("Sombra na imagem", percent(result.shadow_coverage, 100))
@@ -306,7 +306,7 @@ export async function createAnalysisReport({ kind, result, images = [], context 
       field("Fileiras identificadas", typeof result.rows?.detected === "boolean" ? result.rows.detected ? "Sim" : "Não" : null)
       field("Quantidade de fileiras", result.rows?.row_count)
       field("Orientação das fileiras", numeric(result.rows?.orientation_deg) ? `${result.rows.orientation_deg} graus` : null)
-      field("Alinhamento", typeof result.alignment?.aligned === "boolean" ? result.alignment.aligned ? "Alinhado" : "Desalinhado" : null)
+      field("Padrão das fileiras", typeof result.alignment?.aligned === "boolean" ? result.alignment.aligned ? "Regular" : "Irregular" : null)
     } else text("Este registro antigo não permite confirmar a origem de todas as métricas. Por isso, elas não são apresentadas neste relatório.")
     const warnings = result.warnings || result.avisos
     if (Array.isArray(warnings)) warnings.filter(v => typeof v === "string").forEach(v => field("Aviso", v))

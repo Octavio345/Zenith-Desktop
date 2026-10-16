@@ -3,9 +3,9 @@ import styles from "../../../../styles/App/MonitoramentoView.module.css"
 
 const LEGENDA = [
   { cor: "#56a870", rotulo: "Vegetação detectada" },
-  { cor: "#f59e0b", rotulo: "Baixa densidade — atenção moderada" },
-  { cor: "#ef4444", rotulo: "Baixa densidade — atenção alta" },
-  { cor: "#3b82f6", rotulo: "Caminho identificado" },
+  { cor: "#f59e0b", rotulo: "Menor cobertura — atenção moderada" },
+  { cor: "#ef4444", rotulo: "Menor cobertura — atenção alta" },
+  { cor: "#3b82f6", rotulo: "Caminho excluído da análise" },
 ]
 
 export default function OverlayResult({ originalSrc, result }) {
@@ -24,7 +24,7 @@ export default function OverlayResult({ originalSrc, result }) {
 
   return (
     <div className={styles.imagemCard}>
-      <div className={styles.abas} role="tablist" aria-label="Imagem analisada">
+      <div className={styles.abas} role="group" aria-label="Imagem analisada">
         {[
           { id: "original", rotulo: "Original" },
           { id: "analise", rotulo: "Análise" },
@@ -32,8 +32,7 @@ export default function OverlayResult({ originalSrc, result }) {
           <button
             key={id}
             type="button"
-            role="tab"
-            aria-selected={abaAtiva === id}
+            aria-pressed={abaAtiva === id}
             className={`${styles.aba} ${abaAtiva === id ? styles.aba_ativa : ""}`}
             onClick={() => setAbaAtiva(id)}
           >
@@ -45,7 +44,7 @@ export default function OverlayResult({ originalSrc, result }) {
       <div className={styles.imagemWrapper}>
         <img
           src={imagemAtual}
-          alt={abaAtiva === "original" ? "Imagem original" : "Sobreposição de densidade na imagem, sem georreferenciamento"}
+          alt={abaAtiva === "original" ? "Imagem original enviada" : "Imagem com vegetação, áreas de menor cobertura e caminhos destacados; sem georreferenciamento"}
           className={styles.imagemDisplay}
           loading="lazy"
         />

@@ -20,20 +20,20 @@ function interpretarCobertura(coverage) {
   if (coverage < THRESHOLDS.coverage.critico) {
     return {
       tipo: "perigo",
-      texto: `Cobertura vegetal de ${pct}% na imagem. Confirme as regiões de baixa densidade em campo.`,
+      texto: `Cobertura vegetal estimada em ${pct}% da área analisada. Compare com a cultura e o estágio de desenvolvimento antes de avaliar as áreas de menor cobertura.`,
     }
   }
 
   if (coverage < THRESHOLDS.coverage.moderado) {
     return {
       tipo: "aviso",
-      texto: `Cobertura vegetal de ${pct}% na imagem. Acompanhe o desenvolvimento e confirme em campo.`,
+      texto: `Cobertura vegetal estimada em ${pct}% da área analisada. Verifique se esse valor é esperado para o estágio da cultura.`,
     }
   }
 
   return {
     tipo: "ok",
-    texto: `Cobertura vegetal de ${pct}% na imagem. Interprete conforme a fase da cultura em campo.`,
+    texto: `Cobertura vegetal estimada em ${pct}% da área analisada. Interprete o valor conforme a cultura e seu estágio.`,
   }
 }
 
@@ -44,20 +44,20 @@ function interpretarFalhas(failureScore, failureLevel) {
   if (nivel === "ALTO") {
     return {
       tipo: "perigo",
-      texto: `Baixa densidade identificada — atenção alta. Índice de baixa densidade: ${pct}%. Confirme em campo.`,
+      texto: `${pct}% da área analisada foi destacada por menor cobertura vegetal. Priorize a conferência dessas regiões em campo.`,
     }
   }
 
   if (nivel === "MEDIO") {
     return {
       tipo: "aviso",
-      texto: `Baixa densidade identificada — atenção moderada. Índice de baixa densidade: ${pct}%. Confirme em campo.`,
+      texto: `${pct}% da área analisada foi destacada por menor cobertura vegetal. Confira essas regiões em campo.`,
     }
   }
 
   return {
     tipo: "ok",
-    texto: "Baixo nível de atenção indicado na imagem. Mantenha o acompanhamento em campo.",
+    texto: `Áreas de menor cobertura somam ${pct}% da área analisada. Mantenha o acompanhamento em campo.`,
   }
 }
 
@@ -67,14 +67,14 @@ function interpretarUniformidade(uniformity) {
   if (uniformity < THRESHOLDS.uniformity.baixa) {
     return {
       tipo: "aviso",
-      texto: `Uniformidade de ${pct}%. A distribuição está irregular entre regiões do talhão.`,
+      texto: `Uniformidade visual de ${pct}%. A cobertura varia entre as regiões da imagem.`,
     }
   }
 
   if (uniformity >= THRESHOLDS.uniformity.media) {
     return {
       tipo: "ok",
-      texto: `Uniformidade de ${pct}%. Boa homogeneidade na distribuição do plantio.`,
+      texto: `Uniformidade visual de ${pct}%. A cobertura se distribui de forma semelhante entre as regiões da imagem.`,
     }
   }
 
@@ -88,18 +88,18 @@ function interpretarFileiras(rows) {
     if (rows.periodicity_snr < THRESHOLDS.periodicity.fraco) {
       return {
         tipo: "info",
-        texto: "Fileiras não identificadas com confiança. Em dossel fechado, isso pode ser esperado.",
+        texto: "Fileiras não identificadas com confiança. Isso pode ocorrer quando a vegetação cobre as entrelinhas.",
       }
     }
     return {
       tipo: "info",
-      texto: "As fileiras não atingiram confiança suficiente para estimar alinhamento e espaçamento.",
+      texto: "O padrão das fileiras não ficou nítido o suficiente para estimar sua orientação ou espaçamento.",
     }
   }
 
-  const partes = ["Fileiras detectadas com regularidade."]
+  const partes = ["Fileiras identificadas na imagem."]
   if (rows.row_count) partes.push(`Estimativa: ${rows.row_count} fileiras.`)
-  if (rows.orientation_deg != null) partes.push(`Ângulo: ${rows.orientation_deg} graus.`)
+  if (rows.orientation_deg != null) partes.push(`Orientação: ${rows.orientation_deg}°.`)
 
   return { tipo: "info", texto: partes.join(" ") }
 }
@@ -108,14 +108,14 @@ function interpretarIluminacao(quality, shadowCoverage) {
   if (quality === "poor") {
     return {
       tipo: "aviso",
-      texto: "Qualidade de iluminação ruim. Os resultados podem ser menos precisos.",
+      texto: "A iluminação pode reduzir a confiança da leitura. Se possível, envie uma imagem mais nítida e bem iluminada.",
     }
   }
 
   if (shadowCoverage > 0.2) {
     return {
       tipo: "info",
-      texto: `${Math.round(shadowCoverage * 100)}% da imagem está em sombra. Essas áreas foram excluídas da análise.`,
+      texto: `${Math.round(shadowCoverage * 100)}% da imagem está em sombra e ficou fora da área analisada.`,
     }
   }
 
@@ -127,7 +127,7 @@ function interpretarCaminhos(pathCoverage) {
 
   return {
     tipo: "info",
-    texto: `${Math.round(pathCoverage * 100)}% da imagem foi identificado como caminho de maquinário e excluído da contagem.`,
+    texto: `${Math.round(pathCoverage * 100)}% da imagem foi identificado como caminho e ficou fora da área analisada.`,
   }
 }
 
@@ -261,7 +261,7 @@ export function interpretar(result) {
 
   const alertaPrincipal = perigo || aviso || {
     nivel: "ok",
-    texto: "Interprete a imagem e confirme as observações em campo antes de qualquer intervenção.",
+    texto: "Use os indicadores para orientar a vistoria e confirme as observações em campo antes de intervir.",
   }
 
   return {

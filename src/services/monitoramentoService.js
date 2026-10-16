@@ -1,23 +1,31 @@
 const API_URL =
-  import.meta.env.VITE_MONITORAMENTO_API_URL ||
+  import.meta.env?.VITE_MONITORAMENTO_API_URL ||
   "https://tccamsamericana-monitoramento-plantacao.hf.space/analyze"
 
 const TIMEOUT_MS = 40000
 const TIPOS_PERMITIDOS = ["image/jpeg", "image/png", "image/webp"]
-const MAX_TAMANHO_MB = 50
+const MAX_TAMANHO_MB = 30
 
 export function validarArquivo(file) {
   if (!file) return "Nenhum arquivo selecionado."
 
   if (!TIPOS_PERMITIDOS.includes(file.type)) {
-    return "Formato nao suportado. Use JPG, PNG ou WebP."
+    return "Formato não aceito. Use JPG, PNG ou WebP."
   }
 
   if (file.size > MAX_TAMANHO_MB * 1024 * 1024) {
-    return `Arquivo muito grande. Maximo permitido: ${MAX_TAMANHO_MB} MB.`
+    return `Arquivo muito grande. Tamanho máximo: ${MAX_TAMANHO_MB} MB.`
   }
 
   return null
+}
+
+export function resultadoConclusivo(data) {
+  if (!data) return false
+  return data.is_plantation !== false &&
+    data.analysis_status !== "inconclusive" &&
+    data.analysis_status !== "partial" &&
+    !data.processing_warnings?.length
 }
 
 function normalizarNivelFalha(level) {
@@ -103,11 +111,11 @@ export async function analisarImagem(file) {
     return normalizarResposta(data)
   } catch (err) {
     if (err.name === "AbortError") {
-      throw new Error("Tempo limite excedido. Verifique sua conexao e tente novamente.")
+      throw new Error("A análise demorou mais que o esperado. Verifique sua conexão e tente novamente.")
     }
 
     if (err.message?.startsWith("Failed to fetch") || err.message?.startsWith("NetworkError")) {
-      throw new Error("Sem conexao com o servidor. Verifique sua internet e tente novamente.")
+      throw new Error("Não foi possível conectar ao servidor. Verifique sua internet e tente novamente.")
     }
 
     throw err

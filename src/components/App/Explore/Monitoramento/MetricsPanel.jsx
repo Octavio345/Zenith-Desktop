@@ -112,7 +112,7 @@ function MetricsPanel({ result, insights }) {
             <AnelProgresso valor={uniformity} cor={corUniformidade} />
             <span className={styles.metricaAnelValor}>{uniformityPct}%</span>
           </div>
-          <span className={styles.metricaAnelRotulo}>Uniformidade</span>
+          <span className={styles.metricaAnelRotulo}>Uniformidade visual</span>
         </div>
         )}
         {(result.failure_level != null || result.failures != null) && (
@@ -128,9 +128,9 @@ function MetricsPanel({ result, insights }) {
           >
             <span className={styles.badgeFalhasRotulo}>Atenção</span>
             <span className={styles.badgeFalhasNivel}>{{ ALTO: "ALTA", MEDIO: "MODERADA", BAIXO: "BAIXA" }[failureLevel]}</span>
-            {result.failure_score != null && <span className={styles.badgeFalhasPct} title="Índice de baixa densidade retornado pelo processamento">{failurePct}%</span>}
+            {result.failure_score != null && <span className={styles.badgeFalhasPct} title="Parcela da área analisada destacada por menor cobertura vegetal">{failurePct}%</span>}
           </div>
-          <span className={styles.metricaAnelRotulo}>Baixa densidade</span>
+          <span className={styles.metricaAnelRotulo}>Menor cobertura</span>
         </div>
         )}
       </div>
@@ -141,14 +141,14 @@ function MetricsPanel({ result, insights }) {
             rows.detected ? (
               <div className={styles.fileirasDetalhes}>
                 <span className={`${styles.statusTag} ${styles.statusTag_ok}`}>
-                  Detectadas
+                  Identificadas
                 </span>
                 {rows.row_count && (
                   <span className={styles.fileirasDetalheItem}>~{rows.row_count} fileiras</span>
                 )}
                 {rows.orientation_deg != null && (
                   <span className={styles.fileirasDetalheItem}>
-                    {rows.orientation_deg} graus de ângulo
+                    Orientação: {rows.orientation_deg}°
                   </span>
                 )}
               </div>
@@ -163,7 +163,7 @@ function MetricsPanel({ result, insights }) {
                 result.alignment?.aligned ? styles.statusTag_ok : styles.statusTag_aviso
               }`}
             >
-              {result.alignment?.aligned ? "Alinhado" : "Desalinhado"}
+              {result.alignment?.aligned ? "Padrão regular" : "Padrão irregular"}
             </span>
           )}
         </CartaoMetrica>}
@@ -173,11 +173,11 @@ function MetricsPanel({ result, insights }) {
             {iluminacaoInfo.texto}
           </span>}
           {sombraPct > 5 && (
-            <span className={styles.notaSombra}>{sombraPct}% em sombra</span>
+            <span className={styles.notaSombra}>Sombra em {sombraPct}% da imagem</span>
           )}
           {pathPct > 2 && (
             <span className={styles.notaSombra}>
-              Área excluída: {pathPct}% em caminhos
+              Caminhos: {pathPct}% da imagem, fora da análise
             </span>
           )}
         </CartaoMetrica>}

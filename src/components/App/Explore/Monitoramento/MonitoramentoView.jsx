@@ -10,6 +10,7 @@ import UploadImage from "./UploadImage"
 import FeatureAccessPanel from "../FeatureAccessPanel"
 import { useFeatureAccess } from "../../../../hooks/useFeatureAccess"
 import { createOccurrenceFromAnalysis, saveActivityDraft } from "../../../../services/fieldOperations"
+import { resultadoConclusivo } from "../../../../services/monitoramentoService"
 import styles from "../../../../styles/App/MonitoramentoView.module.css"
 
 export default function MonitoramentoView() {
@@ -18,21 +19,32 @@ export default function MonitoramentoView() {
   const navigate = useNavigate()
 
   const handleAnalyze = async (file) => {
-    const permission = await monitoringAccess.consume()
-    if (permission.allowed) await analisar(file)
+    await analisar(file, async () => {
+      const permission = await monitoringAccess.consume()
+      if (!permission.allowed) {
+        throw new Error(
+          permission.limitReached
+            ? "Você já utilizou as três análises disponíveis para este recurso."
+            : permission.error?.message || "Não foi possível registrar a análise. Tente novamente."
+        )
+      }
+    })
   }
 
   const interpretacao = useMemo(() => {
     return result ? interpretar(result) : null
   }, [result])
 
-  const mostrarResultados = result && !loading && !error && interpretacao
+  const temResposta = Boolean(result && !loading && !error)
+  const mostrarInconclusivo = temResposta && !resultadoConclusivo(result)
+  const mostrarResultados = temResposta && !mostrarInconclusivo && interpretacao
+  const imagemInadequada = result?.is_plantation === false || result?.analysis_status === "inconclusive"
 
   const createFieldInspection = () => {
     const occurrence = createOccurrenceFromAnalysis({ result, source: "monitoramento" })
     saveActivityDraft({
-      title: "Vistoriar região de atenção",
-      description: "Análise estrutural realizada pelo Zenith. Vistoriar as regiões de atenção indicadas na imagem e confirmar em campo a possível baixa densidade antes de qualquer intervenção.",
+      title: "Conferir áreas de menor cobertura",
+      description: "Conferir em campo as áreas de menor cobertura destacadas na imagem. Considere a cultura e o estágio de desenvolvimento antes de definir qualquer intervenção.",
       type: "tarefa",
       priority: "media",
       source: "monitoramento_aereo",
@@ -42,13 +54,13 @@ export default function MonitoramentoView() {
   }
 
   return (
-    <div className={`${styles.container} ${!mostrarResultados ? styles.containerUpload : ""}`}>
-      {!mostrarResultados ? (
+    <div className={`${styles.container} ${!temResposta ? styles.containerUpload : ""}`}>
+      {!temResposta ? (
         <section className={styles.hero} aria-labelledby="monitoramento-title">
           <div className={styles.cabecalho}>
-            <h2 id="monitoramento-title" className={styles.titulo}>Alinhamento da Plantação</h2>
+            <h2 id="monitoramento-title" className={styles.titulo}>Monitoramento da plantação</h2>
             <p className={styles.subtitulo}>
-              Analise o alinhamento e a uniformidade das fileiras
+              Avalie a cobertura vegetal, a uniformidade e as áreas de menor cobertura na imagem.
             </p>
           </div>
         </section>
@@ -56,14 +68,14 @@ export default function MonitoramentoView() {
         <div className={styles.cabecalho}>
           <h2 className={styles.titulo}>Monitoramento da plantação</h2>
           <p className={styles.subtitulo}>
-            Selecione uma imagem da soja, analise os resultados e confirme em campo.
+            Os destaques são indícios visuais. Confirme as áreas de atenção em campo.
           </p>
         </div>
       )}
 
       <FeatureAccessPanel feature="monitoring" access={{ ...monitoringAccess, refresh: monitoringAccess.refresh }} />
 
-      {!mostrarResultados && (monitoringAccess.fullAccess || monitoringAccess.remaining > 0) && !monitoringAccess.error && (
+      {!temResposta && (monitoringAccess.fullAccess || monitoringAccess.remaining > 0) && !monitoringAccess.error && (
         <UploadImage
           onSelect={handleAnalyze}
           disabled={loading || monitoringAccess.loading}
@@ -84,21 +96,21 @@ export default function MonitoramentoView() {
               </div>
             </div>
 
-            <h3>Analisando plantio</h3>
-            <p>Processando imagem com visão computacional...</p>
+            <h3>Analisando a imagem</h3>
+            <p>Estimando cobertura, uniformidade e áreas de atenção...</p>
 
             <div className={styles.analysisSteps}>
               <div className={styles.analysisStep}>
                 <span className="material-symbols-outlined">filter_center_focus</span>
-                <span>Pré-processamento</span>
+                <span>Preparando imagem</span>
               </div>
               <div className={styles.analysisStep}>
                 <span className="material-symbols-outlined">monitoring</span>
-                <span>Leitura da imagem</span>
+                <span>Lendo padrões visuais</span>
               </div>
               <div className={styles.analysisStep}>
                 <span className="material-symbols-outlined">analytics</span>
-                <span>Métricas finais</span>
+                <span>Organizando resultado</span>
               </div>
             </div>
 
@@ -130,6 +142,27 @@ export default function MonitoramentoView() {
             Tentar novamente
           </button>
         </div>
+      )}
+
+      {mostrarInconclusivo && (
+        <section className={styles.inconclusiveCard} role="status" aria-labelledby="monitoramento-inconclusivo">
+          <div className={styles.inconclusiveText}>
+            <span className={`material-symbols-outlined ${styles.inconclusiveIcon}`} aria-hidden="true">info</span>
+            <h3 id="monitoramento-inconclusivo">Análise inconclusiva</h3>
+            <p>
+              {imagemInadequada
+                ? "A imagem não oferece evidência visual suficiente para estimar os indicadores com segurança."
+                : "O processamento ficou incompleto. Os indicadores parciais não serão apresentados como resultado."}
+            </p>
+            <p>Escolha uma foto aérea ou elevada, nítida e bem iluminada, da área que deseja avaliar.</p>
+            <span className={styles.inconclusiveCredit}>Esta tentativa não descontou uma análise.</span>
+            <button type="button" className={`${styles.botaoResultado} ${styles.botaoResultadoPrimario}`} onClick={resetar}>
+              <span className="material-symbols-outlined" aria-hidden="true">refresh</span>
+              Escolher outra imagem
+            </button>
+          </div>
+          {preview && <img className={styles.inconclusivePreview} src={preview} alt="Imagem enviada para análise" />}
+        </section>
       )}
 
       {mostrarResultados && (

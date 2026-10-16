@@ -405,7 +405,15 @@
 }
 
 .uploadInputOculto {
-  display: none;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .containerUpload .uploadArea {
@@ -464,6 +472,11 @@
   background: #f5faf2;
 }
 
+.uploadArea:focus-within .uploadDropZone {
+  border-color: #2e6f46;
+  box-shadow: 0 0 0 3px rgba(46, 111, 70, 0.2);
+}
+
 .uploadArea_desabilitado .uploadDropZone {
   cursor: wait;
 }
@@ -519,14 +532,14 @@
 
 .uploadDropTitle {
   color: #31523e;
-  font-size: 0.82rem;
+  font-size: 0.9rem;
   font-weight: 750;
 }
 
 .uploadDropZone .uploadDica {
   max-width: 46ch;
-  color: #7a877f;
-  font-size: 0.7rem;
+  color: #53665a;
+  font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.45;
 }
@@ -538,7 +551,7 @@
   border-radius: 14px;
   background: #fff3f3;
   color: #a43b3b;
-  font-size: 0.72rem;
+  font-size: 0.85rem;
   font-weight: 700;
   line-height: 1.35;
 }
@@ -1194,6 +1207,11 @@
   background: rgba(255, 255, 255, 0.05);
 }
 
+.aba:focus-visible {
+  outline: 3px solid rgba(46, 111, 70, 0.45);
+  outline-offset: -3px;
+}
+
 .aba_ativa {
   color: var(--n-primary);
   background: var(--n-primary-soft);
@@ -1642,6 +1660,67 @@
   box-shadow: none;
 }
 
+.inconclusiveCard {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr);
+  gap: 24px;
+  align-items: center;
+  padding: 24px;
+  border: 1px solid #e3d1a6;
+  border-radius: 22px;
+  background: #fffdf7;
+  box-shadow: 0 14px 38px rgba(39, 78, 48, 0.09);
+}
+
+.inconclusiveText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.inconclusiveIcon {
+  color: #9a6100;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.inconclusiveText h3 {
+  margin: 0;
+  color: #173326;
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  line-height: 1.15;
+}
+
+.inconclusiveText p {
+  max-width: 55ch;
+  margin: 0;
+  color: #53665a;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.inconclusiveCredit {
+  color: #42634b;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.inconclusiveText .botaoResultado {
+  width: auto;
+  margin-top: 6px;
+}
+
+.inconclusivePreview {
+  display: block;
+  width: 100%;
+  max-height: 320px;
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+  border-radius: 16px;
+  background: #e8f0e7;
+}
+
 
 
 
@@ -1691,6 +1770,15 @@
   }
 }
 @media (max-width: 719px) {
+  .inconclusiveCard {
+    grid-template-columns: 1fr;
+    padding: 18px;
+  }
+
+  .inconclusivePreview {
+    max-height: 240px;
+  }
+
   .acoesResultado {
     grid-template-columns: 1fr;
     gap: 8px;

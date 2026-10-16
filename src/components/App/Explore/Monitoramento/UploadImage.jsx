@@ -13,11 +13,6 @@ function formatarTipo(file) {
   return type === "JPEG" ? "JPG" : type || "IMAGEM"
 }
 
-function estimarTempoAnalise(bytes) {
-  const megabytes = Number(bytes) / (1024 * 1024)
-  return Math.min(35, Math.max(8, Math.ceil(megabytes / 2) + 8))
-}
-
 function UploadGlyph({ loading = false }) {
   if (loading) {
     return (
@@ -39,7 +34,6 @@ export default function UploadImage({ onSelect, disabled, validateFile = validar
   const [arquivo, setArquivo] = useState(null)
   const [erroArquivo, setErroArquivo] = useState("")
   const [previewUrl, setPreviewUrl] = useState("")
-  const [tempoRestante, setTempoRestante] = useState(null)
   const inputRef = useRef(null)
   const inputId = useId()
 
@@ -53,20 +47,6 @@ export default function UploadImage({ onSelect, disabled, validateFile = validar
     setPreviewUrl(objectUrl)
     return () => URL.revokeObjectURL(objectUrl)
   }, [arquivo])
-
-  useEffect(() => {
-    if (!disabled || !arquivo) {
-      setTempoRestante(null)
-      return undefined
-    }
-
-    setTempoRestante(estimarTempoAnalise(arquivo.size))
-    const timer = window.setInterval(() => {
-      setTempoRestante((current) => Math.max(1, (current || 1) - 1))
-    }, 1000)
-
-    return () => window.clearInterval(timer)
-  }, [arquivo, disabled])
 
   const limparArquivo = () => {
     if (disabled) return
@@ -122,7 +102,9 @@ export default function UploadImage({ onSelect, disabled, validateFile = validar
           htmlFor={inputId}
           onClick={(event) => disabled && event.preventDefault()}
         >
-          <span className={styles.uploadTexto}>Envie a imagem das fileiras</span>
+          <span className={styles.uploadTexto}>
+            {variant === "cana" ? "Envie uma imagem da plantação" : "Escolha uma imagem da área cultivada"}
+          </span>
           <span className={styles.uploadVisual} aria-hidden="true">
             <UploadGlyph loading={disabled} />
           </span>
@@ -130,7 +112,9 @@ export default function UploadImage({ onSelect, disabled, validateFile = validar
             {arrastando ? "Solte a imagem aqui" : "Arraste ou selecione uma imagem"}
           </span>
           <span className={styles.uploadDica}>
-            JPG, PNG ou WebP, até 50 MB. Prefira fotos aéreas em alta resolução.
+            {variant === "cana"
+              ? "JPG, PNG ou WebP, até 30 MB. Prefira uma foto aérea nítida, com boa iluminação."
+              : "JPG, PNG ou WebP, até 30 MB. Prefira uma vista aérea, nítida e bem iluminada."}
           </span>
         </label>
       )}
@@ -158,7 +142,7 @@ export default function UploadImage({ onSelect, disabled, validateFile = validar
             <strong title={arquivo.name}>{arquivo.name}</strong>
             <span>
               {formatarTipo(arquivo)} · {formatarTamanho(arquivo.size)} · {disabled
-                ? `aprox. ${tempoRestante ?? estimarTempoAnalise(arquivo.size)} s restantes`
+                ? "Análise em andamento"
                 : "Pronta para análise"}
             </span>
           </div>
@@ -201,7 +185,7 @@ export default function UploadImage({ onSelect, disabled, validateFile = validar
             <span className="material-symbols-outlined" aria-hidden="true">
               {disabled ? "progress_activity" : "analytics"}
             </span>
-            {disabled ? "Analisando" : "Analisar fileiras"}
+            {disabled ? "Analisando" : variant === "cana" ? "Analisar plantação" : "Analisar imagem"}
           </button>
         </div>
       )}

@@ -365,7 +365,7 @@ VITE_MODELO_3D_API_URL=
 ```
 
 - `src/services/diagnosticoApi.js` envia o lote para a rota da cultura escolhida (`soja` ou `trigo`). O tempo limite da requisição é de cinco minutos e a interface permite cancelar a análise.
-- `src/services/monitoramentoService.js` aceita JPG, PNG ou WebP de até 50 MB. O tempo limite é de 40 segundos; respostas antigas e novas da API são normalizadas antes de chegar à interface.
+- `src/services/monitoramentoService.js` aceita JPG, PNG ou WebP de até 30 MB, em acordo com a API. O tempo limite é de 40 segundos; respostas antigas e novas da API são normalizadas antes de chegar à interface. Resultados inconclusivos ou parciais não são exibidos como indicadores finais nem descontam uma análise.
 - `src/services/modelo3dApi.js` cria tarefas de reconstrução 3D com 2 a 40 imagens, consulta o status da tarefa e monta a URL do visualizador. O envio pode durar até 30 minutos antes de ser interrompido pelo navegador.
 
 #### Fluxo de uma análise

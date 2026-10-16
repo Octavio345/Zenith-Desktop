@@ -26,7 +26,7 @@ const modules = [
     tab: "monitoramento",
     icon: "monitoring",
     label: "Monitoramento",
-    sublabel: "Analise de plantio",
+    sublabel: "Cobertura e áreas de atenção",
     type: "monitoring"
   },
   {
