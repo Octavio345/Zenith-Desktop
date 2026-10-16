@@ -3,14 +3,71 @@ const API_URL =
   "https://tccamsamericana-monitoramento-plantacao.hf.space/analyze"
 
 const TIMEOUT_MS = 40000
-const TIPOS_PERMITIDOS = ["image/jpeg", "image/png", "image/webp"]
+const TIPOS_PERMITIDOS = ["image/jpeg", "image/png", "image/webp", "image/avif"]
 const MAX_TAMANHO_MB = 30
+
+export async function arquivoEhAvif(file) {
+  if (file.type === "image/avif") return true
+  if (!file.slice) return false
+
+  const bytes = new Uint8Array(await file.slice(0, 32).arrayBuffer())
+  if (bytes.length < 12 || String.fromCharCode(...bytes.slice(4, 8)) !== "ftyp") return false
+
+  for (let offset = 8; offset + 4 <= bytes.length; offset += 4) {
+    const brand = String.fromCharCode(...bytes.slice(offset, offset + 4))
+    if (brand === "avif" || brand === "avis") return true
+  }
+  return false
+}
+
+function converterAvifParaJpeg(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file)
+    const image = new Image()
+    const liberar = () => URL.revokeObjectURL(url)
+
+    image.onerror = () => {
+      liberar()
+      reject(new Error("Não foi possível abrir esta imagem AVIF. Exporte-a como JPG ou PNG e tente novamente."))
+    }
+    image.onload = () => {
+      liberar()
+      const scale = Math.min(1, 4096 / Math.max(image.naturalWidth, image.naturalHeight))
+      const canvas = document.createElement("canvas")
+      canvas.width = Math.max(1, Math.round(image.naturalWidth * scale))
+      canvas.height = Math.max(1, Math.round(image.naturalHeight * scale))
+      const context = canvas.getContext("2d")
+      if (!context) {
+        reject(new Error("Não foi possível preparar a imagem. Tente exportá-la como JPG ou PNG."))
+        return
+      }
+      context.drawImage(image, 0, 0, canvas.width, canvas.height)
+      canvas.toBlob((blob) => {
+        if (!blob || blob.type !== "image/jpeg") {
+          reject(new Error("Não foi possível converter a imagem AVIF. Exporte-a como JPG ou PNG."))
+          return
+        }
+        const name = `${file.name.replace(/\.[^.]+$/, "")}.jpg`
+        resolve(new File([blob], name, { type: "image/jpeg" }))
+      }, "image/jpeg", 0.92)
+    }
+    image.src = url
+  })
+}
+
+async function prepararArquivo(file) {
+  if (!(await arquivoEhAvif(file))) return file
+  const jpeg = await converterAvifParaJpeg(file)
+  const erro = validarArquivo(jpeg)
+  if (erro) throw new Error(erro)
+  return jpeg
+}
 
 export function validarArquivo(file) {
   if (!file) return "Nenhum arquivo selecionado."
 
   if (!TIPOS_PERMITIDOS.includes(file.type)) {
-    return "Formato não aceito. Use JPG, PNG ou WebP."
+    return "Formato não aceito. Use JPG, PNG, WebP ou AVIF."
   }
 
   if (file.size > MAX_TAMANHO_MB * 1024 * 1024) {
@@ -83,11 +140,12 @@ function normalizarResposta(data) {
 }
 
 export async function analisarImagem(file) {
+  const arquivoParaEnvio = await prepararArquivo(file)
   const controller = new AbortController()
   const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS)
 
   const formData = new FormData()
-  formData.append("file", file)
+  formData.append("file", arquivoParaEnvio)
 
   try {
     const response = await fetch(API_URL, {

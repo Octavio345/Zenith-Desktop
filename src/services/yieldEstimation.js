@@ -78,6 +78,6 @@ export const yieldFormat = {
   bags: (value) => new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 }).format(value),
   kg: (value) => new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 0 }).format(value),
   tonnes: (value) => new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value / 1000),
-  area: (value) => new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 4 }).format(value),
+  area: (value) => new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value),
   decimal: (value) => new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 }).format(value),
 }

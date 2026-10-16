@@ -298,7 +298,7 @@ export async function createAnalysisReport({ kind, result, images = [], context 
       }
     } else if (result._apiVersion !== "v1") {
       field("Cobertura vegetal da área analisada", percent(result.coverage, 100)); field("Uniformidade visual", percent(result.uniformity, 100))
-      field("Área com menor cobertura", percent(result.failure_score, 100))
+      field("Menor cobertura na região de plantio", percent(result.failure_score, 100))
       field("Nível de atenção", present(result.failure_level) ? ({ ALTO: "Alta", MEDIO: "Moderada", BAIXO: "Baixa" }[result.failure_level] || readable(result.failure_level)) : null)
       field("Caminhos identificados na imagem", percent(result.path_coverage, 100))
       field("Sombra na imagem", percent(result.shadow_coverage, 100))

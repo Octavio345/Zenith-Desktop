@@ -44,20 +44,22 @@ function interpretarFalhas(failureScore, failureLevel) {
   if (nivel === "ALTO") {
     return {
       tipo: "perigo",
-      texto: `${pct}% da área analisada foi destacada por menor cobertura vegetal. Priorize a conferência dessas regiões em campo.`,
+      texto: `${pct}% da região de plantio avaliada foi destacada por menor cobertura vegetal. Priorize a conferência em campo.`,
     }
   }
 
   if (nivel === "MEDIO") {
     return {
       tipo: "aviso",
-      texto: `${pct}% da área analisada foi destacada por menor cobertura vegetal. Confira essas regiões em campo.`,
+      texto: `${pct}% da região de plantio avaliada foi destacada por menor cobertura vegetal. Confira essas regiões em campo.`,
     }
   }
 
   return {
     tipo: "ok",
-    texto: `Áreas de menor cobertura somam ${pct}% da área analisada. Mantenha o acompanhamento em campo.`,
+    texto: pct === 0
+      ? "Não foram destacadas áreas relevantes de menor cobertura dentro da região de plantio avaliada."
+      : `Áreas de menor cobertura somam ${pct}% da região de plantio avaliada. Mantenha o acompanhamento em campo.`,
   }
 }
 
@@ -250,6 +252,10 @@ export function interpretar(result) {
   const candidatos = [
     result.coverage != null && interpretarCobertura(coverage),
     result.failure_score != null && result.failure_level != null && interpretarFalhas(failure_score, failure_level),
+    result.quality_details?.field_support_coverage < 0.8 && {
+      tipo: "info",
+      texto: "A imagem inclui áreas fora da região com plantio reconhecido. Elas reduzem a cobertura total, mas não são classificadas automaticamente como falhas.",
+    },
     result.uniformity != null && interpretarUniformidade(uniformity),
     interpretarFileiras(rows),
     result._apiVersion !== "v1" && interpretarIluminacao(illumination_quality, shadow_coverage),

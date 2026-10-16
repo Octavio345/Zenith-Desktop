@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react"
-import { validarArquivo } from "../../../../services/monitoramentoService"
+import { arquivoEhAvif, validarArquivo } from "../../../../services/monitoramentoService"
 import styles from "../../../../styles/App/MonitoramentoView.module.css"
 
 function formatarTamanho(bytes) {
@@ -34,6 +34,7 @@ export default function UploadImage({ onSelect, disabled, validateFile = validar
   const [arquivo, setArquivo] = useState(null)
   const [erroArquivo, setErroArquivo] = useState("")
   const [previewUrl, setPreviewUrl] = useState("")
+  const [formatoAvif, setFormatoAvif] = useState(false)
   const inputRef = useRef(null)
   const inputId = useId()
 
@@ -47,6 +48,20 @@ export default function UploadImage({ onSelect, disabled, validateFile = validar
     setPreviewUrl(objectUrl)
     return () => URL.revokeObjectURL(objectUrl)
   }, [arquivo])
+
+  useEffect(() => {
+    let active = true
+    if (!arquivo || variant === "cana") {
+      setFormatoAvif(false)
+      return undefined
+    }
+    arquivoEhAvif(arquivo).then((avif) => {
+      if (active) setFormatoAvif(avif)
+    }).catch(() => {
+      if (active) setFormatoAvif(false)
+    })
+    return () => { active = false }
+  }, [arquivo, variant])
 
   const limparArquivo = () => {
     if (disabled) return
@@ -88,6 +103,7 @@ export default function UploadImage({ onSelect, disabled, validateFile = validar
       className={[
         styles.uploadArea,
         variant === "cana" ? styles.uploadAreaCana : "",
+        arquivo && variant !== "cana" ? styles.uploadAreaComArquivo : "",
         arrastando ? styles.uploadArea_arrastando : "",
         disabled ? styles.uploadArea_desabilitado : "",
       ].filter(Boolean).join(" ")}
@@ -96,7 +112,7 @@ export default function UploadImage({ onSelect, disabled, validateFile = validar
       onDrop={handleDrop}
       aria-busy={disabled}
     >
-      {(!arquivo || variant !== "cana") && (
+      {!arquivo && (
         <label
           className={styles.uploadDropZone}
           htmlFor={inputId}
@@ -114,7 +130,7 @@ export default function UploadImage({ onSelect, disabled, validateFile = validar
           <span className={styles.uploadDica}>
             {variant === "cana"
               ? "JPG, PNG ou WebP, até 30 MB. Prefira uma foto aérea nítida, com boa iluminação."
-              : "JPG, PNG ou WebP, até 30 MB. Prefira uma vista aérea, nítida e bem iluminada."}
+              : "JPG, PNG, WebP ou AVIF, até 30 MB. Prefira uma vista aérea, nítida e bem iluminada."}
           </span>
         </label>
       )}
@@ -123,11 +139,32 @@ export default function UploadImage({ onSelect, disabled, validateFile = validar
         id={inputId}
         ref={inputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp"
+        accept={variant === "cana" ? "image/jpeg,image/png,image/webp" : "image/jpeg,image/png,image/webp,image/avif"}
         className={styles.uploadInputOculto}
         disabled={disabled}
         onChange={handleFileChange}
       />
+
+      {arquivo && variant !== "cana" && (
+        <div className={styles.uploadSelectedHeader}>
+          <div className={styles.uploadSelectedHeading}>
+            <span className="material-symbols-outlined" aria-hidden="true">{disabled ? "progress_activity" : "check_circle"}</span>
+            <div>
+              <strong>{disabled ? "Análise em andamento" : "Imagem pronta para análise"}</strong>
+              <span>{disabled ? "Aguarde o processamento da imagem." : "Confira o arquivo antes de continuar."}</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            className={styles.uploadTrocar}
+            onClick={() => inputRef.current?.click()}
+            disabled={disabled}
+          >
+            <span className="material-symbols-outlined" aria-hidden="true">upload_file</span>
+            Trocar imagem
+          </button>
+        </div>
+      )}
 
       {erroArquivo && (
         <p className={styles.uploadFileError} role="alert">{erroArquivo}</p>
@@ -141,28 +178,31 @@ export default function UploadImage({ onSelect, disabled, validateFile = validar
           <div className={styles.uploadFileInfo}>
             <strong title={arquivo.name}>{arquivo.name}</strong>
             <span>
-              {formatarTipo(arquivo)} · {formatarTamanho(arquivo.size)} · {disabled
-                ? "Análise em andamento"
-                : "Pronta para análise"}
+              {formatoAvif && variant !== "cana" ? "AVIF · convertido para JPG no envio" : formatarTipo(arquivo)} · {formatarTamanho(arquivo.size)}
+              {variant === "cana" && ` · ${disabled ? "Análise em andamento" : "Pronta para análise"}`}
             </span>
           </div>
-          <button
-            type="button"
-            className={styles.uploadFileRemove}
-            onClick={limparArquivo}
-            disabled={disabled}
-            aria-label="Remover imagem selecionada"
-          >
-            <span className="material-symbols-outlined" aria-hidden="true">close</span>
-          </button>
-          <div
-            className={styles.uploadProgress}
-            role="progressbar"
-            aria-label={disabled ? "Analisando imagem" : "Imagem pronta para análise"}
-            aria-valuetext={disabled ? "Analisando" : "Pronta"}
-          >
-            <span className={disabled ? styles.uploadProgress_loading : ""} />
-          </div>
+          {variant === "cana" && (
+            <button
+              type="button"
+              className={styles.uploadFileRemove}
+              onClick={limparArquivo}
+              disabled={disabled}
+              aria-label="Remover imagem selecionada"
+            >
+              <span className="material-symbols-outlined" aria-hidden="true">close</span>
+            </button>
+          )}
+          {disabled && (
+            <div
+              className={styles.uploadProgress}
+              role="progressbar"
+              aria-label="Analisando imagem"
+              aria-valuetext="Analisando"
+            >
+              <span className={styles.uploadProgress_loading} />
+            </div>
+          )}
         </div>
       )}
 

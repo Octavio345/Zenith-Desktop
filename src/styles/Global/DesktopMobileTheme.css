@@ -1575,6 +1575,44 @@ html,body,button,input,select,textarea,h1,h2,h3,h4,h5,h6,p,a,label,strong,small,
   }
 }
 
+.explore-container--monitoramento [class*="_containerUpload_"] [class*="_uploadAreaComArquivo_"] {
+  gap:18px !important;
+  padding:24px !important;
+}
+
+.explore-container--monitoramento [class*="_containerUpload_"] [class*="_uploadAreaComArquivo_"] [class*="_uploadAcoes_"] {
+  display:flex !important;
+  justify-content:flex-end !important;
+  gap:10px !important;
+}
+
+.explore-container--monitoramento [class*="_containerUpload_"] [class*="_uploadAreaComArquivo_"] [class*="_uploadCancelar_"] {
+  width:auto !important;
+  min-width:120px !important;
+  min-height:48px !important;
+}
+
+.explore-container--monitoramento [class*="_containerUpload_"] [class*="_uploadAreaComArquivo_"] [class*="_uploadAcao_"] {
+  width:auto !important;
+  min-width:236px !important;
+  min-height:48px !important;
+}
+
+@media(max-width:600px){
+  .explore-container--monitoramento [class*="_containerUpload_"] [class*="_uploadAreaComArquivo_"] {
+    padding:16px !important;
+  }
+
+  .explore-container--monitoramento [class*="_containerUpload_"] [class*="_uploadAreaComArquivo_"] [class*="_uploadAcoes_"] {
+    flex-direction:column-reverse !important;
+  }
+
+  .explore-container--monitoramento [class*="_containerUpload_"] [class*="_uploadAreaComArquivo_"] [class*="_uploadCancelar_"],
+  .explore-container--monitoramento [class*="_containerUpload_"] [class*="_uploadAreaComArquivo_"] [class*="_uploadAcao_"] {
+    width:100% !important;
+  }
+}
+
 /* Escala tipográfica comum dos módulos operacionais: Mapa até Legislação. */
 :is(
   .farm-map-shell,

@@ -128,7 +128,7 @@ function MetricsPanel({ result, insights }) {
           >
             <span className={styles.badgeFalhasRotulo}>Atenção</span>
             <span className={styles.badgeFalhasNivel}>{{ ALTO: "ALTA", MEDIO: "MODERADA", BAIXO: "BAIXA" }[failureLevel]}</span>
-            {result.failure_score != null && <span className={styles.badgeFalhasPct} title="Parcela da área analisada destacada por menor cobertura vegetal">{failurePct}%</span>}
+            {result.failure_score != null && <span className={styles.badgeFalhasPct} title="Parcela da região de plantio avaliada com menor cobertura vegetal">{failurePct}%</span>}
           </div>
           <span className={styles.metricaAnelRotulo}>Menor cobertura</span>
         </div>

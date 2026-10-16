@@ -3,7 +3,7 @@ import { calculateEstimate, calculateProjection, COST_CATEGORIES, parseBrazilian
 import "../../../styles/App/GestaoEconomicaTab.css"
 
 const currency = (cents) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(cents / 100)
-const areaFormat = (area) => new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 4 }).format(area)
+const areaFormat = (area) => new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(area)
 const decimalFormat = (value) => new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 }).format(value)
 const moneyFormat = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 const formatSavedMoney = (value) => {
